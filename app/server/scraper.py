@@ -1,5 +1,3 @@
-from unicodedata import name
-
 __author__ = 'Gardner'
 
 import urllib.request as request
