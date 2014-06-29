@@ -1,17 +1,20 @@
+import urllib.parse as urlparse
+
 from flask import Flask
 from flask import request
 from flask import jsonify
-import urllib.parse as urlparse
+from flask import render_template
 
 from scraper import JavadocScraper
 
-app = Flask(__name__)
+
+app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
 _javadoc_scraper = JavadocScraper("http://docs.oracle.com/javase/7/docs/api")
 
 @app.route('/')
-def hello_world():
-    return 'Hello World!'
+def index():
+    return render_template('index.html', message="Hello world!")
 
 
 @app.route('/classes', methods=['GET'])
