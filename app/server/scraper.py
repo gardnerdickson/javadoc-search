@@ -7,12 +7,11 @@ import html5lib
 class JavadocScraper:
 
     def __init__(self, url):
-        self._url_base = url
-        self._classes_url = self._url_base + '/allclasses-frame.html'
-        self._packages_url = self._url_base + '/overview-frame.html'
+        self._classes_path = '/allclasses-frame.html'
+        self._packages_path = '/overview-frame.html'
 
     def retrieve_classes(self):
-        classes_doc = JavadocScraper._retrieve_response_as_doc(self._classes_url)
+        classes_doc = JavadocScraper._retrieve_response_as_doc(self._classes_path)
 
         classes = {}
         class_links = classes_doc.findall('.//li/a')
@@ -38,8 +37,8 @@ class JavadocScraper:
 
         return classes
 
-    def retrieve_hierarchy_classes(self, relative_class_url):
-        class_page_doc = self._retrieve_response_as_doc(self._url_base + '/' + relative_class_url)
+    def retrieve_hierarchy_classes(self, class_url):
+        class_page_doc = self._retrieve_response_as_doc(class_url)
 
         super_classes = {}
         sub_classes = {}

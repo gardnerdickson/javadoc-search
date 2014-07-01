@@ -28,7 +28,6 @@ def index():
 def get_classes():
     encoded_url = request.args['url']
     url = urlparse.unquote(encoded_url)
-    session['url'] = url
 
     javadoc_scraper = JavadocScraper(url)
     classes = javadoc_scraper.retrieve_classes()
@@ -56,5 +55,4 @@ def get_packages():
 
 
 if __name__ == '__main__':
-    app.secret_key = 'gardner' # NOT PRODUCTION SAFE!
     app.run(debug=True)
