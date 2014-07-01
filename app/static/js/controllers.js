@@ -12,7 +12,7 @@ app.controller('MainCtrl', ['$scope', '$log', 'constants', 'javadocService', 'se
       $scope.display = angular.toJson(classes);
       $scope.loading = false;
 
-      searchDataLocator.setSearchData(classes, constants.CLASSES);
+      searchDataLocator.setSearchData(classes, constants.metadata.CLASSES);
     });
   };
 
@@ -22,8 +22,12 @@ app.controller('MainCtrl', ['$scope', '$log', 'constants', 'javadocService', 'se
       $scope.display = angular.toJson(packages);
       $scope.loading = false;
 
-      searchDataLocator.setSearchData(packages, constants.PACKAGES);
+      searchDataLocator.setSearchData(packages, constants.metadata.PACKAGES);
     });
+  };
+
+  $scope.breakpoint = function() {
+    console.log('breakpoint');
   };
 
 }]);
