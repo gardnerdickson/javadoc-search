@@ -29,8 +29,7 @@ def get_classes():
     encoded_url = request.args['url']
     url = urlparse.unquote(encoded_url)
 
-    javadoc_scraper = JavadocScraper(url)
-    classes = javadoc_scraper.retrieve_classes()
+    classes = JavadocScraper.retrieve_classes(url)
     return jsonify(classes)
 
 
@@ -39,8 +38,7 @@ def get_hierarchy_classes():
     encoded_url = request.args['url']
     url = urlparse.unquote(encoded_url)
 
-    javadoc_scraper = JavadocScraper(session['url'])
-    classes = javadoc_scraper.retrieve_hierarchy_classes(url)
+    classes = JavadocScraper.retrieve_hierarchy_classes(url)
     return jsonify(classes)
 
 
@@ -49,8 +47,7 @@ def get_packages():
     encoded_url = request.args['url']
     url = urlparse.unquote(encoded_url)
 
-    javadoc_scraper = JavadocScraper(url)
-    packages = javadoc_scraper.retrieve_packages()
+    packages = JavadocScraper.retrieve_packages(url)
     return jsonify(packages)
 
 

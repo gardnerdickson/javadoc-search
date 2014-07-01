@@ -6,12 +6,12 @@ import html5lib
 
 class JavadocScraper:
 
-    def __init__(self, url):
-        self._classes_path = '/allclasses-frame.html'
-        self._packages_path = '/overview-frame.html'
+    _CLASSES_PATH = '/allclasses-frame.html'
+    _PACKAGES_PATH = '/overview-frame.html'
 
-    def retrieve_classes(self):
-        classes_doc = JavadocScraper._retrieve_response_as_doc(self._classes_path)
+    @staticmethod
+    def retrieve_classes(base_url):
+        classes_doc = JavadocScraper._retrieve_response_as_doc(base_url + JavadocScraper._CLASSES_PATH)
 
         classes = {}
         class_links = classes_doc.findall('.//li/a')
@@ -37,8 +37,10 @@ class JavadocScraper:
 
         return classes
 
-    def retrieve_hierarchy_classes(self, class_url):
-        class_page_doc = self._retrieve_response_as_doc(class_url)
+
+    @staticmethod
+    def retrieve_hierarchy_classes(base_url):
+        class_page_doc = JavadocScraper._retrieve_response_as_doc(base_url)
 
         super_classes = {}
         sub_classes = {}
@@ -56,9 +58,11 @@ class JavadocScraper:
             'subClasses': sub_classes
         }
 
-    def retrieve_packages(self):
+
+    @staticmethod
+    def retrieve_packages(base_url):
         packages = {}
-        package_page_doc = self._retrieve_response_as_doc(self._packages_url)
+        package_page_doc = JavadocScraper._retrieve_response_as_doc(base_url + JavadocScraper._PACKAGES_PATH)
         package_links = package_page_doc.findall('.//li/a')
         for package_link in package_links:
             package_name = package_link.text
