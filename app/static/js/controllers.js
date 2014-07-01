@@ -7,24 +7,34 @@ app.controller('MainCtrl', ['$scope', '$log', 'constants', 'javadocService', 'se
   $scope.display = null;
   $scope.loading = false;
 
-  $scope.retrieveJavadocClasses = function() {
+  $scope.retrieveJavadocClassesAndPackages = function() {
+    var finished = {
+      classes: false,
+      packages: false
+    };
+
     $scope.loading = true;
+
     javadocService.retrieveClasses($scope.javadocUrl, function(classes) {
       $scope.display = angular.toJson(classes);
-      $scope.loading = false;
-
       searchDataLocator.setSearchData(classes, constants.metadata.CLASSES);
-    });
-  };
 
-  $scope.retrieveJavadocPackages = function() {
-    $scope.loading = true;
+      finished.classes = true;
+      if (!_.contains(_.values(finished), false)) {
+        $scope.loading = false;
+      }
+    });
+
     javadocService.retrievePackages($scope.javadocUrl, function(packages) {
       $scope.display = angular.toJson(packages);
-      $scope.loading = false;
-
       searchDataLocator.setSearchData(packages, constants.metadata.PACKAGES);
+
+      finished.packages = true;
+      if (!_.contains(_.values(finished), false)) {
+        $scope.loading = false;
+      }
     });
+
   };
 
   $scope.retrieveJavadocClassRelatives = function() {
@@ -34,6 +44,12 @@ app.controller('MainCtrl', ['$scope', '$log', 'constants', 'javadocService', 'se
       $scope.display = angular.toJson(relatives);
       $scope.loading = false;
     });
+  };
+
+  $scope.test = function() {
+    console.log("AppletContext < Applet", "AppletContext" < "Applet");
+    console.log("ArrayList < List", "ArrayList" < "List");
+    console.log("Collection < Thread", "Collection" < "Thread");
   };
 
 }]);

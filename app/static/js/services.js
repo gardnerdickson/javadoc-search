@@ -77,10 +77,22 @@ app.service('indexLocator', ['constants', function(constants) {
 
   var service = {};
 
-  function Index(data) {
-    // TODO: subclasses for class search and package search.
+  function BinaryTree(data) {
+
   }
 
 
+  function Node(name, value) {
+    this.name = name;
+    this.value = value;
+    this.leftChild = null;
+    this.rightChild = null;
+  }
+  Node.prototype.setLeftChild = function(node) {
+
+  };
+  Node.prototype.setRightChild = function(node) {
+
+  };
 
 }]);

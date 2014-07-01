@@ -8,6 +8,7 @@
 
     <script src="static/lib/jquery/dist/jquery.js"></script>
     <script src="static/lib/angular/angular.js"></script>
+    <script src="static/lib/underscore/underscore.js"></script>
 
     <script src="static/js/app.js"></script>
     <script src="static/js/controllers.js"></script>
@@ -17,10 +18,12 @@
 <body ng-controller="MainCtrl">
     <div>
         <input type="text" ng-model="javadocUrl"/>
-        <button ng-click="retrieveJavadocClasses()">Get Classes</button>
-        <button ng-click="retrieveJavadocPackages()">Get Packages</button>
+        <button ng-click="retrieveJavadocClassesAndPackages()">Get Classes</button>
         <input type="text" ng-model="classRelativeUrl"/>
         <button ng-click="retrieveJavadocClassRelatives()">Get Class Relatives</button>
+    </div>
+    <div>
+        <button ng-click="test()">Test</button>
     </div>
     <div ng-show="loading">Loading...</div>
     <div>
