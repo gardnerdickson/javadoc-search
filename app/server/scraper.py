@@ -57,6 +57,18 @@ class JavadocScraper:
             'subClasses': sub_classes
         }
 
+    def retrieve_packages(self):
+        packages = {}
+        package_page_doc = self._retrieve_response_as_doc(self._packages_url)
+        package_links = package_page_doc.findall('.//li/a')
+        for package_link in package_links:
+            package_name = package_link.text
+            url = package_link.attrib['href']
+
+            packages[package_name] = url
+
+        return packages
+
 
     @staticmethod
     def _find_class_links(description_root, index):

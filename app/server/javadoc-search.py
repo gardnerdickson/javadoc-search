@@ -8,6 +8,7 @@ from flask import session
 
 from scraper import JavadocScraper
 
+
 class CustomFlask(Flask):
     jinja_options = Flask.jinja_options.copy()
     jinja_options.update({
@@ -42,6 +43,16 @@ def get_hierarchy_classes():
     javadoc_scraper = JavadocScraper(session['url'])
     classes = javadoc_scraper.retrieve_hierarchy_classes(url)
     return jsonify(classes)
+
+
+@app.route('/packages', methods=['GET'])
+def get_packages():
+    encoded_url = request.args['url']
+    url = urlparse.unquote(encoded_url)
+
+    javadoc_scraper = JavadocScraper(url)
+    packages = javadoc_scraper.retrieve_packages()
+    return jsonify(packages)
 
 
 if __name__ == '__main__':
