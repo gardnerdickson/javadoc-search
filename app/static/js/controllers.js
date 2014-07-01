@@ -3,6 +3,7 @@
 app.controller('MainCtrl', ['$scope', '$log', 'constants', 'javadocService', 'searchDataLocator', function($scope, $log, constants, javadocService, searchDataLocator) {
 
   $scope.javadocUrl = null;
+  $scope.classRelativeUrl = null;
   $scope.display = null;
   $scope.loading = false;
 
@@ -26,8 +27,13 @@ app.controller('MainCtrl', ['$scope', '$log', 'constants', 'javadocService', 'se
     });
   };
 
-  $scope.breakpoint = function() {
-    console.log('breakpoint');
+  $scope.retrieveJavadocClassRelatives = function() {
+    $scope.loading = true;
+    var url = $scope.javadocUrl + '/' + $scope.classRelativeUrl;
+    javadocService.retrieveRelatives(url, function(relatives) {
+      $scope.display = angular.toJson(relatives);
+      $scope.loading = false;
+    });
   };
 
 }]);

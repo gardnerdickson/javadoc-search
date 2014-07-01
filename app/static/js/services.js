@@ -22,8 +22,16 @@ app.service('javadocService', ['$http', function($http) {
     });
   };
 
-  return service;
+  service.retrieveRelatives = function(javadocUrl, onComplete) {
+    var config = {
+      params: { url: encodeURIComponent(javadocUrl) }
+    };
+    $http.get('./relatives', config).then(function(response) {
+      onComplete(response.data);
+    })
+  };
 
+  return service;
 }]);
 
 
