@@ -1,6 +1,6 @@
 'use strict';
 
-app.controller('MainCtrl', ['$scope', '$log', 'constants', 'javadocService', 'searchDataLocator', function($scope, $log, constants, javadocService, searchDataLocator) {
+app.controller('MainCtrl', ['$scope', '$log', 'constants', 'javadocService', 'searchDataLocator', 'indexLocator', function($scope, $log, constants, javadocService, searchDataLocator, indexLocator) {
 
   $scope.javadocUrl = null;
   $scope.classRelativeUrl = null;
@@ -16,8 +16,10 @@ app.controller('MainCtrl', ['$scope', '$log', 'constants', 'javadocService', 'se
     $scope.loading = true;
 
     javadocService.retrieveClasses($scope.javadocUrl, function(classes) {
-      $scope.display = angular.toJson(classes);
+      console.log('Classes: ', classes);
       searchDataLocator.setSearchData(classes, constants.metadata.CLASSES);
+      indexLocator.createIndex(_.keys(classes), constants.metadata.CLASSES);
+      console.log('Class Tree: ', indexLocator.getIndex(constants.metadata.CLASSES));
 
       finished.classes = true;
       if (!_.contains(_.values(finished), false)) {
@@ -26,8 +28,10 @@ app.controller('MainCtrl', ['$scope', '$log', 'constants', 'javadocService', 'se
     });
 
     javadocService.retrievePackages($scope.javadocUrl, function(packages) {
-      $scope.display = angular.toJson(packages);
+      console.log('Packages:', packages);
       searchDataLocator.setSearchData(packages, constants.metadata.PACKAGES);
+      indexLocator.createIndex(_.keys(packages), constants.metadata.PACKAGES);
+      console.log('Package Tree: ', indexLocator.getIndex(constants.metadata.PACKAGES));
 
       finished.packages = true;
       if (!_.contains(_.values(finished), false)) {

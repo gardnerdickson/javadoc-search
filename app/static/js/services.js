@@ -77,22 +77,81 @@ app.service('indexLocator', ['constants', function(constants) {
 
   var service = {};
 
-  function BinaryTree(data) {
+  var indexes = {};
 
+  service.createIndex = function(values, type) {
+    constants.tryValidateMetadataType(type);
+    indexes[type] = new BinaryTree(values);
+  };
+
+  service.getIndex = function(type) {
+    constants.tryValidateMetadataType(type);
+    return indexes[type];
+  };
+
+
+  function BinaryTree(sortedValues) {
+    this._root = null;
+
+    var rightIndex = Math.round(sortedValues.length / 2);
+    var leftIndex = rightIndex - 1;
+
+    for (var i = rightIndex; i < sortedValues.length; i++) {
+      this.add(sortedValues[i]);
+    }
+    for (i = leftIndex; i >= 0; i--) {
+      this.add(sortedValues[i]);
+    }
   }
+  BinaryTree.prototype = {
+
+    add: function(value) {
+      var node = new Node(value);
+      var current = null;
+
+      if (this._root === null) {
+        this._root = node;
+      }
+      else {
+        current = this._root;
+
+        var nodeInserted = false;
+        while (!nodeInserted) {
+          if (value < current.value) {
+            if (current.left === null) {
+              current.left = node;
+              nodeInserted = true;
+            }
+            else {
+              current = current.left;
+            }
+          }
+          else if (value > current.value) {
+            if (current.right === null) {
+              current.right = node;
+              nodeInserted = true;
+            }
+            else {
+              current = current.right;
+            }
+          }
+          else {
+            throw 'This code should never be reached.'
+          }
+        }
+      }
+    }
+
+  };
 
 
-  function Node(name, value) {
-    this.name = name;
+  function Node(value) {
     this.value = value;
-    this.leftChild = null;
-    this.rightChild = null;
   }
-  Node.prototype.setLeftChild = function(node) {
-
-  };
-  Node.prototype.setRightChild = function(node) {
-
+  Node.prototype = {
+    left: null,
+    right: null
   };
 
+  return service;
 }]);
