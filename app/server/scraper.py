@@ -26,9 +26,10 @@ class JavadocScraper:
             else:
                 class_name = class_link.text
 
-            full_class_name = package + '.' + class_name
+            while class_name in classes:
+                class_name += '#'
 
-            classes[full_class_name] = {
+            classes[class_name] = {
                 'package': package,
                 'className': class_name,
                 'classType': class_type,
@@ -36,7 +37,6 @@ class JavadocScraper:
             }
 
         return classes
-
 
     @staticmethod
     def retrieve_hierarchy_classes(base_url):
@@ -58,7 +58,6 @@ class JavadocScraper:
             'subClasses': sub_classes
         }
 
-
     @staticmethod
     def retrieve_packages(base_url):
         packages = {}
@@ -72,7 +71,6 @@ class JavadocScraper:
 
         return packages
 
-
     @staticmethod
     def _find_class_links(description_root, index):
         classes = {}
@@ -83,7 +81,6 @@ class JavadocScraper:
             classes[class_name] = url
 
         return classes
-
 
     @staticmethod
     def _retrieve_response_as_doc(url):
