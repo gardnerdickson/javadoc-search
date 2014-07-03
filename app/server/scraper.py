@@ -9,6 +9,23 @@ class JavadocScraper:
     _CLASSES_PATH = '/allclasses-frame.html'
     _PACKAGES_PATH = '/overview-frame.html'
 
+    _SUPER_CLASS_LABELS = [
+        "All Superinterfaces:",
+        "All Implemented Interfaces:",
+        "Enclosing class:"
+    ]
+
+    _SUB_CLASS_LABELS = [
+        "All Known Implementing Classes:",
+        "All Known Subinterfaces:",
+        "Direct Known Subclasses:"
+    ]
+
+    _IGNORED_LABELS = [
+        "Enclosing class:",
+        "Enclosing interface:"
+    ]
+
     @staticmethod
     def retrieve_classes(base_url):
         classes_doc = JavadocScraper._retrieve_response_as_doc(base_url + JavadocScraper._CLASSES_PATH)
@@ -39,19 +56,22 @@ class JavadocScraper:
         return classes
 
     @staticmethod
-    def retrieve_hierarchy_classes(base_url):
-        class_page_doc = JavadocScraper._retrieve_response_as_doc(base_url)
+    def retrieve_hierarchy_classes(url):
+        class_page_doc = JavadocScraper._retrieve_response_as_doc(url)
 
         super_classes = {}
         sub_classes = {}
 
         description_root = class_page_doc.find(".//div[@class='description']/ul[@class='blockList']/li[@class='blockList']")
         for index, label in enumerate(description_root.findall('./dl/dt')):
-            if label.text == "All superinterfaces:":
+            if label.text in JavadocScraper._SUPER_CLASS_LABELS:
                 super_classes = JavadocScraper._find_class_links(description_root, index)
 
-            elif label.text == "All Known Implementing Classes:":
+            elif label.text in JavadocScraper._SUB_CLASS_LABELS:
                 sub_classes = JavadocScraper._find_class_links(description_root, index)
+
+            # elif label.text is not None and label.text not in JavadocScraper._IGNORED_LABELS:
+            #     raise Exception("Unknown super or sub class label: ", label.text, ' at ', url)
 
         return {
             'superClasses': super_classes,
