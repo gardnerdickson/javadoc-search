@@ -43,8 +43,11 @@ app.controller('MainCtrl', ['$scope', '$log', 'constants', 'javadocService', 'se
 
   $scope.retrieveJavadocClassRelatives = function() {
     $scope.loading = true;
-    var url = $scope.javadocUrl + '/' + $scope.classRelativeUrl;
-    javadocService.retrieveRelatives(url, function(relatives) {
+
+    var url = new URI($scope.javadocUrl);
+    url.segment($scope.classRelativeUrl);
+
+    javadocService.retrieveRelatives(url.toString(), function(relatives) {
       $scope.display = angular.toJson(relatives);
       $scope.loading = false;
     });
