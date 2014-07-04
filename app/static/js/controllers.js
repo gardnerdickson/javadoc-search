@@ -4,7 +4,6 @@ app.controller('MainCtrl', ['$scope', '$log', 'constants', 'javadocService', 'se
 
   $scope.javadocUrl = null;
   $scope.classRelativeUrl = null;
-  $scope.display = null;
   $scope.loading = false;
 
   $scope.retrieveJavadocClassesAndPackages = function() {
@@ -15,11 +14,15 @@ app.controller('MainCtrl', ['$scope', '$log', 'constants', 'javadocService', 'se
 
     $scope.loading = true;
 
-    javadocService.retrieveClasses($scope.javadocUrl, function(classes) {
-      console.log('Classes: ', classes);
+    var encodedUrl = URI.encode($scope.javadocUrl);
+
+    javadocService.retrieveClasses(encodedUrl, function(classes) {
       searchDataLocator.setSearchData(classes, constants.metadata.CLASSES);
       indexLocator.createIndex(_.keys(classes), constants.metadata.CLASSES);
-      console.log('Class Tree: ', indexLocator.getIndex(constants.metadata.CLASSES));
+
+      $scope.classes = _.keys(classes);
+
+      $scope.display = angular.toJson(searchDataLocator.getSearchData(constants.metadata.CLASSES), true);
 
       finished.classes = true;
       if (!_.contains(_.values(finished), false)) {
@@ -27,11 +30,9 @@ app.controller('MainCtrl', ['$scope', '$log', 'constants', 'javadocService', 'se
       }
     });
 
-    javadocService.retrievePackages($scope.javadocUrl, function(packages) {
-      console.log('Packages:', packages);
+    javadocService.retrievePackages(encodedUrl, function(packages) {
       searchDataLocator.setSearchData(packages, constants.metadata.PACKAGES);
       indexLocator.createIndex(_.keys(packages), constants.metadata.PACKAGES);
-      console.log('Package Tree: ', indexLocator.getIndex(constants.metadata.PACKAGES));
 
       finished.packages = true;
       if (!_.contains(_.values(finished), false)) {
@@ -44,10 +45,10 @@ app.controller('MainCtrl', ['$scope', '$log', 'constants', 'javadocService', 'se
   $scope.retrieveJavadocClassRelatives = function() {
     $scope.loading = true;
 
-    var url = new URI($scope.javadocUrl);
-    url.segment($scope.classRelativeUrl);
+    var url = new URI($scope.javadocUrl).segment($scope.classRelativeUrl);
+    var encodedUrl = URI.encode(url.toString());
 
-    javadocService.retrieveRelatives(url.toString(), function(relatives) {
+    javadocService.retrieveRelatives(encodedUrl, function(relatives) {
       $scope.display = angular.toJson(relatives);
       $scope.loading = false;
     });

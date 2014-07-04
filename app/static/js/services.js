@@ -4,27 +4,27 @@ app.service('javadocService', ['$http', function($http) {
 
   var service = {};
 
-  service.retrieveClasses = function(javadocUrl, onComplete) {
+  service.retrieveClasses = function(encodedUrl, onComplete) {
     var config = {
-      params: { url: encodeURIComponent(javadocUrl) }
+      params: { url: encodedUrl }
     };
     $http.get('./classes', config).then(function(response) {
       onComplete(response.data);
     });
   };
 
-  service.retrievePackages = function(javadocUrl, onComplete) {
+  service.retrievePackages = function(encodedUrl, onComplete) {
     var config = {
-      params: { url: encodeURIComponent(javadocUrl) }
+      params: { url: encodedUrl }
     };
     $http.get('./packages', config).then(function(response) {
       onComplete(response.data);
     });
   };
 
-  service.retrieveRelatives = function(javadocUrl, onComplete) {
+  service.retrieveRelatives = function(encodedUrl, onComplete) {
     var config = {
-      params: { url: encodeURIComponent(javadocUrl) }
+      params: { url: encodedUrl }
     };
     $http.get('./relatives', config).then(function(response) {
       onComplete(response.data);
@@ -59,9 +59,9 @@ app.service('searchDataLocator', ['constants', function(constants) {
 
   var searchData = {};
 
-  service.setSearchData = function(searchData, type) {
+  service.setSearchData = function(data, type) {
     constants.tryValidateMetadataType(type);
-    searchData[type] = searchData;
+    searchData[type] = data;
   };
 
   service.getSearchData = function(type) {

@@ -22,13 +22,14 @@
         <button ng-click="retrieveJavadocClassesAndPackages()">Get Classes</button>
         <input type="text" ng-model="classRelativeUrl"/>
         <button ng-click="retrieveJavadocClassRelatives()">Get Class Relatives</button>
-    </div>
-    <div>
         <button ng-click="test()">Test</button>
     </div>
     <div ng-show="loading">Loading...</div>
     <div>
-        {{ display }}
+        <input type="search" ng-model="searchFilter"/>
+    </div>
+    <div ng-repeat="class in classes | filter:searchFilter">
+        {{ class }}
     </div>
 </body>
 </html>
