@@ -9,22 +9,22 @@ class JavadocScraper:
     _CLASSES_PATH = '/allclasses-frame.html'
     _PACKAGES_PATH = '/overview-frame.html'
 
-    _SUPER_CLASS_LABELS = [
+    _SUPER_CLASS_LABELS = (
         "All Superinterfaces:",
         "All Implemented Interfaces:",
         "Enclosing class:"
-    ]
+    )
 
-    _SUB_CLASS_LABELS = [
+    _SUB_CLASS_LABELS = (
         "All Known Implementing Classes:",
         "All Known Subinterfaces:",
         "Direct Known Subclasses:"
-    ]
+    )
 
-    _IGNORED_LABELS = [
+    _IGNORED_LABELS = (
         "Enclosing class:",
         "Enclosing interface:"
-    ]
+    )
 
     @staticmethod
     def retrieve_classes(base_url):
@@ -70,8 +70,8 @@ class JavadocScraper:
             elif label.text in JavadocScraper._SUB_CLASS_LABELS:
                 sub_classes = JavadocScraper._find_class_links(description_root, index)
 
-            # elif label.text is not None and label.text not in JavadocScraper._IGNORED_LABELS:
-            #     raise Exception("Unknown super or sub class label: ", label.text, ' at ', url)
+            elif label.text is not None and label.text not in JavadocScraper._IGNORED_LABELS:
+                raise Exception("Unknown super or sub class label: ", label.text, ' at ', url)
 
         return {
             'superClasses': super_classes,
