@@ -71,7 +71,8 @@ app.controller('MainCtrl', ['$scope', '$log', '$sce', 'constants', 'javadocServi
   }
 
   function loadJavadocSite(url) {
-    $scope.iframeSource = $sce.trustAsResourceUrl(url)
+    url = new URI(url).segment('overview-summary.html');
+    $scope.iframeSource = $sce.trustAsResourceUrl(url.toString())
   }
 
 }]);
