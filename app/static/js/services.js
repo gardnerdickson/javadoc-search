@@ -73,7 +73,7 @@ app.service('searchDataLocator', ['constants', function(constants) {
 }]);
 
 
-app.service('indexLocator', ['constants', function(constants) {
+app.service('indexLocator', ['$log', 'constants', function($log, constants) {
 
   var service = {};
 
@@ -81,12 +81,34 @@ app.service('indexLocator', ['constants', function(constants) {
 
   service.createIndex = function(values, type) {
     constants.tryValidateMetadataType(type);
-    indexes[type] = new BinaryTree(values);
+    indexes[type] = new BasicMatcher(values);
   };
 
   service.getIndex = function(type) {
     constants.tryValidateMetadataType(type);
     return indexes[type];
+  };
+
+
+  function BasicMatcher(sortedValues) {
+    $log.debug("Creating BasicMatcher");
+    this.values = sortedValues;
+  }
+  BasicMatcher.prototype.getMatchingFunction = function() {
+    var thisBasicMatcher = this;
+    return function findMatches(q, cb) {
+      $log.debug("findMatches got called. q = ", q);
+      var matches = [];
+      var regex = new RegExp(q, 'i');
+
+      _.each(thisBasicMatcher.values, function (str) {
+        if (regex.test(str)) {
+          matches.push({ value: str })
+        }
+      });
+
+      cb(matches);
+    }
   };
 
 

@@ -12,6 +12,7 @@
     <script src="static/lib/angular/angular.js"></script>
     <script src="static/lib/underscore/underscore.js"></script>
     <script src="static/lib/uri.js/src/URI.js"></script>
+    <script src="static/lib/typeahead.js/dist/typeahead.jquery.js"></script>
 
     <script src="static/js/app.js"></script>
     <script src="static/js/controllers.js"></script>
@@ -37,15 +38,15 @@
         <div ng-show="viewMode == 'LoadingJavadoc'">Loading...</div>
 
         <div ng-show="viewMode == 'JavadocLoaded'" >
-            <div style="border: 1px solid #000">
+            <div style="background: #c4e3f3; padding: 10px;">
                 <div>
-                    <input type="search" ng-model="searchFilter" placeholder="Class or package name "/>
+                    <input style="width: 300px" class="typeahead form-control" type="text" placeholder="Class or package name"/>
                 </div>
                 {#            <div ng-repeat="class in classes | filter:searchFilter">#}
                 {#                {{ class }}#}
                 {#            </div>#}
             </div>
-            <div style="height: 100%; width: 100%">
+            <div style="height: 100%; width: 100%;">
                 <iframe ng-src="{{ iframeSource }}" style="width: 100%; height: 100%"></iframe>
             </div>
         </div>

@@ -1,6 +1,6 @@
 'use strict';
 
-app.controller('MainCtrl', ['$scope', '$log', '$sce', 'constants', 'javadocService', 'searchDataLocator', 'indexLocator', function($scope, $log, $sce, constants, javadocService, searchDataLocator, indexLocator) {
+app.controller('MainCtrl', ['$scope', '$log', '$sce', '$timeout', 'constants', 'javadocService', 'searchDataLocator', 'indexLocator', function($scope, $log, $sce, $timeout, constants, javadocService, searchDataLocator, indexLocator) {
 
   var viewModes = {
     ENTER_URL: 'EnterUrl',
@@ -46,12 +46,28 @@ app.controller('MainCtrl', ['$scope', '$log', '$sce', 'constants', 'javadocServi
     };
 
     javadocService.retrieveClasses(encodedUrl, function(classes) {
+      $log.debug("Got metadata for classes");
       searchDataLocator.setSearchData(classes, constants.metadata.CLASSES);
       indexLocator.createIndex(_.keys(classes), constants.metadata.CLASSES);
 
-      $scope.classes = _.keys(classes);
-
-      $scope.display = angular.toJson(searchDataLocator.getSearchData(constants.metadata.CLASSES), true);
+      $('.typeahead').typeahead(
+          {
+            hint: true,
+            highlight: true,
+            minLength: 1
+          },
+          {
+            name: 'classes',
+            displayKey: 'value',
+            source: indexLocator.getIndex(constants.metadata.CLASSES).getMatchingFunction()
+          }
+      )
+          .on('typeahead:selected', function($event, selection, datasetName) {
+            var classMetadata = searchDataLocator.getSearchData(constants.metadata.CLASSES);
+            $timeout(function() {
+              loadJavadocClassPage(classMetadata[selection.value].url);
+            }, 0);
+          });
 
       finished.classes = true;
       if (!_.contains(_.values(finished), false)) {
@@ -60,6 +76,7 @@ app.controller('MainCtrl', ['$scope', '$log', '$sce', 'constants', 'javadocServi
     });
 
     javadocService.retrievePackages(encodedUrl, function(packages) {
+      $log.debug("Got metadata for packages");
       searchDataLocator.setSearchData(packages, constants.metadata.PACKAGES);
       indexLocator.createIndex(_.keys(packages), constants.metadata.PACKAGES);
 
@@ -73,6 +90,11 @@ app.controller('MainCtrl', ['$scope', '$log', '$sce', 'constants', 'javadocServi
   function loadJavadocSite(url) {
     url = new URI(url).segment('overview-summary.html');
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString())
+  }
+
+  function loadJavadocClassPage(relativeUrl) {
+    var url = new URI($scope.javadocUrl).segment(relativeUrl);
+    $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   }
 
 }]);
