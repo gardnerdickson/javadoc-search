@@ -81,7 +81,7 @@ app.service('indexLocator', ['$log', 'constants', function($log, constants) {
 
   service.createIndex = function(values, type) {
     constants.tryValidateMetadataType(type);
-    indexes[type] = new BasicMatcher(values);
+    indexes[type] = new BinarySearchTree(values);
   };
 
   service.getIndex = function(type) {
@@ -103,7 +103,7 @@ app.service('indexLocator', ['$log', 'constants', function($log, constants) {
 
       _.each(thisBasicMatcher.values, function (str) {
         if (regex.test(str)) {
-          matches.push({ value: str })
+          matches.push({ value: str });
         }
       });
 
@@ -112,8 +112,8 @@ app.service('indexLocator', ['$log', 'constants', function($log, constants) {
   };
 
 
-  function BinaryTree(sortedValues) {
-    this._root = null;
+  function BinarySearchTree(sortedValues) {
+    this.root = null;
 
     var rightIndex = Math.round(sortedValues.length / 2);
     var leftIndex = rightIndex - 1;
@@ -125,17 +125,17 @@ app.service('indexLocator', ['$log', 'constants', function($log, constants) {
       this.add(sortedValues[i]);
     }
   }
-  BinaryTree.prototype = {
+  BinarySearchTree.prototype = {
 
     add: function(value) {
       var node = new Node(value);
       var current = null;
 
-      if (this._root === null) {
-        this._root = node;
+      if (this.root === null) {
+        this.root = node;
       }
       else {
-        current = this._root;
+        current = this.root;
 
         var nodeInserted = false;
         while (!nodeInserted) {
@@ -161,6 +161,46 @@ app.service('indexLocator', ['$log', 'constants', function($log, constants) {
             throw 'This code should never be reached.'
           }
         }
+      }
+    },
+
+    getMatchingFunction: function() {
+      var thisBinarySearchTree = this;
+      return function findMatches(pattern, cb) {
+        pattern = pattern.toLowerCase();
+        var nodeCount = 0;
+        var matches = [];
+        var regex = new RegExp(pattern, 'i');
+
+        function traverse(node) {
+          nodeCount++;
+          if (node) {
+            if (regex.test(node.value)) {
+              matches.push({ value: node.value });
+              if (matches.length > 20) {
+                return;
+              }
+            }
+
+            if (node.left !== null && node.right !== null) {
+              if (regex.test(node.left.value) && regex.test(node.right.value)) {
+                $log.log("Left and Right match");
+              }
+            }
+
+            if (node.value < pattern && node.left !== null) {
+              traverse(node.left);
+            }
+            if (node.value > pattern && node.right !== null) {
+              traverse(node.right);
+            }
+          }
+        }
+
+        traverse(thisBinarySearchTree.root);
+
+        $log.log("Checked ", nodeCount, " nodes.");
+        cb(matches);
       }
     }
 
