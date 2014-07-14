@@ -43,6 +43,10 @@ app.service('constants', [function() {
     PACKAGES: 'Packages'
   };
 
+  service.search = {
+    MAX_RESULTS: 30
+  };
+
   service.tryValidateMetadataType = function(type) {
     if (type != service.metadata.CLASSES && type != service.metadata.PACKAGES) {
       throw 'Invalid type: ' + type;
@@ -73,47 +77,107 @@ app.service('searchDataLocator', ['constants', function(constants) {
 }]);
 
 
-app.service('indexLocator', ['$log', 'constants', function($log, constants) {
+app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
 
   var service = {};
 
   var indexes = {};
 
-  service.createIndex = function(values, type) {
-    constants.tryValidateMetadataType(type);
-    indexes[type] = new BinarySearchTree(values);
+  service.createMatcher = function(values, type) {
+    if (type === 'Basic') {
+      indexes[type] = new BasicMatcher(values, constants.search.MAX_RESULTS)
+    }
+    else if (type === 'CamelCase') {
+      indexes[type] = new CamelCaseMatcher(values, constants.search.MAX_RESULTS)
+    }
+    else {
+      throw "Invalid matcher type: " + type;
+    }
   };
 
-  service.getIndex = function(type) {
-    constants.tryValidateMetadataType(type);
+  service.getMatcher = function(type) {
     return indexes[type];
   };
 
 
-  function BasicMatcher(sortedValues) {
+  function BasicMatcher(sortedValues, maxResults) {
     $log.debug("Creating BasicMatcher");
-    this.values = sortedValues;
+    this._values = sortedValues;
+    this._maxResults = maxResults;
   }
-  BasicMatcher.prototype.getMatchingFunction = function() {
-    var thisBasicMatcher = this;
-    return function findMatches(q, cb) {
-      $log.debug("findMatches got called. q = ", q);
+  BasicMatcher.prototype = {
+
+    maxResults: function(value) {
+      if (value === undefined) {
+        return this._maxResults;
+      }
+      this._maxResults = value;
+    },
+
+    findMatches: function(query) {
       var matches = [];
-      var regex = new RegExp(q, 'i');
+      var regex = new RegExp(query, 'i');
+      $log.debug("values length: " , this._values.length);
 
-      _.each(thisBasicMatcher.values, function (str) {
-        if (regex.test(str)) {
-          matches.push({ value: str });
+      for (var i = 0; i < this._values.length; i++) {
+        if (regex.test(this._values[i])) {
+          matches.push({ value: this._values[i] });
+          if (matches.length >= this._maxResults) {
+            return matches;
+          }
         }
-      });
+      }
 
-      cb(matches);
+      return matches;
     }
   };
 
 
-  function BinarySearchTree(sortedValues) {
-    this.root = null;
+  function CamelCaseMatcher(values, maxResults) {
+    this._values = values;
+    this._maxResults = maxResults;
+  }
+  CamelCaseMatcher.prototype = {
+
+    maxResults: function(value) {
+      if (value === undefined) {
+        return this._maxResults;
+      }
+      this._maxResults = value;
+    },
+
+    findMatches: function(pattern) {
+      var matches = [];
+      var regex = new RegExp(pattern);
+
+      for (var i = 0; i < this._values.length; i++) {
+        if (regex.test(this.getCamelCaseValue(this._values[i]))) {
+          matches.push({ value: this._values[i] });
+          if (matches.length >= this._values[i]) {
+            return matches;
+          }
+        }
+      }
+
+      return matches;
+    },
+
+    getCamelCaseValue: function(str) {
+      var upperCaseValue = '';
+      for (var i = 0; i < str.length; i++) {
+        var char = str.charAt(i);
+        if (char === char.toUpperCase()) {
+          upperCaseValue += char;
+        }
+      }
+      return upperCaseValue;
+    }
+  };
+
+
+  function BinarySearchTree(sortedValues, maxResults) {
+    this._root = null;
+    this._maxResults = maxResults;
 
     var rightIndex = Math.round(sortedValues.length / 2);
     var leftIndex = rightIndex - 1;
@@ -131,11 +195,11 @@ app.service('indexLocator', ['$log', 'constants', function($log, constants) {
       var node = new Node(value);
       var current = null;
 
-      if (this.root === null) {
-        this.root = node;
+      if (this._root === null) {
+        this._root = node;
       }
       else {
-        current = this.root;
+        current = this._root;
 
         var nodeInserted = false;
         while (!nodeInserted) {
@@ -164,6 +228,14 @@ app.service('indexLocator', ['$log', 'constants', function($log, constants) {
       }
     },
 
+    maxResults: function(value) {
+      if (value === undefined) {
+        return this._maxResults;
+      }
+
+      this._maxResults = value;
+    },
+
     getMatchingFunction: function() {
       var thisBinarySearchTree = this;
       return function findMatches(pattern, cb) {
@@ -173,33 +245,34 @@ app.service('indexLocator', ['$log', 'constants', function($log, constants) {
         var regex = new RegExp(pattern, 'i');
 
         function traverse(node) {
+          if (matches.length >= thisBinarySearchTree._maxResults) {
+            return;
+          }
+
           nodeCount++;
           if (node) {
-            if (regex.test(node.value)) {
+
+            if (node === thisBinarySearchTree._root) {
+              if (regex.test(node.value)) {
+                matches.push({ value: node.value });
+              }
+            }
+            else {
               matches.push({ value: node.value });
-              if (matches.length > 20) {
-                return;
-              }
             }
 
-            if (node.left !== null && node.right !== null) {
-              if (regex.test(node.left.value) && regex.test(node.right.value)) {
-                $log.log("Left and Right match");
-              }
-            }
-
-            if (node.value < pattern && node.left !== null) {
+            if (node.left !== null && regex.test(node.left.value)) {
               traverse(node.left);
             }
-            if (node.value > pattern && node.right !== null) {
+            if (node.right !== null && regex.test(node.right.value)) {
               traverse(node.right);
             }
           }
         }
 
-        traverse(thisBinarySearchTree.root);
+        traverse(thisBinarySearchTree._root);
 
-        $log.log("Checked ", nodeCount, " nodes.");
+//        $log.log("Checked ", nodeCount, " nodes.");
         cb(matches);
       }
     }

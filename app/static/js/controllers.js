@@ -1,6 +1,6 @@
 'use strict';
 
-app.controller('MainCtrl', ['$scope', '$log', '$sce', '$timeout', 'constants', 'javadocService', 'searchDataLocator', 'indexLocator', function($scope, $log, $sce, $timeout, constants, javadocService, searchDataLocator, indexLocator) {
+app.controller('MainCtrl', ['$scope', '$log', '$sce', '$timeout', 'constants', 'javadocService', 'searchDataLocator', 'matcherLocator', function($scope, $log, $sce, $timeout, constants, javadocService, searchDataLocator, matcherLocator) {
 
   var viewModes = {
     ENTER_URL: 'EnterUrl',
@@ -48,10 +48,11 @@ app.controller('MainCtrl', ['$scope', '$log', '$sce', '$timeout', 'constants', '
     javadocService.retrieveClasses(encodedUrl, function(classes) {
       $log.debug("Got metadata for classes");
       searchDataLocator.setSearchData(classes, constants.metadata.CLASSES);
-      indexLocator.createIndex(_.keys(classes), constants.metadata.CLASSES);
 
-      $('.typeahead').typeahead(
-          {
+      matcherLocator.createMatcher(_.keys(classes), 'Basic');
+      matcherLocator.createMatcher(_.keys(classes), 'CamelCase');
+
+      $('.typeahead').typeahead({
             hint: true,
             highlight: true,
             minLength: 1
@@ -59,10 +60,13 @@ app.controller('MainCtrl', ['$scope', '$log', '$sce', '$timeout', 'constants', '
           {
             name: 'classes',
             displayKey: 'value',
-            source: indexLocator.getIndex(constants.metadata.CLASSES).getMatchingFunction()
-          }
-      )
-          .on('typeahead:selected', function($event, selection, datasetName) {
+            source: function(query, cb) {
+//              var basicMatches = matcherLocator.getMatcher('Basic').findMatches(query);
+              var camelCaseMatches = matcherLocator.getMatcher('CamelCase').findMatches(query);
+
+              cb(camelCaseMatches);
+            }
+          }).on('typeahead:selected', function($event, selection, datasetName) {
             var classMetadata = searchDataLocator.getSearchData(constants.metadata.CLASSES);
             $timeout(function() {
               loadJavadocClassPage(classMetadata[selection.value].url);
@@ -78,7 +82,7 @@ app.controller('MainCtrl', ['$scope', '$log', '$sce', '$timeout', 'constants', '
     javadocService.retrievePackages(encodedUrl, function(packages) {
       $log.debug("Got metadata for packages");
       searchDataLocator.setSearchData(packages, constants.metadata.PACKAGES);
-      indexLocator.createIndex(_.keys(packages), constants.metadata.PACKAGES);
+//      matcherLocator.createMatcher(_.keys(packages), constants.metadata.PACKAGES);
 
       finished.packages = true;
       if (!_.contains(_.values(finished), false)) {
