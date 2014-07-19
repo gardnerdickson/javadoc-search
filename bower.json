@@ -14,11 +14,12 @@
     "tests"
   ],
   "dependencies": {
-    "angular": "~1.2.18",
+    "angular": "~1.2.20",
     "bootstrap": "~3.2.0",
     "jquery": "~2.1.1",
     "underscore": "~1.6.0",
     "uri.js": "~1.13.2",
-    "typeahead.js": "~0.10.3"
+    "typeahead.js": "~0.10.3",
+    "angular-route": "~1.2.20"
   }
 }

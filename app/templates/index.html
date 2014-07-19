@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="javadocSearch">
+<html>
 <head lang="en">
     <meta charset="UTF-8">
     <title>Javadoc Search</title>
@@ -10,6 +10,7 @@
 
     <script src="static/lib/jquery/dist/jquery.js"></script>
     <script src="static/lib/angular/angular.js"></script>
+    <script src="static/lib/angular-route/angular-route.js"></script>
     <script src="static/lib/underscore/underscore.js"></script>
     <script src="static/lib/uri.js/src/URI.js"></script>
     <script src="static/lib/typeahead.js/dist/typeahead.jquery.js"></script>
@@ -19,37 +20,11 @@
     <script src="static/js/services.js"></script>
 
 </head>
-<body ng-controller="MainCtrl">
+{#<body ng-controller="MainCtrl">#}
+<body>
 
-    <div class="top-container">
-
-        <div class="javadoc-input-container" ng-show="viewMode == 'EnterUrl'">
-            <div>
-                Enter a URL to any standard Javadoc
-            </div>
-            <div style="margin-top: 5px">
-                <input class="javadoc-input" type="text" ng-model="javadocUrl"/>
-            </div>
-            <div style="margin-top: 5px">
-                <button ng-click="retrieveJavadocClassesAndPackages()">Load Javadoc</button>
-            </div>
-        </div>
-
-        <div ng-show="viewMode == 'LoadingJavadoc'">Loading...</div>
-
-        <div ng-show="viewMode == 'JavadocLoaded'" >
-            <div style="background: #c4e3f3; padding: 10px;">
-                <div>
-                    <input style="width: 300px" class="typeahead form-control" type="text" placeholder="Class or package name"/>
-                </div>
-                {#            <div ng-repeat="class in classes | filter:searchFilter">#}
-                {#                {{ class }}#}
-                {#            </div>#}
-            </div>
-            <div style="height: 100%; width: 100%;">
-                <iframe ng-src="{{ iframeSource }}" style="width: 100%; height: 100%"></iframe>
-            </div>
-        </div>
+    <div ng-app="javadocSearch">
+        <ng-view></ng-view>
     </div>
 
 </body>

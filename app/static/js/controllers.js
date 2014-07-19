@@ -61,10 +61,10 @@ app.controller('MainCtrl', ['$scope', '$log', '$sce', '$timeout', 'constants', '
             name: 'classes',
             displayKey: 'value',
             source: function(query, cb) {
-//              var basicMatches = matcherLocator.getMatcher('Basic').findMatches(query);
-              var camelCaseMatches = matcherLocator.getMatcher('CamelCase').findMatches(query);
+              var basicMatches = matcherLocator.getMatcher('Basic').findMatches(query);
+//              var camelCaseMatches = matcherLocator.getMatcher('CamelCase').findMatches(query);
 
-              cb(camelCaseMatches);
+              cb(basicMatches);
             }
           }).on('typeahead:selected', function($event, selection, datasetName) {
             var classMetadata = searchDataLocator.getSearchData(constants.metadata.CLASSES);
@@ -102,3 +102,12 @@ app.controller('MainCtrl', ['$scope', '$log', '$sce', '$timeout', 'constants', '
   }
 
 }]);
+
+app.controller('LoadUrlController', ['$log', function($log) {
+  $log.log("LoadUrlController");
+}]);
+
+app.controller('JavadocSearchController', ['$log', function($log) {
+  $log.log("JavadocSearchController");
+}]);
+
