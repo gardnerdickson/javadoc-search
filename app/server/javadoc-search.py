@@ -5,27 +5,24 @@ from flask import Flask
 from flask import request
 from flask import jsonify
 from flask import render_template
-from flask import make_response
 
 from scraper import JavadocScraper
 
 
-class CustomFlask(Flask):
+class Flask_JavadocSearch(Flask):
     jinja_options = Flask.jinja_options.copy()
     jinja_options.update({
         'variable_start_string': '{[{',
         'variable_end_string': '}]}'
     })
 
-app = CustomFlask(__name__, template_folder='../templates', static_folder='../static')
-# app = CustomFlask(__name__)
+app = Flask_JavadocSearch(__name__, template_folder='../templates', static_folder='../static')
 
 
 @app.route('/')
 @app.route('/url')
-def index(**kwargs):
+def index():
     return render_template('index.html')
-    # return render_template('index.html')
 
 
 @app.route('/classes', methods=['GET'])
