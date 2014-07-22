@@ -1,45 +1,36 @@
 'use strict';
 
-app.controller('MainCtrl', ['$scope', '$log', '$sce', '$timeout', 'constants', 'javadocService', 'searchDataLocator', 'matcherLocator', function($scope, $log, $sce, $timeout, constants, javadocService, searchDataLocator, matcherLocator) {
+app.controller('LoadUrlController', ['$scope', '$log', '$location', function($scope, $log, $location) {
+  $log.log("LoadUrlController");
 
-  var viewModes = {
-    ENTER_URL: 'EnterUrl',
-    LOADING_JAVADOC: 'LoadingJavadoc',
-    JAVADOC_LOADED: 'JavadocLoaded'
-  };
-
-  $scope.viewMode = viewModes.ENTER_URL;
   $scope.javadocUrl = null;
 
-  $scope.retrieveJavadocClassesAndPackages = function() {
+  $scope.loadJavadoc = function() {
+    var encodedUrl = URI.encode($scope.javadocUrl);
+    $location.path('/url/' + encodedUrl);
+  };
 
-    $scope.viewMode = viewModes.LOADING_JAVADOC;
+}]);
 
-    loadClassesAndPackages(URI.encode($scope.javadocUrl) ,function() {
-      $scope.viewMode = viewModes.JAVADOC_LOADED;
+app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', 'javadocService', 'searchDataLocator', 'matcherLocator', 'constants', function($scope, $log, $routeParams, $timeout, $sce, javadocService, searchDataLocator , matcherLocator, constants) {
+  $log.log("JavadocSearchController");
+
+  var javadocUrl = null;
+
+  $scope.loading = true;
+
+  function init() {
+
+    javadocUrl = $routeParams.url;
+
+    retrieveClassesAndPackages(javadocUrl, function() {
+      $scope.loading = false;
     });
 
-    loadJavadocSite($scope.javadocUrl);
-  };
+    loadJavadocSite(javadocUrl);
+  }
 
-  $scope.retrieveJavadocClassRelatives = function() {
-    var url = new URI($scope.javadocUrl).segment($scope.classRelativeUrl);
-    var encodedUrl = URI.encode(url.toString());
-
-    javadocService.retrieveRelatives(encodedUrl, function(relatives) {
-      $scope.display = angular.toJson(relatives);
-    });
-  };
-
-  $scope.test = function() {
-    console.log("AppletContext < Applet", "AppletContext" < "Applet");
-    console.log("ArrayList < List", "ArrayList" < "List");
-    console.log("Collection < Thread", "Collection" < "Thread");
-  };
-
-
-  function loadClassesAndPackages(encodedUrl, onComplete) {
-
+  function retrieveClassesAndPackages(encodedUrl, onComplete) {
     var finished = {
       classes: false,
       packages: false
@@ -97,17 +88,10 @@ app.controller('MainCtrl', ['$scope', '$log', '$sce', '$timeout', 'constants', '
   }
 
   function loadJavadocClassPage(relativeUrl) {
-    var url = new URI($scope.javadocUrl).segment(relativeUrl);
+    var url = new URI(javadocUrl).segment(relativeUrl);
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   }
 
-}]);
-
-app.controller('LoadUrlController', ['$log', function($log) {
-  $log.log("LoadUrlController");
-}]);
-
-app.controller('JavadocSearchController', ['$log', function($log) {
-  $log.log("JavadocSearchController");
+  init();
 }]);
 

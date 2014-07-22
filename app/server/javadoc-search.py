@@ -20,7 +20,6 @@ app = Flask_JavadocSearch(__name__, template_folder='../templates', static_folde
 
 
 @app.route('/')
-@app.route('/url')
 def index():
     return render_template('index.html')
 
