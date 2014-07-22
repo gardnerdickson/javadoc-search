@@ -1,7 +1,7 @@
-import os
 import urllib.parse as urlparse
 
 from flask import Flask
+
 from flask import request
 from flask import jsonify
 from flask import render_template
@@ -24,7 +24,7 @@ app = CustomFlask(__name__, template_folder='../templates', static_folder='../st
 @app.route('/')
 @app.route('/url')
 def index(**kwargs):
-    return make_response(render_template('index.html'))
+    return render_template('index.html')
     # return render_template('index.html')
 
 
