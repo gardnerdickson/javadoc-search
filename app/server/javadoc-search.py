@@ -1,10 +1,12 @@
 import urllib.parse as urlparse
+import json
 
 from flask import Flask
 
 from flask import request
 from flask import jsonify
 from flask import render_template
+from flask import session
 
 from scraper import JavadocScraper
 
@@ -24,32 +26,49 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/baseUrl', methods=['POST'])
+def post_base_url():
+    # encoded_url = request.args['baseUrl']
+    # session['base_url'] = urlparse.unquote(encoded_url)
+    print(request.stream.read())
+    return "Not implemented yet"
+
+
 @app.route('/classes', methods=['GET'])
 def get_classes():
-    encoded_url = request.args['url']
-    url = urlparse.unquote(encoded_url)
+    scraper = JavadocScraper(session['base_url'])
+    classes = scraper.retrieve_classes()
 
-    classes = JavadocScraper.retrieve_classes(url)
     return jsonify(classes)
+
+
+@app.route('/class')
+def get_class():
+    encoded_class_relative_url = request.args['classRelativeUrl']
+    class_relative_url = urlparse.unquote(encoded_class_relative_url)
+
+    return "test: " + class_relative_url
 
 
 @app.route('/relatives', methods=['GET'])
 def get_hierarchy_classes():
-    encoded_url = request.args['url']
-    url = urlparse.unquote(encoded_url)
+    encoded_class_relative_url = request.args['classRelativeUrl']
+    class_relative_url = urlparse.unquote(encoded_class_relative_url)
 
-    classes = JavadocScraper.retrieve_hierarchy_classes(url)
+    scraper = JavadocScraper(session['base_url'])
+    classes = scraper.retrieve_hierarchy_classes(class_relative_url)
+
     return jsonify(classes)
 
 
 @app.route('/packages', methods=['GET'])
 def get_packages():
-    encoded_url = request.args['url']
-    url = urlparse.unquote(encoded_url)
+    scraper = JavadocScraper(session['base_url'])
+    packages = scraper.retrieve_packages()
 
-    packages = JavadocScraper.retrieve_packages(url)
     return jsonify(packages)
 
 
 if __name__ == '__main__':
+    app.secret_key = 'gardnerdickson' #TODO: change this
     app.run(debug=True)

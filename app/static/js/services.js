@@ -4,27 +4,28 @@ app.service('javadocService', ['$http', function($http) {
 
   var service = {};
 
-  service.retrieveClasses = function(encodedUrl, onComplete) {
-    var config = {
-      params: { url: encodedUrl }
-    };
-    $http.get('./classes', config).then(function(response) {
+  service.setBaseJavadocUrl = function(encodedUrl, onComplete) {
+    var data = { baseUrl: encodedUrl };
+    $http.post('./baseUrl', data).then(function() {
+      onComplete();
+    })
+  };
+
+  service.retrieveClasses = function(onComplete) {
+    $http.get('./classes').then(function(response) {
       onComplete(response.data);
     });
   };
 
-  service.retrievePackages = function(encodedUrl, onComplete) {
-    var config = {
-      params: { url: encodedUrl }
-    };
-    $http.get('./packages', config).then(function(response) {
+  service.retrievePackages = function(onComplete) {
+    $http.get('./packages').then(function(response) {
       onComplete(response.data);
     });
   };
 
-  service.retrieveRelatives = function(encodedUrl, onComplete) {
+  service.retrieveRelatives = function(encodedClassRelativeUrl, onComplete) {
     var config = {
-      params: { url: encodedUrl }
+      params: { classRelativeUrl: encodedClassRelativeUrl }
     };
     $http.get('./relatives', config).then(function(response) {
       onComplete(response.data);

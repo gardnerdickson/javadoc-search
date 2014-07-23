@@ -23,20 +23,23 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
     javadocUrl = $routeParams.url;
 
-    retrieveClassesAndPackages(javadocUrl, function() {
-      $scope.loading = false;
-    });
+    javadocService.setBaseJavadocUrl(URI.encode(javadocUrl), function() {
 
-    loadJavadocSite(javadocUrl);
+      retrieveClassesAndPackages(function() {
+        $scope.loading = false;
+      });
+
+      loadJavadocSite(javadocUrl);
+    });
   }
 
-  function retrieveClassesAndPackages(encodedUrl, onComplete) {
+  function retrieveClassesAndPackages(onComplete) {
     var finished = {
       classes: false,
       packages: false
     };
 
-    javadocService.retrieveClasses(encodedUrl, function(classes) {
+    javadocService.retrieveClasses(function(classes) {
       $log.debug("Got metadata for classes");
       searchDataLocator.setSearchData(classes, constants.metadata.CLASSES);
 
@@ -70,7 +73,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       }
     });
 
-    javadocService.retrievePackages(encodedUrl, function(packages) {
+    javadocService.retrievePackages(function(packages) {
       $log.debug("Got metadata for packages");
       searchDataLocator.setSearchData(packages, constants.metadata.PACKAGES);
 //      matcherLocator.createMatcher(_.keys(packages), constants.metadata.PACKAGES);
