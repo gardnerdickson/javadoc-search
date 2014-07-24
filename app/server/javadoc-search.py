@@ -28,10 +28,10 @@ def index():
 
 @app.route('/baseUrl', methods=['POST'])
 def post_base_url():
-    # encoded_url = request.args['baseUrl']
-    # session['base_url'] = urlparse.unquote(encoded_url)
-    print(request.stream.read())
-    return "Not implemented yet"
+    encoded_url = request.form['baseUrl']
+    session['base_url'] = urlparse.unquote(encoded_url)
+
+    return '', 200
 
 
 @app.route('/classes', methods=['GET'])
