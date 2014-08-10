@@ -12,7 +12,7 @@ app.controller('LoadUrlController', ['$scope', '$log', '$location', function($sc
 
 }]);
 
-app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', 'javadocService', 'searchDataLocator', 'matcherLocator', 'constants', function($scope, $log, $routeParams, $timeout, $sce, javadocService, searchDataLocator , matcherLocator, constants) {
+app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', 'javadocService', 'searchDataLocator', 'matcherLocator', 'constants', 'searchResultObserver', function($scope, $log, $routeParams, $timeout, $sce, javadocService, searchDataLocator , matcherLocator, constants, searchResultObserver) {
   $log.log("JavadocSearchController");
 
   var javadocUrl = null;
@@ -67,7 +67,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
             source: function(query, cb) {
               var basicMatches = matcherLocator.getMatcher('Basic').findMatches(query);
 //              var camelCaseMatches = matcherLocator.getMatcher('CamelCase').findMatches(query);
-
+              searchResultObserver.update(basicMatches);
               cb(basicMatches);
             }
           }).on('typeahead:selected', function($event, selection, datasetName) {

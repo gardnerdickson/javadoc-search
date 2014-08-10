@@ -37,6 +37,7 @@
     width: 100%;
     position: absolute;
     top: 54px;
+    overflow-x: hidden;
 }
 
 
