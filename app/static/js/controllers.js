@@ -19,6 +19,16 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
   $scope.loading = true;
 
+  $scope.toggleMenu = function() {
+    var body = $('.top-container');
+    if (body.hasClass('menu-open')) {
+      body.removeClass('menu-open');
+    }
+    else {
+      body.addClass('menu-open');
+    }
+  };
+
   function init() {
 
     javadocUrl = $routeParams.url;
