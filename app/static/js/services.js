@@ -292,22 +292,3 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
   return service;
 }]);
 
-
-app.service('searchResultObserver', ['$log', 'constants', function($log, constants) {
-  var service = {};
-
-  var subjects = [];
-
-  service.register = function(subject) {
-    subjects.push(subject);
-  };
-
-  service.update = function(searchResults) {
-    $log.log("Updating subjects.");
-    _.each(subjects, function(subject) {
-      subject.notify(searchResults);
-    });
-  };
-
-  return service;
-}]);
