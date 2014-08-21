@@ -20,15 +20,13 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   $scope.loading = true;
   $scope.searchResults = null;
 
-  $scope.toggleMenu = function() {
-    var body = $('.top-container');
-    if (body.hasClass('menu-open')) {
-      body.removeClass('menu-open');
-    }
-    else {
-      body.addClass('menu-open');
-    }
+
+  $scope.loadJavadocClassPage = function(classInfo) {
+    $log.info("Loading class page: ", classInfo);
+    var url = new URI(javadocUrl).segment(classInfo.url);
+    $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   };
+
 
   function init() {
 
@@ -54,34 +52,8 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       $log.debug("Got metadata for classes");
       searchDataLocator.setSearchData(classes, constants.metadata.CLASSES);
 
-      matcherLocator.createMatcher(_.keys(classes), 'Basic');
-      matcherLocator.createMatcher(_.keys(classes), 'CamelCase');
-
-      $('.typeahead').typeahead({
-            hint: true,
-            highlight: true,
-            minLength: 1
-          },
-          {
-            name: 'classes',
-            displayKey: 'value',
-            source: function(query, cb) {
-              var basicMatches = matcherLocator.getMatcher('Basic').findMatches(query);
-//              var camelCaseMatches = matcherLocator.getMatcher('CamelCase').findMatches(query);
-//              searchResultObserver.update(basicMatches);
-
-//              $timeout(function() {
-//                $scope.searchResults = basicMatches;
-//              }, 0);
-
-              cb(basicMatches);
-            }
-          }).on('typeahead:selected', function($event, selection, datasetName) {
-            var classMetadata = searchDataLocator.getSearchData(constants.metadata.CLASSES);
-            $timeout(function() {
-              loadJavadocClassPage(classMetadata[selection.value].url);
-            }, 0);
-          });
+      matcherLocator.createMatcher(classes, 'Basic');
+      matcherLocator.createMatcher(classes, 'CamelCase');
 
       finished.classes = true;
       if (!_.contains(_.values(finished), false)) {
@@ -104,11 +76,6 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   function loadJavadocSite(url) {
     url = new URI(url).segment('overview-summary.html');
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString())
-  }
-
-  function loadJavadocClassPage(relativeUrl) {
-    var url = new URI(javadocUrl).segment(relativeUrl);
-    $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   }
 
   init();

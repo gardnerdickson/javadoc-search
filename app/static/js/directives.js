@@ -9,18 +9,39 @@ app.directive('searchBox', ['$log', 'matcherLocator', function($log, matcherLoca
 
       var searchResultMenu = {};
 
+      var lastQuery = null;
+
+      scope.SearchBox = {};
+
+      scope.SearchBox.setSearchResultMenu = function(menu) {
+        searchResultMenu = menu;
+      };
+
       scope.onChange = function() {
-        $log.log('onchange');
+
+        if (lastQuery === null || lastQuery === '') {
+          openSearchResultMenu();
+        }
+        else if (scope.query === '') {
+          closeSearchResultMenu();
+        }
+
         if (basicMatcher === null) {
           basicMatcher = matcherLocator.getMatcher('Basic');
         }
         var matches = basicMatcher.findMatches(scope.query);
         searchResultMenu.updateResults(matches);
+
+        lastQuery = scope.query;
       };
 
-      scope.setSearchResultMenu = function(menu) {
-        searchResultMenu = menu;
-      };
+      function openSearchResultMenu() {
+        $('.top-container').addClass('menu-open');
+      }
+
+      function closeSearchResultMenu() {
+        $('.top-container').removeClass('menu-open');
+      }
 
     }
   }
@@ -38,7 +59,7 @@ app.directive('searchResultMenu', ['$log', '$timeout', function($log, $timeout) 
         }, 0);
       };
 
-      scope.setSearchResultMenu(scope);
+      scope.SearchBox.setSearchResultMenu(scope);
 
     }
   };

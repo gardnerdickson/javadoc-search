@@ -19,7 +19,6 @@
     "jquery": "~2.1.1",
     "underscore": "~1.6.0",
     "uri.js": "~1.13.2",
-    "typeahead.js": "~0.10.3",
     "angular-route": "~1.2.20"
   }
 }
