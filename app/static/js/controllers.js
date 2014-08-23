@@ -30,7 +30,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
   function init() {
 
-    javadocUrl = $routeParams.url;
+    javadocUrl = URI.decode($routeParams.url);
 
     javadocService.setBaseJavadocUrl(URI.encode(javadocUrl), function() {
 
