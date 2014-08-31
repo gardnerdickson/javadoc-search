@@ -116,14 +116,12 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
     },
 
     findMatches: function(query) {
-      var matches = {};
+      var matches = [];
       var regex = new RegExp(query, 'i');
 
-      // test keys for matches
-      var keys = _.keys(this._values);
-      for (var i = 0; i < keys.length; i++) {
-        if (regex.test(keys[i])) {
-          matches[keys[i]] = this._values[keys[i]];
+      for (var i = 0; i < this._values.length; i++) {
+        if (regex.test(this._values[i])) {
+          matches.push(this._values[i]);
           if (matches.length >= this._maxResults) {
             return matches;
           }

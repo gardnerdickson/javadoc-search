@@ -1,4 +1,6 @@
 <input type="text"
        placeholder="Class or package name"
-       ng-change="onChange()"
-       ng-model="query"/>
+       ng-focus="onFocus()"
+       ng-blur="onBlur()"
+       ng-model="query"
+       ng-change="onChange($event)"/>

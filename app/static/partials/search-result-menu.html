@@ -1,7 +1,7 @@
 <nav class="menu push-menu-left" >
     <ul>
-        <li ng-repeat="(name, classInfo) in searchResults">
-            <a href ng-click="loadJavadocClassPage(classInfo)">{{ name }}</a>
+        <li ng-repeat="name in searchResults" ng-click="loadJavadocClassPage(name)" ng-class="{'selected': $index == selectedIndex}">
+            {{ name }}
         </li>
     </ul>
 </nav>

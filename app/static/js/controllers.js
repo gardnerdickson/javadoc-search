@@ -12,6 +12,7 @@ app.controller('LoadUrlController', ['$scope', '$log', '$location', function($sc
 
 }]);
 
+
 app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', 'javadocService', 'searchDataLocator', 'matcherLocator', 'constants', function($scope, $log, $routeParams, $timeout, $sce, javadocService, searchDataLocator , matcherLocator, constants) {
   $log.log("JavadocSearchController");
 
@@ -21,8 +22,8 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   $scope.searchResults = null;
 
 
-  $scope.loadJavadocClassPage = function(classInfo) {
-    $log.info("Loading class page: ", classInfo);
+  $scope.loadJavadocClassPage = function(className) {
+    var classInfo = searchDataLocator.getSearchData('Classes')[className];
     var url = new URI(javadocUrl).segment(classInfo.url);
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   };
@@ -52,8 +53,8 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       $log.debug("Got metadata for classes");
       searchDataLocator.setSearchData(classes, constants.metadata.CLASSES);
 
-      matcherLocator.createMatcher(classes, 'Basic');
-      matcherLocator.createMatcher(classes, 'CamelCase');
+      matcherLocator.createMatcher(_.keys(classes), 'Basic');
+      matcherLocator.createMatcher(_.keys(classes), 'CamelCase');
 
       finished.classes = true;
       if (!_.contains(_.values(finished), false)) {
@@ -77,6 +78,17 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     url = new URI(url).segment('overview-summary.html');
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString())
   }
+
+  $(document).on('keydown', function(event) {
+    if (event.which === 8 && !$(event.target).is("input, textarea") ||
+        event.which === 38 || event.which === 40) {
+      event.preventDefault();
+    }
+
+    $log.log('keypress: ', event);
+
+    $scope.$broadcast('JavadocSearchController.keypress', event);
+  });
 
   init();
 }]);

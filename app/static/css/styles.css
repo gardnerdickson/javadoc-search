@@ -79,6 +79,14 @@ nav.push-menu-left li {
     border-top: solid 1px #b5dbe9;
 }
 
+nav.push-menu-left li.selected {
+    background-color: white;
+}
+
+nav.push-menu-left li:hover {
+    cursor: pointer;
+}
+
 nav.push-menu-left {
     left: -300px;
 }
