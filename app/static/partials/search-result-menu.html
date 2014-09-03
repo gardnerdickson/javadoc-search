@@ -1,7 +1,6 @@
 <nav class="menu push-menu-left" >
     <ul>
-        <li search-result="" ng-repeat="name in searchResults" ng-click="loadJavadocClassPage(name)" ng-class="{'selected': $index == SearchResultMenu.selectedIndex}">
-            {{ name }}
+        <li search-result="" class-name="{{name}}" ng-repeat="name in SearchResultMenu.searchResults" ng-click="loadJavadocClassPage(name)" ng-class="{'selected': $index == SearchResultMenu.selectedIndex}">
         </li>
     </ul>
 </nav>

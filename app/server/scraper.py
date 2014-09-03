@@ -62,23 +62,23 @@ class JavadocScraper:
         class_url = urlparse.urljoin(self._url, class_relative_url)
         class_page_doc = self._retrieve_response_as_doc(class_url)
 
-        super_classes = {}
-        sub_classes = {}
+        ancestors = {}
+        descendants = {}
 
         description_root = class_page_doc.find(".//div[@class='description']/ul[@class='blockList']/li[@class='blockList']")
         for index, label in enumerate(description_root.findall('./dl/dt')):
             if label.text in self._SUPER_CLASS_LABELS:
-                super_classes = self._find_class_links(description_root, index)
+                ancestors = self._find_class_links(description_root, index)
 
             elif label.text in self._SUB_CLASS_LABELS:
-                sub_classes = self._find_class_links(description_root, index)
+                descendants = self._find_class_links(description_root, index)
 
             elif label.text is not None and label.text not in self._IGNORED_LABELS:
                 raise Exception("Unknown super or sub class label: ", label.text, ' at ', class_url)
 
         return {
-            'superClasses': super_classes,
-            'subClasses': sub_classes
+            'ancestors': ancestors,
+            'descendants': descendants
         }
 
     def retrieve_packages(self):

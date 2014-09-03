@@ -105,10 +105,6 @@ nav.push-menu-left li.selected {
     background-color: #fff;
     color: #000;
 }
-/*nav.push-menu-left li:focus {*/
-    /*background-color: #d1d1d1;*/
-    /*color: #000;*/
-/*}*/
 
 nav.push-menu-left li:hover {
     cursor: pointer;
@@ -116,6 +112,10 @@ nav.push-menu-left li:hover {
 
 nav.push-menu-left {
     left: -300px;
+}
+
+nav.push-menu-left .class-relative-list li {
+    color: #000;
 }
 
 

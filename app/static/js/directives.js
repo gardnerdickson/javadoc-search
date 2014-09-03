@@ -100,7 +100,7 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'jav
       scope.SearchResultMenu = {};
 
       scope.SearchResultMenu.updateResults = function(searchResults) {
-        scope.searchResults = searchResults;
+        scope.SearchResultMenu.searchResults = searchResults;
       };
 
       scope.SearchResultMenu.selectedIndex = -1;
@@ -116,29 +116,19 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'jav
           }
           else if (keyPress.which === 40) { // down
             scope.SearchResultMenu.selectedIndex++;
-            if (scope.SearchResultMenu.selectedIndex > scope.searchResults.length - 1) {
-              scope.SearchResultMenu.selectedIndex = scope.searchResults.length - 1;
+            if (scope.SearchResultMenu.selectedIndex > scope.SearchResultMenu.searchResults.length - 1) {
+              scope.SearchResultMenu.selectedIndex = scope.SearchResultMenu.searchResults.length - 1;
             }
-          }
-          else if (keyPress.which === 39) {
-
-            var className = scope.searchResults[scope.SearchResultMenu.selectedIndex];
-            var classInfo = searchDataLocator.getSearchData('Classes')[className];
-
-            javadocService.retrieveRelatives(new URI(classInfo.url).toString(), function(relatives) {
-              $log.log("Class hierarchy info for ", className, ": ", relatives);
-            });
           }
 
           if (keyPress.which === 13) {
-            scope.loadJavadocClassPage(scope.searchResults[scope.SearchResultMenu.selectedIndex]);
+            scope.loadJavadocClassPage(scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedIndex]);
             scope.SearchResultMenu.selectedIndex = -1;
           }
 
         }, 0);
 
       });
-
 
       scope.SearchBox.setSearchResultMenu(scope.SearchResultMenu);
 
@@ -147,12 +137,52 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'jav
 }]);
 
 
-app.directive('searchResult', ['$log', function($log) {
+app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', function($log, searchDataLocator, javadocService) {
   return {
+    templateUrl: 'static/partials/search-result.html',
     restrict: 'A',
     link: function(scope, element, attrs) {
 
       scope.SearchResult = {};
+
+      scope.ancestors = [];
+      scope.descendants = [];
+
+      var className = attrs.className;
+
+      scope.$on('JavadocSearchController.keypress', function(event, keyPress) {
+
+        var selectedClassName = scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedIndex];
+        if (className === selectedClassName) {
+
+          if (keyPress.which === 39) { // right
+
+            var classInfo = searchDataLocator.getSearchData('Classes')[className];
+
+            javadocService.retrieveRelatives(new URI(classInfo.url).toString(), function(relatives) {
+              scope.ancestors = _.keys(relatives.ancestors);
+              scope.descendants = _.keys(relatives.descendants);
+            });
+          }
+          else if (keyPress.which === 37) { // left
+            clearClassRelatives();
+          }
+
+        }
+        if (keyPress.which === 38 || keyPress.which === 40) {
+          clearClassRelatives();
+        }
+
+      });
+
+      function clearClassRelatives() {
+        while (scope.ancestors.length > 0) {
+          scope.ancestors.pop();
+        }
+        while (scope.descendants.length > 0) {
+          scope.descendants.pop();
+        }
+      }
 
     }
   }
