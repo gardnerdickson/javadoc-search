@@ -1,5 +1,5 @@
 
-app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', function($log, matcherLocator, searchDataLocator) {
+app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyPressWatcher', function($log, matcherLocator, searchDataLocator, keyPressWatcher) {
   return {
     templateUrl: 'static/partials/search-box.html',
     restrict: 'A',
@@ -16,25 +16,6 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', funct
       scope.SearchBox.setSearchResultMenu = function(menu) {
         searchResultMenu = menu;
       };
-
-      scope.$on('JavadocSearchController.keypress', function(event, keyPress) {
-
-        if (!focus) {
-
-          element.find('input').focus();
-
-          // If captured key is a printable character
-          if (keyPress.which >= 32 && keyPress.which <= 126) {
-            scope.query += String.fromCharCode(keyPress.which);
-            scope.onChange(null);
-          }
-
-          // If captured key is backspace
-          if (keyPress.which === 8) {
-            scope.query = scope.query.slice(0, scope.query.length - 2)
-          }
-        }
-      });
 
       scope.onChange = function($event) {
 
@@ -65,17 +46,30 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', funct
         focus = false;
       };
 
-      scope.$on('JavadocSearchController.keypress', function(event, keyPress) {
-        if (keyPress.which === 13) {
-          closeSearchResultMenu();
-          scope.query = matches[searchResultMenu.selectedIndex];
-          lastQuery = '';
-        }
+      keyPressWatcher.addHandler(keyPressWatcher.events.ENTER, function() {
+        closeSearchResultMenu();
+        scope.query = matches[searchResultMenu.selectedIndex];
+        lastQuery = '';
+      });
 
-        if (keyPress.which === 27) {
-          closeSearchResultMenu();
-          scope.query = '';
-          lastQuery = '';
+      keyPressWatcher.addHandler(keyPressWatcher.events.ESC, function() {
+        closeSearchResultMenu();
+        scope.query = '';
+        lastQuery = '';
+      });
+
+      keyPressWatcher.addHandler(keyPressWatcher.events.PRINTABLE, function(charCode) {
+        if (!focus) {
+          element.find('input').focus();
+          scope.query += String.fromCharCode(charCode);
+          scope.onChange(null);
+        }
+      });
+
+      keyPressWatcher.addHandler(keyPressWatcher.events.BACKSPACE, function() {
+        if (!focus) {
+          element.find('input').focus();
+          scope.query = scope.query.slice(0, scope.query.length - 2)
         }
       });
 
@@ -91,7 +85,7 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', funct
   }
 }]);
 
-app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'javadocService', function($log, $timeout, searchDataLocator, javadocService) {
+app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'javadocService', 'keyPressWatcher', function($log, $timeout, searchDataLocator, javadocService, keyPressWatcher) {
   return {
     templateUrl: 'static/partials/search-result-menu.html',
     restrict: 'A',
@@ -105,29 +99,29 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'jav
 
       scope.SearchResultMenu.selectedIndex = -1;
 
-      scope.$on('JavadocSearchController.keypress', function(event, keyPress) {
-
+      keyPressWatcher.addHandler(keyPressWatcher.events.UP, function() {
         $timeout(function() {
-          if (keyPress.which === 38) { // up
-            scope.SearchResultMenu.selectedIndex--;
-            if (scope.SearchResultMenu.selectedIndex < 0) {
-              scope.SearchResultMenu.selectedIndex = 0;
-            }
+          scope.SearchResultMenu.selectedIndex--;
+          if (scope.SearchResultMenu.selectedIndex < 0) {
+            scope.SearchResultMenu.selectedIndex = 0;
           }
-          else if (keyPress.which === 40) { // down
-            scope.SearchResultMenu.selectedIndex++;
-            if (scope.SearchResultMenu.selectedIndex > scope.SearchResultMenu.searchResults.length - 1) {
-              scope.SearchResultMenu.selectedIndex = scope.SearchResultMenu.searchResults.length - 1;
-            }
-          }
-
-          if (keyPress.which === 13) {
-            scope.loadJavadocClassPage(scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedIndex]);
-            scope.SearchResultMenu.selectedIndex = -1;
-          }
-
         }, 0);
+      });
 
+      keyPressWatcher.addHandler(keyPressWatcher.events.DOWN, function() {
+        $timeout(function() {
+          scope.SearchResultMenu.selectedIndex++;
+          if (scope.SearchResultMenu.selectedIndex > scope.SearchResultMenu.searchResults.length - 1) {
+            scope.SearchResultMenu.selectedIndex = scope.SearchResultMenu.searchResults.length - 1;
+          }
+        }, 0);
+      });
+
+      keyPressWatcher.addHandler(keyPressWatcher.events.ENTER, function() {
+        $timeout(function() {
+          scope.loadJavadocClassPage(scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedIndex]);
+          scope.SearchResultMenu.selectedIndex = -1;
+        }, 0);
       });
 
       scope.SearchBox.setSearchResultMenu(scope.SearchResultMenu);
@@ -137,7 +131,7 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'jav
 }]);
 
 
-app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', function($log, searchDataLocator, javadocService) {
+app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'keyPressWatcher', function($log, searchDataLocator, javadocService, keyPressWatcher) {
   return {
     templateUrl: 'static/partials/search-result.html',
     restrict: 'A',
@@ -149,31 +143,40 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', fu
       scope.descendants = [];
 
       var className = attrs.className;
+      var uniqueId = _.uniqueId();
 
-      scope.$on('JavadocSearchController.keypress', function(event, keyPress) {
+      keyPressWatcher.addHandler(keyPressWatcher.events.UP, function() {
+        $log.log('Caught the UP event');
+        clearClassRelatives();
+      }, uniqueId);
 
+      keyPressWatcher.addHandler(keyPressWatcher.events.DOWN, function() {
+        $log.log('Caught the DOWN event');
+        clearClassRelatives();
+      }, uniqueId);
+
+      keyPressWatcher.addHandler(keyPressWatcher.events.LEFT, function() {
+        $log.log('Caught the LEFT event');
         var selectedClassName = scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedIndex];
         if (className === selectedClassName) {
-
-          if (keyPress.which === 39) { // right
-
-            var classInfo = searchDataLocator.getSearchData('Classes')[className];
-
-            javadocService.retrieveRelatives(new URI(classInfo.url).toString(), function(relatives) {
-              scope.ancestors = _.keys(relatives.ancestors);
-              scope.descendants = _.keys(relatives.descendants);
-            });
-          }
-          else if (keyPress.which === 37) { // left
-            clearClassRelatives();
-          }
-
-        }
-        if (keyPress.which === 38 || keyPress.which === 40) {
           clearClassRelatives();
         }
+      }, uniqueId);
 
-      });
+      keyPressWatcher.addHandler(keyPressWatcher.events.RIGHT, function() {
+        $log.log('Caught the RIGHT event');
+        var selectedClassName = scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedIndex];
+        if (className === selectedClassName) {
+          var classInfo = searchDataLocator.getSearchData('Classes')[className];
+          $log.log('Trying to get search data: ', classInfo);
+
+          javadocService.retrieveRelatives(new URI(classInfo.url).toString(), function(relatives) {
+            scope.ancestors = _.keys(relatives.ancestors);
+            scope.descendants = _.keys(relatives.descendants);
+          });
+        }
+      }, uniqueId);
+
 
       function clearClassRelatives() {
         while (scope.ancestors.length > 0) {
@@ -183,6 +186,13 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', fu
           scope.descendants.pop();
         }
       }
+
+      element.on('$destroy', function() {
+        keyPressWatcher.removeHandler(keyPressWatcher.events.UP, uniqueId);
+        keyPressWatcher.removeHandler(keyPressWatcher.events.DOWN, uniqueId);
+        keyPressWatcher.removeHandler(keyPressWatcher.events.LEFT, uniqueId);
+        keyPressWatcher.removeHandler(keyPressWatcher.events.RIGHT, uniqueId);
+      });
 
     }
   }

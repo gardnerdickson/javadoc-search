@@ -79,16 +79,6 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString())
   }
 
-  $(document).on('keydown', function(event) {
-    if (event.which === 8 && !$(event.target).is("input, textarea") ||
-        (event.which === 38 || event.which === 40) ||
-        ((event.which === 37 || event.which === 39) && !$(event.target).is("input, textarea"))) {
-      $log.log('Prevent default');
-      event.preventDefault();
-    }
-
-    $scope.$broadcast('JavadocSearchController.keypress', event);
-  });
 
   init();
 }]);
