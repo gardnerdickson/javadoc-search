@@ -75,7 +75,6 @@ app.service('keyPressWatcher', ['$log', function($log) {
 
     for (var i = 0; i < handlers[keyPressEvent].length; i++) {
       if (handlers[keyPressEvent][i].uniqueId === uniqueId) {
-        $log.log("Removing keypress handler");
         handlers[keyPressEvent].splice(i, 1);
       }
     }

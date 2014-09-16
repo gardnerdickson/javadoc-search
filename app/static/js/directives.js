@@ -53,9 +53,11 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
       });
 
       keyPressWatcher.addHandler(keyPressWatcher.events.ESC, function() {
-        closeSearchResultMenu();
-        scope.query = '';
-        lastQuery = '';
+        scope.$apply(function() {
+          closeSearchResultMenu();
+          scope.query = '';
+          lastQuery = '';
+        });
       });
 
       keyPressWatcher.addHandler(keyPressWatcher.events.PRINTABLE, function(charCode) {
@@ -100,28 +102,28 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'jav
       scope.SearchResultMenu.selectedIndex = -1;
 
       keyPressWatcher.addHandler(keyPressWatcher.events.UP, function() {
-        $timeout(function() {
+        scope.$apply(function() {
           scope.SearchResultMenu.selectedIndex--;
           if (scope.SearchResultMenu.selectedIndex < 0) {
             scope.SearchResultMenu.selectedIndex = 0;
           }
-        }, 0);
+        });
       });
 
       keyPressWatcher.addHandler(keyPressWatcher.events.DOWN, function() {
-        $timeout(function() {
+        scope.$apply(function() {
           scope.SearchResultMenu.selectedIndex++;
           if (scope.SearchResultMenu.selectedIndex > scope.SearchResultMenu.searchResults.length - 1) {
             scope.SearchResultMenu.selectedIndex = scope.SearchResultMenu.searchResults.length - 1;
           }
-        }, 0);
+        });
       });
 
       keyPressWatcher.addHandler(keyPressWatcher.events.ENTER, function() {
-        $timeout(function() {
+        scope.$apply(function() {
           scope.loadJavadocClassPage(scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedIndex]);
           scope.SearchResultMenu.selectedIndex = -1;
-        }, 0);
+        });
       });
 
       scope.SearchBox.setSearchResultMenu(scope.SearchResultMenu);
