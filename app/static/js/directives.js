@@ -148,21 +148,24 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
       var uniqueId = _.uniqueId();
 
       keyPressWatcher.addHandler(keyPressWatcher.events.UP, function() {
-        $log.log('Caught the UP event');
-        clearClassRelatives();
+        scope.$apply(function() {
+          clearClassRelatives();
+        });
       }, uniqueId);
 
       keyPressWatcher.addHandler(keyPressWatcher.events.DOWN, function() {
-        $log.log('Caught the DOWN event');
-        clearClassRelatives();
+        scope.$apply(function() {
+          clearClassRelatives();
+        });
       }, uniqueId);
 
       keyPressWatcher.addHandler(keyPressWatcher.events.LEFT, function() {
-        $log.log('Caught the LEFT event');
-        var selectedClassName = scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedIndex];
-        if (className === selectedClassName) {
-          clearClassRelatives();
-        }
+        scope.$apply(function() {
+          var selectedClassName = scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedIndex];
+          if (className === selectedClassName) {
+            clearClassRelatives();
+          }
+        });
       }, uniqueId);
 
       keyPressWatcher.addHandler(keyPressWatcher.events.RIGHT, function() {

@@ -1,7 +1,11 @@
-<span>{{name}}</span>
+<div class="class-name">{{name}}</div>
 <ul class="class-relative-list">
-    <li ng-repeat="ancestor in ancestors">{{ancestor}}</li>
+    <li class="ancestor-class-name" ng-repeat="ancestor in ancestors">
+        <div>{{ancestor}}</div>
+    </li>
 </ul>
 <ul class="class-relative-list">
-    <li ng-repeat="descendant in descendants">{{descendant}}</li>
+    <li class="ancestor-class-name" ng-repeat="descendant in descendants">
+        <div>{{descendant}}</div>
+    </li>
 </ul>
