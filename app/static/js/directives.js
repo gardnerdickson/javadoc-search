@@ -144,53 +144,61 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
       scope.ancestors = [];
       scope.descendants = [];
 
+      scope.showRelatives = false;
+
       var className = attrs.className;
       var uniqueId = _.uniqueId();
+      var relativesLoaded = false;
 
       keyPressWatcher.addHandler(keyPressWatcher.events.UP, function() {
         scope.$apply(function() {
-          clearClassRelatives();
+          $log.log("Hiding relatives");
+          scope.showRelatives = false;
         });
       }, uniqueId);
 
       keyPressWatcher.addHandler(keyPressWatcher.events.DOWN, function() {
         scope.$apply(function() {
-          clearClassRelatives();
+          $log.log("Hiding relatives");
+          scope.showRelatives = false;
         });
       }, uniqueId);
 
       keyPressWatcher.addHandler(keyPressWatcher.events.LEFT, function() {
-        scope.$apply(function() {
-          var selectedClassName = scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedIndex];
-          if (className === selectedClassName) {
-            clearClassRelatives();
-          }
-        });
-      }, uniqueId);
-
-      keyPressWatcher.addHandler(keyPressWatcher.events.RIGHT, function() {
-        $log.log('Caught the RIGHT event');
         var selectedClassName = scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedIndex];
         if (className === selectedClassName) {
-          var classInfo = searchDataLocator.getSearchData('Classes')[className];
-          $log.log('Trying to get search data: ', classInfo);
-
-          javadocService.retrieveRelatives(new URI(classInfo.url).toString(), function(relatives) {
-            scope.ancestors = _.keys(relatives.ancestors);
-            scope.descendants = _.keys(relatives.descendants);
+          scope.$apply(function() {
+            $log.log("Hiding relatives");
+            scope.showRelatives = false;
           });
         }
       }, uniqueId);
 
+      keyPressWatcher.addHandler(keyPressWatcher.events.RIGHT, function() {
+        $log.log('Caught the RIGHT event');
 
-      function clearClassRelatives() {
-        while (scope.ancestors.length > 0) {
-          scope.ancestors.pop();
+        var selectedClassName = scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedIndex];
+        if (className === selectedClassName) {
+          $log.log("Showing relatives");
+
+          scope.$apply(function() {
+            scope.showRelatives = true;
+          });
+
+          if (!relativesLoaded) {
+            var classInfo = searchDataLocator.getSearchData('Classes')[className];
+            $log.log('Trying to get search data: ', classInfo);
+
+            javadocService.retrieveRelatives(new URI(classInfo.url).toString(), function(relatives) {
+              scope.ancestors = _.keys(relatives.ancestors);
+              scope.descendants = _.keys(relatives.descendants);
+
+              relativesLoaded = true;
+            });
+          }
         }
-        while (scope.descendants.length > 0) {
-          scope.descendants.pop();
-        }
-      }
+      }, uniqueId);
+
 
       element.on('$destroy', function() {
         keyPressWatcher.removeHandler(keyPressWatcher.events.UP, uniqueId);
