@@ -1,8 +1,6 @@
 'use strict';
 
 app.controller('LoadUrlController', ['$scope', '$log', '$location', function($scope, $log, $location) {
-  $log.log("LoadUrlController");
-
   $scope.javadocUrl = null;
 
   $scope.loadJavadoc = function() {
@@ -14,8 +12,6 @@ app.controller('LoadUrlController', ['$scope', '$log', '$location', function($sc
 
 
 app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', 'javadocService', 'searchDataLocator', 'matcherLocator', 'constants', function($scope, $log, $routeParams, $timeout, $sce, javadocService, searchDataLocator , matcherLocator, constants) {
-  $log.log("JavadocSearchController");
-
   var javadocUrl = null;
 
   $scope.loading = true;
@@ -23,11 +19,8 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
 
   $scope.loadJavadocClassPage = function(className) {
-    var classInfo = searchDataLocator.getSearchData('Classes')[className];
-    var url = new URI(javadocUrl).segment(classInfo.url);
-    $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
+    loadJavadocClassPage(className);
   };
-
 
   function init() {
 
@@ -77,6 +70,12 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   function loadJavadocSite(url) {
     url = new URI(url).segment('overview-summary.html');
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString())
+  }
+
+  function loadJavadocClassPage(className) {
+    var classInfo = searchDataLocator.getSearchData('Classes')[className];
+    var url = new URI(javadocUrl).segment(classInfo.url);
+    $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   }
 
 

@@ -116,16 +116,13 @@ app.service('keyPressWatcher', ['$log', function($log) {
 
   // capture the keypress
   $(document).on('keydown', function(event) {
-    $log.log('keyPressWatcher caught the event');
     var keyEvent = getEvent(event.which);
     if (keyEvent === service.events.BACKSPACE && !$(event.target).is("input, textarea") ||
         (keyEvent === service.events.UP || keyEvent === service.events.DOWN) ||
         ((keyEvent === service.events.LEFT || keyEvent === service.events.RIGHT) && !$(event.target).is("input, textarea"))) {
-      $log.log('Prevent default');
       event.preventDefault();
     }
 
-    $log.log('handlers', handlers);
     _.each(handlers[keyEvent], function(handler) {
       handler.callback(event.which);
     });
@@ -142,6 +139,11 @@ app.service('constants', [function() {
   service.metadata = {
     CLASSES: 'Classes',
     PACKAGES: 'Packages'
+  };
+
+  service.selectionMode = {
+    CLASSES: 'Classes',
+    RELATIVES: 'Relatives'
   };
 
   service.search = {
