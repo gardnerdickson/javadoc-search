@@ -1,8 +1,10 @@
-<div class="class-name" ng-click="loadJavadocClassPage(name)">{{name}}</div>
+<div class="class-name" ng-click="loadJavadocClassPage(result.name)">{{result.name}}</div>
 <div ng-show="showRelatives">
 
     <ul class="class-relative-list">
-        <li class-relative="" ng-repeat="class in classRelatives" ng-class="{'selected': $index == selectedRelativeIndex}">
+        <!--<li class-relative="" ng-repeat="class in classRelatives" ng-class="{'selected': $index == selectedRelativeIndex}">-->
+        <!--</li>-->
+        <li class-relative="" ng-repeat="class in classRelatives" ng-class="{'selected': selected}">
         </li>
     </ul>
 

@@ -1,6 +1,8 @@
 <nav class="menu push-menu-left" >
     <ul>
-        <li search-result="" class-name="{{name}}" ng-repeat="name in SearchResultMenu.searchResults" ng-class="{'selected': $index == SearchResultMenu.selectedClassIndex}">
+        <!--<li search-result="" class-name="{{name}}" ng-repeat="name in SearchResultMenu.searchResults" ng-class="{'selected': $index == SearchResultMenu.selectedClassIndex}">-->
+        <!--</li>-->
+        <li search-result="" ng-repeat="result in SearchResultMenu.searchResults" ng-class="{'selected': selected}">
         </li>
     </ul>
 </nav>
