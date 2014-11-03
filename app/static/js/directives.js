@@ -94,7 +94,6 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'jav
     link: function(scope, element, attrs) {
 
       scope.SearchResultMenu = {};
-      scope.selectionTree = {}; // Not really a tree just a linear list that represent the selectable results currently visible.
 
       scope.SearchResultMenu.selectionMode = constants.selectionMode.CLASSES;
       scope.SearchResultMenu.selectedClassIndex = -1;
@@ -114,37 +113,6 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'jav
           }
         });
       };
-
-//      scope.SearchResultMenu.addSearchResultChildScope = function(parentName, childName, childScope) {
-//        scope.selectionTree[parentName].children[childName] = childScope;
-//      };
-
-//      scope.SearchResultMenu.removeSearchResultScope = function(name) {
-//        delete scope.selectionTree[name];
-//      };
-
-
-//      scope.SearchResultMenu.insertResult = function(searchResults, parent) {
-//        $log.log("Inserting results into the search tree: ", searchResults);
-//        if (parent !== undefined) {
-//          var parentIndex = scope.selectionTree.indexOf(parent);
-//          if (parentIndex === -1) {
-//            throw "Could not find class in selection tree: " + parent;
-//          }
-//
-//          parentIndex++;
-//          _.each(searchResults, function(result) {
-//            scope.selectionTree.splice(parentIndex++, 0, {result: {}});
-//          });
-//        }
-//        else {
-//          _.each(searchResults, function(result) {
-//            scope.selectionTree.push({result: {}});
-//          });
-//        }
-//
-//        $log.log("selectionTree: ", scope.selectionTree);
-//      };
 
       scope.SearchResultMenu.selectedRelativeIndex = -1;
 
@@ -171,28 +139,6 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'jav
             scope.SearchResultMenu.searchResults[0].scope.selected = true;
           }
 
-
-//          if (scope.SearchResultMenu.selectionMode == constants.selectionMode.CLASSES) {
-//
-//            if (_.contains(_.keys(scope.selectionTree), selectedClassName)) {
-//              scope.selectionTree[selectedClassName].scope.deselect();
-//            }
-//
-//            scope.SearchResultMenu.selectedClassIndex--;
-//            if (scope.SearchResultMenu.selectedClassIndex < 0) {
-//              scope.SearchResultMenu.selectedClassIndex = 0;
-//            }
-//
-//            selectedClassName = scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedClassIndex];
-//            scope.selectionTree[selectedClassName].scope.select();
-//          }
-//          else if (scope.SearchResultMenu.selectionMode == constants.selectionMode.RELATIVES) {
-//            var selectedSearchResult = searchResultScopes[scope.SearchResultMenu.selectedClassIndex];
-//            selectedSearchResult.selectedRelativeIndex--;
-//            if (selectedSearchResult.selectedRelativeIndex < 0) {
-//              selectedSearchResult.selectedRelativeIndex = 0;
-//            }
-//          }
         });
       });
 
@@ -220,30 +166,6 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'jav
             scope.SearchResultMenu.searchResults[0].scope.selected = true;
           }
 
-//          if (scope.SearchResultMenu.selectionMode == constants.selectionMode.CLASSES) {
-//
-//            if (_.contains(_.keys(scope.selectionTree), selectedClassName)) {
-//              scope.selectionTree[selectedClassName].scope.deselect();
-//            }
-//
-//            scope.SearchResultMenu.selectedClassIndex++;
-//            if (scope.SearchResultMenu.selectedClassIndex > scope.SearchResultMenu.searchResults.length - 1) {
-//              scope.SearchResultMenu.selectedClassIndex = scope.SearchResultMenu.searchResults.length - 1;
-//            }
-//
-//            selectedClassName = scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedClassIndex];
-//            scope.selectionTree[selectedClassName].scope.select();
-//
-//            $log.log("incrementing selectedClassIndex: ", scope.SearchResultMenu.selectedClassIndex);
-//          }
-//          else if (scope.SearchResultMenu.selectionMode == constants.selectionMode.RELATIVES) {
-//            var selectedSearchResult = searchResultScopes[scope.SearchResultMenu.selectedClassIndex];
-//            selectedSearchResult.selectedRelativeIndex++;
-//            if (selectedSearchResult.selectedRelativeIndex > selectedSearchResult.classRelatives.length - 1) {
-//              selectedSearchResult.selectedRelativeIndex = selectedSearchResult.classRelatives.length - 1;
-//            }
-//            $log.log("incrementing selectedClassIndex: ", scope.SearchResultMenu.selectedRelativeIndex);
-//          }
         });
       });
 
@@ -259,8 +181,13 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'jav
 
       keyPressWatcher.addHandler(keyPressWatcher.events.ENTER, function() {
         scope.$apply(function() {
-          scope.loadJavadocClassPage(scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedClassIndex]);
-          scope.SearchResultMenu.selectedClassIndex = -1;
+
+          _.each(scope.SearchResultMenu.searchResults, function(searchResult) {
+            if (searchResult.scope.selected) {
+              scope.loadJavadocClassPage(searchResult.name);
+            }
+          });
+
         });
       });
 
@@ -327,24 +254,10 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
                 scope.classRelatives.push({name: relative});
               });
 
-//              scope.SearchResultMenu.insertResult(scope.classRelatives.slice(), scope.name);
-
             });
           }
         }
       }, uniqueId);
-
-
-//      scope.select = function() {
-//        if (!element.hasClass('selected')) {
-//          element.addClass('selected')
-//        }
-//      };
-//
-//      scope.deselect = function() {
-//        element.removeClass('selected');
-//      };
-
 
       scope.SearchResultMenu.setSearchResultScope(scope.name, scope);
 
