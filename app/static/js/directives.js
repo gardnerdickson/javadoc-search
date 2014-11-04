@@ -48,7 +48,18 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
 
       keyPressWatcher.addHandler(keyPressWatcher.events.ENTER, function() {
         closeSearchResultMenu();
-        scope.query = matches[searchResultMenu.selectedClassIndex];
+
+        var selectedClassName = null;
+        _.each(searchResultMenu.searchResults, function(searchResult) {
+          if (searchResult.scope.selected) {
+            selectedClassName = searchResult.scope.name;
+          }
+        });
+
+        if (selectedClassName !== null) {
+          scope.query = selectedClassName;
+        }
+
         lastQuery = '';
       });
 
