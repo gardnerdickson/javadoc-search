@@ -49,13 +49,7 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
       keyPressWatcher.addHandler(keyPressWatcher.events.ENTER, function() {
         closeSearchResultMenu();
 
-        var selectedClassName = null;
-        _.each(searchResultMenu.searchResults, function(searchResult) {
-          if (searchResult.scope.selected) {
-            selectedClassName = searchResult.scope.name;
-          }
-        });
-
+        var selectedClassName = searchResultMenu.getSelectedSearchResult();
         if (selectedClassName !== null) {
           scope.query = selectedClassName;
         }
@@ -107,7 +101,6 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'jav
       scope.SearchResultMenu = {};
 
       scope.SearchResultMenu.selectionMode = constants.selectionMode.CLASSES;
-      scope.SearchResultMenu.selectedClassIndex = -1;
 
 
       scope.SearchResultMenu.updateResults = function(searchResults) {
@@ -125,7 +118,16 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'jav
         });
       };
 
-      scope.SearchResultMenu.selectedRelativeIndex = -1;
+      scope.SearchResultMenu.getSelectedSearchResult = function() {
+        var selectedSearchResult = null;
+        _.each(scope.SearchResultMenu.searchResults, function(searchResult) {
+          if (searchResult.scope.selected) {
+            selectedSearchResult = searchResult.name;
+          }
+        });
+        return selectedSearchResult;
+      };
+
 
       keyPressWatcher.addHandler(keyPressWatcher.events.UP, function() {
         scope.$apply(function() {
@@ -192,13 +194,7 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'jav
 
       keyPressWatcher.addHandler(keyPressWatcher.events.ENTER, function() {
         scope.$apply(function() {
-
-          _.each(scope.SearchResultMenu.searchResults, function(searchResult) {
-            if (searchResult.scope.selected) {
-              scope.loadJavadocClassPage(searchResult.name);
-            }
-          });
-
+          scope.loadJavadocClassPage(scope.SearchResultMenu.getSelectedSearchResult())
         });
       });
 
@@ -217,12 +213,11 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
 
       scope.SearchResult = {};
 
-      scope.classRelatives = {};
+      scope.classRelatives = [];
       scope.showRelatives = false;
       scope.selected = false;
       scope.name = scope.result.name;
 
-      var className = attrs.className;
       var uniqueId = _.uniqueId();
       var relativesLoaded = false;
 
@@ -247,14 +242,15 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
 
       keyPressWatcher.addHandler(keyPressWatcher.events.RIGHT, function() {
 
-        var selectedClassName = scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedClassIndex];
-        if (className === selectedClassName) {
+        var selectedClassName = scope.SearchResultMenu.getSelectedSearchResult();
+
+        if (scope.name === selectedClassName) {
           scope.$apply(function() {
             scope.showRelatives = true;
           });
 
           if (!relativesLoaded) {
-            var classInfo = searchDataLocator.getSearchData('Classes')[className];
+            var classInfo = searchDataLocator.getSearchData('Classes')[scope.name];
 
             javadocService.retrieveRelatives(new URI(classInfo.url).toString(), function(relatives) {
 
