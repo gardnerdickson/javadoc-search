@@ -74,7 +74,10 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
   function loadJavadocClassPage(className) {
     var classInfo = searchDataLocator.getSearchData('Classes')[className];
-    var url = new URI(javadocUrl).segment(classInfo.url);
+//    var url = new URI(javadocUrl).segment(classInfo.url);
+//    $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
+
+    var url = new URI('./docPage').addSearch({classRelativeUrl: classInfo.url});
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   }
 

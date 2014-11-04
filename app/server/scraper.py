@@ -3,6 +3,7 @@ __author__ = 'Gardner'
 import urllib.request as request
 import html5lib
 import urllib.parse as urlparse
+import xml.etree.ElementTree as ElementTree
 
 
 class JavadocScraper:
@@ -93,6 +94,25 @@ class JavadocScraper:
 
         return packages
 
+    def retrieve_class_doc_page(self, class_relative_url):
+        class_url = urlparse.urljoin(self._url, class_relative_url)
+        class_doc_page = self._retrieve_response_as_doc(class_url)
+
+        parent = class_doc_page.find("body")  # direct parent to elements that we want to remove
+
+        top_nav_div = parent.find(".//div[@class='topNav']")
+        parent.remove(top_nav_div)
+
+        bottom_nav_div = parent.find(".//div[@class='bottomNav']")
+        parent.remove(bottom_nav_div)
+
+        sub_nav_divs = parent.findall(".//div[@class='subNav']")
+        for sub_nav_div in sub_nav_divs:
+            parent.remove(sub_nav_div)
+
+        return ElementTree.tostring(class_doc_page)
+
+
     @staticmethod
     def _find_class_links(description_root, index):
         classes = {}
@@ -104,7 +124,9 @@ class JavadocScraper:
 
         return classes
 
-    def _retrieve_response_as_doc(self, url):
+
+    @staticmethod
+    def _retrieve_response_as_doc(url):
         html_raw_response = request.urlopen(url)
         html_doc = html5lib.parse(html_raw_response, encoding=html_raw_response.info().get_content_charset(), namespaceHTMLElements=False)
         return html_doc

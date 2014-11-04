@@ -69,6 +69,17 @@ def get_packages():
     return jsonify(packages)
 
 
+@app.route('/docPage', methods=['GET'])
+def get_class_doc():
+    encoded_class_relative_url = request.args['classRelativeUrl']
+    class_relative_url = urlparse.unquote(encoded_class_relative_url)
+
+    scraper = JavadocScraper(session['base_url'])
+    class_doc_page_modified = scraper.retrieve_class_doc_page(class_relative_url)
+
+    return class_doc_page_modified
+
+
 if __name__ == '__main__':
     app.secret_key = 'gardnerdickson' #TODO: change this
     app.run(debug=True)
