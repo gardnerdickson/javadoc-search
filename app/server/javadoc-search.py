@@ -1,8 +1,7 @@
 import urllib.parse as urlparse
-import json
+import urllib.request
 
 from flask import Flask
-
 from flask import request
 from flask import jsonify
 from flask import render_template
@@ -24,6 +23,14 @@ app = Flask_JavadocSearch(__name__, template_folder='../templates', static_folde
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/stylesheet.css')
+def style_sheet_proxy():
+    stylesheet_url = urlparse.urljoin(session['base_url'], 'stylesheet.css')
+    stylesheet_response = urllib.request.urlopen(stylesheet_url)
+
+    return stylesheet_response.read()
 
 
 @app.route('/baseUrl', methods=['POST'])
