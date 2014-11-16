@@ -29,7 +29,7 @@ app.service('javadocService', ['$http', function($http) {
     };
     $http.get('./relatives', config).then(function(response) {
       onComplete(response.data);
-    })
+    });
   };
 
   return service;
