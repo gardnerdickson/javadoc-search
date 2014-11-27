@@ -78,6 +78,11 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   }
 
 
+  window.onbeforeunload = function() {
+    return "You are about to leave Javadoc Search."
+  };
+
+
   init();
 }]);
 
