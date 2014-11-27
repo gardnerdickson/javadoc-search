@@ -186,20 +186,20 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
 
   var indexes = {};
 
-  service.createMatcher = function(values, type) {
+  service.createMatcher = function(values, type, key) {
     if (type === 'Basic') {
-      indexes[type] = new BasicMatcher(values, constants.search.MAX_RESULTS)
+      indexes[key] = new BasicMatcher(values, constants.search.MAX_RESULTS)
     }
     else if (type === 'CamelCase') {
-      indexes[type] = new CamelCaseMatcher(values, constants.search.MAX_RESULTS)
+      indexes[key] = new CamelCaseMatcher(values, constants.search.MAX_RESULTS)
     }
     else {
       throw "Invalid matcher type: " + type;
     }
   };
 
-  service.getMatcher = function(type) {
-    return indexes[type];
+  service.getMatcher = function(key) {
+    return indexes[key];
   };
 
 

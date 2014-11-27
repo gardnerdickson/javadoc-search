@@ -5,13 +5,16 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
     restrict: 'A',
     link: function(scope, element, attrs) {
 
-      var basicMatcher = null;
+      var basicClassesMatcher = null;
+      var basicPackagesMatcher = null;
       var searchResultMenu = {};
       var lastQuery = null;
       var focus = false;
       var matches = [];
 
       scope.SearchBox = {};
+
+      scope.SearchBox.searchMode = 'Classes';
 
       scope.SearchBox.setSearchResultMenu = function(menu) {
         searchResultMenu = menu;
@@ -26,12 +29,24 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
           closeSearchResultMenu();
         }
 
-        if (basicMatcher === null) {
-          basicMatcher = matcherLocator.getMatcher('Basic');
+        if (basicClassesMatcher === null) {
+          basicClassesMatcher = matcherLocator.getMatcher('Classes_Basic');
+        }
+        if (basicPackagesMatcher === null) {
+          basicPackagesMatcher = matcherLocator.getMatcher('Packages_Basic');
         }
 
-        try { matches = basicMatcher.findMatches(scope.query); }
-        catch (exception) { /* suppress */ }
+        try {
+          if (scope.query.indexOf(':') === 0) {
+            scope.SearchBox.searchMode = 'Packages';
+            matches = basicPackagesMatcher.findMatches(scope.query.substr(1));
+          }
+          else {
+            scope.SearchBox.searchMode = 'Classes';
+            matches = basicClassesMatcher.findMatches(scope.query);
+          }
+        }
+        catch (ignore) { }
 
         searchResultMenu.updateResults(matches);
 
@@ -194,7 +209,12 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'jav
 
       keyPressWatcher.addHandler(keyPressWatcher.events.ENTER, function() {
         scope.$apply(function() {
-          scope.loadJavadocClassPage(scope.SearchResultMenu.getSelectedSearchResult())
+          if (scope.SearchBox.searchMode === 'Classes') {
+            scope.loadJavadocClassPage(scope.SearchResultMenu.getSelectedSearchResult())
+          }
+          else {
+            scope.loadJavadocPackagePage(scope.SearchResultMenu.getSelectedSearchResult())
+          }
         });
       });
 
@@ -222,7 +242,7 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
       var relativesLoaded = false;
 
 
-      scope.setRelativeScope = function(name, scope) {
+      scope.SearchResult.setRelativeScope = function(name, scope) {
         _.each(scope.classRelatives, function(relative) {
           if (relative.name === name) {
             relative.scope = scope;

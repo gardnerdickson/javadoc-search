@@ -90,7 +90,9 @@ class JavadocScraper:
             package_name = package_link.text
             url = package_link.attrib['href']
 
-            packages[package_name] = url
+            packages[package_name] = {
+                'url': url
+            }
 
         return packages
 

@@ -19,7 +19,11 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
 
   $scope.loadJavadocClassPage = function(className) {
-    loadJavadocClassPage(className);
+    loadJavadocPage(searchDataLocator.getSearchData('Classes')[className]);
+  };
+
+  $scope.loadJavadocPackagePage = function(packageName) {
+    loadJavadocPage(searchDataLocator.getSearchData('Packages')[packageName]);
   };
 
   function init() {
@@ -46,8 +50,8 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       $log.debug("Got metadata for classes");
       searchDataLocator.setSearchData(classes, constants.metadata.CLASSES);
 
-      matcherLocator.createMatcher(_.keys(classes), 'Basic');
-      matcherLocator.createMatcher(_.keys(classes), 'CamelCase');
+      matcherLocator.createMatcher(_.keys(classes), 'Basic', 'Classes_Basic');
+      matcherLocator.createMatcher(_.keys(classes), 'CamelCase', 'Classes_CamelCase');
 
       finished.classes = true;
       if (!_.contains(_.values(finished), false)) {
@@ -58,6 +62,8 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     javadocService.retrievePackages(function(packages) {
       $log.debug("Got metadata for packages");
       searchDataLocator.setSearchData(packages, constants.metadata.PACKAGES);
+
+      matcherLocator.createMatcher(_.keys(packages), 'Basic', 'Packages_Basic');
 
       finished.packages = true;
       if (!_.contains(_.values(finished), false)) {
@@ -71,9 +77,9 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString())
   }
 
-  function loadJavadocClassPage(className) {
-    var classInfo = searchDataLocator.getSearchData('Classes')[className];
-    var url = new URI(javadocUrl).segment(classInfo.url);
+
+  function loadJavadocPage(moduleInfo) {
+    var url = new URI(javadocUrl).segment(moduleInfo.url);
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   }
 
