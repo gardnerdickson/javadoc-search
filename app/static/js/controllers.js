@@ -73,38 +73,9 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
   function loadJavadocClassPage(className) {
     var classInfo = searchDataLocator.getSearchData('Classes')[className];
-    //var url = new URI(javadocUrl).segment(classInfo.url);
-    //$scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
-
-    var url = new URI('./docPage').addSearch({classRelativeUrl: classInfo.url});
+    var url = new URI(javadocUrl).segment(classInfo.url);
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   }
-
-
-  var javadocFrame = $('#javadoc-frame');
-  javadocFrame.load(function() {
-    var iframeBody = $(javadocFrame.contents().find('body'));
-    iframeBody.find('.topNav').remove();
-    iframeBody.find('.bottomNav').remove();
-    iframeBody.find('.subNav').remove();
-
-    var links = iframeBody.find('.contentContainer a');
-    _.each(links, function(link) {
-      link = $(link);
-      var linkUrl = link.attr('href');
-      link.attr('href', "javascript: parent.linkProxyRequest('" + linkUrl + "')")
-    });
-
-  });
-
-
-  window.linkProxyRequest = function(relativeUrl) {
-    relativeUrl = new URI(relativeUrl).hash("").toString().replace(/\.\.\//g, '');
-    var url = new URI('/linkProxy').addSearch({classRelativeUrl: relativeUrl});
-    $scope.$apply(function() {
-      $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
-    });
-  };
 
 
   init();

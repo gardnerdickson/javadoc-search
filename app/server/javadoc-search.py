@@ -69,35 +69,6 @@ def get_packages():
     return jsonify(packages)
 
 
-@app.route('/docPage', methods=['GET'])
-def get_class_doc():
-    encoded_class_relative_url = request.args['classRelativeUrl']
-    class_relative_url = urlparse.unquote(encoded_class_relative_url)
-
-    scraper = JavadocScraper(session['base_url'])
-    class_doc_page_modified = scraper.retrieve_class_doc_page(class_relative_url)
-
-    return class_doc_page_modified
-
-
-@app.route('/stylesheet.css', methods=['GET'])
-def style_sheet_proxy():
-    stylesheet_url = urlparse.urljoin(session['base_url'], 'stylesheet.css')
-    stylesheet_response = urllib.request.urlopen(stylesheet_url)
-
-    return Response(stylesheet_response, content_type='text/css')
-
-
-@app.route('/linkProxy', methods=['GET'])
-def link_proxy():
-    encoded_class_relative_url = request.args['classRelativeUrl']
-    class_relative_url = urlparse.urljoin(session['base_url'], urlparse.unquote(encoded_class_relative_url))
-    print(str("Trying to get: " + class_relative_url))
-    class_page_response = urllib.request.urlopen(class_relative_url)
-
-    return Response(class_page_response, content_type='text/html')
-
-
 if __name__ == '__main__':
     app.secret_key = 'gardnerdickson' #TODO: change this
     app.run(debug=True)

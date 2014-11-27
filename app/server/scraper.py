@@ -94,36 +94,6 @@ class JavadocScraper:
 
         return packages
 
-    def retrieve_class_doc_page(self, class_relative_url):
-        class_url = urlparse.urljoin(self._url, class_relative_url)
-        class_doc_page = request.urlopen(class_url)
-        return class_doc_page.read()
-        #
-        # head = class_doc_page.find("head")
-        #
-        # script_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'test.html')
-        # with open(script_path, mode='r', encoding='utf-8') as script_file:
-        #     script_str = script_file.read()
-        #
-        # script = html5lib.parse(script_str, namespaceHTMLElements=False)
-        # head.append(script)
-        #
-        # # body = class_doc_page.find("body")  # direct parent to elements that we want to remove
-        # #
-        # # top_nav_div = body.find(".//div[@class='topNav']")
-        # # body.remove(top_nav_div)
-        # #
-        # # bottom_nav_div = body.find(".//div[@class='bottomNav']")
-        # # body.remove(bottom_nav_div)
-        # #
-        # # sub_nav_divs = body.findall(".//div[@class='subNav']")
-        # # for sub_nav_div in sub_nav_divs:
-        # #     body.remove(sub_nav_div)
-        #
-        # html_string = ElementTree.tostring(class_doc_page, encoding='utf-8')
-        #
-        # return html_string
-
 
     @staticmethod
     def _find_class_links(description_root, index):
