@@ -256,7 +256,7 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
 
       keyPressWatcher.addHandler(keyPressWatcher.events.LEFT, function() {
         var selectedClassName = scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedClassIndex];
-        if (className === selectedClassName) {
+        if (scope.name === selectedClassName) {
           scope.$apply(function() {
             scope.showRelatives = false;
           });

@@ -19,11 +19,11 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
 
   $scope.loadJavadocClassPage = function(className) {
-    loadJavadocPage(searchDataLocator.getSearchData('Classes')[className]);
+    loadJavadocClassPage(searchDataLocator.getSearchData('Classes')[className]);
   };
 
   $scope.loadJavadocPackagePage = function(packageName) {
-    loadJavadocPage(searchDataLocator.getSearchData('Packages')[packageName]);
+    loadJavadocPackagePage(searchDataLocator.getSearchData('Packages')[packageName]);
   };
 
   function init() {
@@ -78,8 +78,14 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   }
 
 
-  function loadJavadocPage(moduleInfo) {
-    var url = new URI(javadocUrl).segment(moduleInfo.url);
+  function loadJavadocClassPage(classInfo) {
+    var url = new URI(javadocUrl).segment(classInfo.url);
+    $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
+  }
+
+  function loadJavadocPackagePage(packageInfo) {
+    $log.log("load package: ", packageInfo);
+    var url = new URI('/packagePageProxy').addSearch('packageRelativeUrl', packageInfo.url);
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   }
 
