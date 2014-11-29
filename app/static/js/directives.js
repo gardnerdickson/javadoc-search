@@ -64,9 +64,12 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
       keyPressWatcher.addHandler(keyPressWatcher.events.ENTER, function() {
         closeSearchResultMenu();
 
-        var selectedClassName = searchResultMenu.getSelectedSearchResult();
-        if (selectedClassName !== null) {
-          scope.query = selectedClassName;
+        var selectedSearchResult = searchResultMenu.getSelectedSearchResult();
+        if (selectedSearchResult !== null) {
+          scope.query = selectedSearchResult;
+          if (scope.SearchBox.searchMode === 'Packages') {
+            scope.query = ':' + scope.query;
+          }
         }
 
         lastQuery = '';

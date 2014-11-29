@@ -84,8 +84,11 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   }
 
 
-  window.onbeforeunload = function() {
-    return "You are about to leave Javadoc Search."
+  window.onbeforeunload = function(e) {
+    if (e.srcElement.activeElement.id === 'javadoc-frame') {
+      return "You are about to leave Javadoc Search.";
+    }
+    return null;
   };
 
 
