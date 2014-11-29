@@ -1,9 +1,7 @@
 import urllib.parse as urlparse
-import urllib.request
 
 from flask import Flask
 from flask import request
-from flask import Response
 from flask import jsonify
 from flask import render_template
 from flask import session
@@ -12,6 +10,7 @@ from scraper import JavadocScraper
 
 
 class Flask_JavadocSearch(Flask):
+    # Need to use something other than '{{' and '}}' for templating to avoid conflicts with angular templating.
     jinja_options = Flask.jinja_options.copy()
     jinja_options.update({
         'variable_start_string': '{[{',
@@ -40,14 +39,6 @@ def get_classes():
     classes = scraper.retrieve_classes()
 
     return jsonify(classes)
-
-
-@app.route('/class')
-def get_class():
-    encoded_class_relative_url = request.args['classRelativeUrl']
-    class_relative_url = urlparse.unquote(encoded_class_relative_url)
-
-    return "test: " + class_relative_url
 
 
 @app.route('/relatives', methods=['GET'])
