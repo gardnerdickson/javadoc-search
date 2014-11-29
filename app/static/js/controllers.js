@@ -26,6 +26,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     loadJavadocPackagePage(searchDataLocator.getSearchData('Packages')[packageName]);
   };
 
+
   function init() {
 
     javadocUrl = URI.decode($routeParams.url);
@@ -77,17 +78,38 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString())
   }
 
-
   function loadJavadocClassPage(classInfo) {
+    javadocFrame.load(function() {
+      // do nothing
+    });
+
     var url = new URI(javadocUrl).segment(classInfo.url);
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   }
 
   function loadJavadocPackagePage(packageInfo) {
-    $log.log("load package: ", packageInfo);
+    PackageFrameOnLoadHandler.path = packageInfo.url.replace('package-frame.html', ''); // TODO: Is there a nicer way of getting the package url??
+    javadocFrame.load(PackageFrameOnLoadHandler.onLoad);
+
     var url = new URI('/packagePageProxy').addSearch('packageRelativeUrl', packageInfo.url);
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   }
+
+
+  var javadocFrame = $('#javadoc-frame');
+  var PackageFrameOnLoadHandler = {
+    path: '',
+    onLoad: function() {
+      $log.log('PackageFrameOnLoadHandler called');
+      var iframeBody = $(javadocFrame.contents().find('body'));
+      var links = iframeBody.find('.indexContainer a');
+      _.each(links, function(link) {
+        link = $(link);
+        var linkUrl = PackageFrameOnLoadHandler.path +  link.attr('href');
+        link.attr('href', "javascript: parent.setIframeSource('" + linkUrl + "')")
+      });
+    }
+  };
 
 
   window.onbeforeunload = function(e) {
@@ -95,6 +117,14 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       return "You are about to leave Javadoc Search.";
     }
     return null;
+  };
+
+
+  window.setIframeSource = function(url) {
+    $scope.$apply(function() {
+      loadJavadocClassPage({url: url});
+      // TODO: update query with class name
+    });
   };
 
 
