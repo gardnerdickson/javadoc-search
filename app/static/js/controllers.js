@@ -79,9 +79,6 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   }
 
   function loadJavadocClassPage(classInfo) {
-    javadocFrame.load(function() {
-      // do nothing
-    });
 
     var url = new URI(javadocUrl).segment(classInfo.url);
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
@@ -89,7 +86,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
   function loadJavadocPackagePage(packageInfo) {
     PackageFrameOnLoadHandler.path = packageInfo.url.replace('package-frame.html', ''); // TODO: Is there a nicer way of getting the package url??
-    javadocFrame.load(PackageFrameOnLoadHandler.onLoad);
+    javadocFrame.bind('load', PackageFrameOnLoadHandler.onLoad);
 
     var url = new URI('/packagePageProxy').addSearch('packageRelativeUrl', packageInfo.url);
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
@@ -105,8 +102,10 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       var links = iframeBody.find('.indexContainer a');
       _.each(links, function(link) {
         link = $(link);
-        var linkUrl = PackageFrameOnLoadHandler.path +  link.attr('href');
-        link.attr('href', "javascript: parent.setIframeSource('" + linkUrl + "')")
+        var linkUrl = PackageFrameOnLoadHandler.path + link.attr('href');
+        link.attr('href', "javascript: parent.setIframeSource('" + linkUrl + "')");
+
+        javadocFrame.unbind('load');
       });
     }
   };
@@ -123,7 +122,6 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   window.setIframeSource = function(url) {
     $scope.$apply(function() {
       loadJavadocClassPage({url: url});
-      // TODO: update query with class name
     });
   };
 
