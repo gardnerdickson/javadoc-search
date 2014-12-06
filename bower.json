@@ -19,6 +19,7 @@
     "jquery": "~2.1.1",
     "underscore": "~1.6.0",
     "uri.js": "~1.13.2",
-    "angular-route": "~1.2.20"
+    "angular-route": "~1.2.20",
+    "string_score": "~0.1.20"
   }
 }

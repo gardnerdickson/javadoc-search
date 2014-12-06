@@ -219,18 +219,36 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
 
     findMatches: function(query) {
       var matches = [];
+      var scoredMatches = [];
       var regex = new RegExp(query, 'i');
 
       for (var i = 0; i < this._values.length; i++) {
+
+        //var score = query.score(this._values[i]);
+        //var score = this._values[i].score(query);
+        //$log.log("score for ", this._values[i], " is ", score);
+
+        //scoredMatches.push({score: score, value: this._values[i]});
+
         if (regex.test(this._values[i])) {
           matches.push(this._values[i]);
-          if (matches.length >= this._maxResults) {
-            return matches;
-          }
+          //if (matches.length >= this._maxResults) {
+          //  return matches;
+          //}
         }
       }
 
-      return matches;
+
+      var orderedMatches = _.sortBy(matches, function(match) {
+        var score = match.score(query);
+        scoredMatches.push({score: score, value: match});
+        return score;
+      });
+
+      $log.log("scored matches: ", scoredMatches);
+
+
+      return orderedMatches;
     }
   };
 
