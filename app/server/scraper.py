@@ -1,7 +1,7 @@
 __author__ = 'Gardner'
 
-import urllib.request as request
-import urllib.parse as urlparse
+import urlparse
+import urllib2
 
 import html5lib
 
@@ -111,6 +111,6 @@ class JavadocScraper:
 
     @staticmethod
     def _retrieve_response_as_doc(url):
-        html_raw_response = request.urlopen(url)
-        html_doc = html5lib.parse(html_raw_response, encoding=html_raw_response.info().get_content_charset(), namespaceHTMLElements=False)
+        html_raw_response = urllib2.urlopen(url)
+        html_doc = html5lib.parse(html_raw_response, encoding=html_raw_response.info().getparam('charset'), namespaceHTMLElements=False)
         return html_doc
