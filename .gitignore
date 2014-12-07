@@ -2,3 +2,5 @@
 *.iml
 __pycache__
 app/static/lib
+.DS_Store
+*.pyc
