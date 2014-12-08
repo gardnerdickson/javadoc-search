@@ -191,7 +191,10 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
       indexes[key] = new BasicMatcher(values, constants.search.MAX_RESULTS)
     }
     else if (type === 'CamelCase') {
-      indexes[key] = new CamelCaseMatcher(values, constants.search.MAX_RESULTS)
+      indexes[key] = new CamelCaseMatcher(values, constants.search.MAX_RESULTS);
+    }
+    else if (type === 'Fuzzy') {
+      indexes[key] = new FuzzyMatcher(values, constants.search.MAX_RESULTS);
     }
     else {
       throw "Invalid matcher type: " + type;
@@ -202,6 +205,31 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
     return indexes[key];
   };
 
+
+  function FuzzyMatcher(values, maxResults) {
+    $log.debug("Creating FuzzyMatcher");
+
+    this._values = values;
+    this._maxResults = maxResults;
+  }
+  FuzzyMatcher.prototype = {
+
+    findMatches: function(query) {
+      var fuse = new Fuse(this._values);
+      var fuseResult = fuse.search(query, {
+        threshold: 0.4
+      });
+
+      var searchResultIndexes = fuseResult.splice(0, 30);
+      var searchResults = [];
+      for (var i in searchResultIndexes) {
+        searchResults.push(this._values[searchResultIndexes[i]]);
+      }
+
+      return searchResults;
+    }
+
+  };
 
   function BasicMatcher(sortedValues, maxResults) {
     $log.debug("Creating BasicMatcher");
@@ -219,36 +247,18 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
 
     findMatches: function(query) {
       var matches = [];
-      var scoredMatches = [];
       var regex = new RegExp(query, 'i');
 
       for (var i = 0; i < this._values.length; i++) {
-
-        //var score = query.score(this._values[i]);
-        //var score = this._values[i].score(query);
-        //$log.log("score for ", this._values[i], " is ", score);
-
-        //scoredMatches.push({score: score, value: this._values[i]});
-
         if (regex.test(this._values[i])) {
           matches.push(this._values[i]);
-          //if (matches.length >= this._maxResults) {
-          //  return matches;
-          //}
+          if (matches.length >= this._maxResults) {
+            return matches;
+          }
         }
       }
 
-
-      var orderedMatches = _.sortBy(matches, function(match) {
-        var score = match.score(query);
-        scoredMatches.push({score: score, value: match});
-        return score;
-      });
-
-      $log.log("scored matches: ", scoredMatches);
-
-
-      return orderedMatches;
+      return matches;
     }
   };
 

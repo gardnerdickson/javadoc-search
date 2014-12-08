@@ -51,8 +51,10 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       $log.debug("Got metadata for classes");
       searchDataLocator.setSearchData(classes, constants.metadata.CLASSES);
 
-      matcherLocator.createMatcher(_.keys(classes), 'Basic', 'Classes_Basic');
-      matcherLocator.createMatcher(_.keys(classes), 'CamelCase', 'Classes_CamelCase');
+      //matcherLocator.createMatcher(_.keys(classes), 'Basic', 'Classes_Basic');
+      //matcherLocator.createMatcher(_.keys(classes), 'CamelCase', 'Classes_CamelCase');
+
+      matcherLocator.createMatcher(_.keys(classes), 'Fuzzy', 'Classes_Basic');
 
       finished.classes = true;
       if (!_.contains(_.values(finished), false)) {
@@ -64,7 +66,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       $log.debug("Got metadata for packages");
       searchDataLocator.setSearchData(packages, constants.metadata.PACKAGES);
 
-      matcherLocator.createMatcher(_.keys(packages), 'Basic', 'Packages_Basic');
+      matcherLocator.createMatcher(_.keys(packages), 'Fuzzy', 'Packages_Basic');
 
       finished.packages = true;
       if (!_.contains(_.values(finished), false)) {
