@@ -211,14 +211,13 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
 
     this._values = values;
     this._maxResults = maxResults;
+
+    this.fuse = new Fuse(this._values);
   }
   FuzzyMatcher.prototype = {
 
     findMatches: function(query) {
-      var fuse = new Fuse(this._values);
-      var fuseResult = fuse.search(query, {
-        threshold: 0.4
-      });
+      var fuseResult = this.fuse.search(query);
 
       var searchResultIndexes = fuseResult.splice(0, 30);
       var searchResults = [];
