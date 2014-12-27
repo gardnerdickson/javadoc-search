@@ -258,6 +258,14 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
         });
       };
 
+      scope.select = function() {
+        scope.selected = true;
+      };
+
+      scope.deselect = function() {
+        scope.selected = false;
+      };
+
 
       keyPressWatcher.addHandler(keyPressWatcher.events.LEFT, function() {
         var selectedClassName = scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedClassIndex];

@@ -1,4 +1,8 @@
-<div class="class-name" ng-class="{'interface': classInfo.classType == 'interface'}" ng-click="loadJavadocClassPage(result.name)">
+<div class="class-name"
+     ng-class="{'interface': classInfo.classType == 'interface'}"
+     ng-click="loadJavadocClassPage(result.name)"
+     ng-mouseover="select()"
+     ng-mouseleave="deselect()">
     {{result.name}}&nbsp;&nbsp;<span class="class-package-name" ng-show="selected">{{classInfo.package}}</span>
 </div>
 <div ng-show="showRelatives">
