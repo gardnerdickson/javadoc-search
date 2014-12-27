@@ -244,6 +244,7 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
       scope.showRelatives = false;
       scope.selected = false;
       scope.name = scope.result.name;
+      scope.classInfo = searchDataLocator.getClassInfo()[scope.name];
 
       var uniqueId = _.uniqueId();
       var relativesLoaded = false;
