@@ -19,11 +19,11 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
 
   $scope.loadJavadocClassPage = function(className) {
-    loadJavadocClassPage(searchDataLocator.getSearchData('Classes')[className]);
+    loadJavadocClassPage(searchDataLocator.getClassInfo()[className])
   };
 
   $scope.loadJavadocPackagePage = function(packageName) {
-    loadJavadocPackagePage(searchDataLocator.getSearchData('Packages')[packageName]);
+    loadJavadocPackagePage(searchDataLocator.getPackageData()[packageName]);
   };
 
 
@@ -49,12 +49,13 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
     javadocService.retrieveClasses(function(classes) {
       $log.debug("Got metadata for classes");
-      searchDataLocator.setSearchData(classes, constants.metadata.CLASSES);
+
+      searchDataLocator.setClassData(classes);
 
       //matcherLocator.createMatcher(_.keys(classes), 'Basic', 'Classes_Basic');
       //matcherLocator.createMatcher(_.keys(classes), 'CamelCase', 'Classes_CamelCase');
 
-      matcherLocator.createMatcher(_.keys(classes), 'Fuzzy', 'Classes_Basic');
+      matcherLocator.createMatcher(searchDataLocator.getClassNames(), 'Fuzzy', 'Classes_Basic');
 
       finished.classes = true;
       if (!_.contains(_.values(finished), false)) {
@@ -64,9 +65,11 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
     javadocService.retrievePackages(function(packages) {
       $log.debug("Got metadata for packages");
-      searchDataLocator.setSearchData(packages, constants.metadata.PACKAGES);
+      //searchDataLocator.setSearchData(packages, constants.metadata.PACKAGES);
+      searchDataLocator.setPackageData(packages);
 
-      matcherLocator.createMatcher(_.keys(packages), 'Fuzzy', 'Packages_Basic');
+      var packageNames = _.pluck(packages, 'packageName');
+      matcherLocator.createMatcher(packageNames, 'Fuzzy', 'Packages_Basic');
 
       finished.packages = true;
       if (!_.contains(_.values(finished), false)) {

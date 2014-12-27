@@ -34,7 +34,7 @@ class JavadocScraper:
     def retrieve_classes(self):
         classes_doc = self._retrieve_response_as_doc(self._url + self._CLASSES_PATH)
 
-        classes = {}
+        classes = []
         class_links = classes_doc.findall('.//li/a')
         for class_link in class_links:
             class_type_and_package = class_link.attrib['title'].split(' in ')
@@ -47,15 +47,12 @@ class JavadocScraper:
             else:
                 class_name = class_link.text
 
-            while class_name in classes:
-                class_name += '#'
-
-            classes[class_name] = {
+            classes.append({
                 'package': package,
                 'className': class_name,
                 'classType': class_type,
                 'url': url
-            }
+            })
 
         return classes
 
@@ -83,16 +80,17 @@ class JavadocScraper:
         }
 
     def retrieve_packages(self):
-        packages = {}
+        packages = []
         package_page_doc = self._retrieve_response_as_doc(self._url + self._PACKAGES_PATH)
         package_links = package_page_doc.findall('.//li/a')
         for package_link in package_links:
             package_name = package_link.text
             url = package_link.attrib['href']
 
-            packages[package_name] = {
+            packages.append({
+                'packageName': package_name,
                 'url': url
-            }
+            })
 
         return packages
 

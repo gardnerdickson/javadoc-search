@@ -180,6 +180,10 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'jav
             return;
           }
 
+          if (scope.SearchResultMenu.selectionMode === constants.selectionMode.RELATIVES) {
+            $log.log("breakpoint");
+          }
+
           // find the selected class
           var foundSelected = false;
           for (var i = 0; i < scope.SearchResultMenu.searchResults.length; i++) {
@@ -273,7 +277,8 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
           });
 
           if (!relativesLoaded) {
-            var classInfo = searchDataLocator.getSearchData('Classes')[scope.name];
+            //var classInfo = searchDataLocator.getSearchData('Classes')[scope.name];
+            var classInfo = searchDataLocator.getClassData()[scope.name];
 
             javadocService.retrieveRelatives(new URI(classInfo.url).toString(), function(relatives) {
 

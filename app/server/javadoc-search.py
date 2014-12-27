@@ -1,10 +1,10 @@
 import urlparse
 import urllib2
+import json
 
 from flask import Flask
 from flask import request
 from flask import Response
-from flask import jsonify
 from flask import render_template
 from flask import session
 
@@ -47,7 +47,7 @@ def get_classes():
     scraper = JavadocScraper(session['base_url'])
     classes = scraper.retrieve_classes()
 
-    return jsonify(classes)
+    return json.dumps(classes)
 
 
 @app.route('/relatives', methods=['GET'])
@@ -58,7 +58,7 @@ def get_hierarchy_classes():
     scraper = JavadocScraper(session['base_url'])
     classes = scraper.retrieve_hierarchy_classes(class_relative_url)
 
-    return jsonify(classes)
+    return json.dumps(classes)
 
 
 @app.route('/packages', methods=['GET'])
@@ -66,7 +66,7 @@ def get_packages():
     scraper = JavadocScraper(session['base_url'])
     packages = scraper.retrieve_packages()
 
-    return jsonify(packages)
+    return json.dumps(packages)
 
 
 @app.route('/packagePageProxy', methods=['GET'])
