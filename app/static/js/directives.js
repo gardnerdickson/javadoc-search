@@ -180,9 +180,9 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'jav
             return;
           }
 
-          if (scope.SearchResultMenu.selectionMode === constants.selectionMode.RELATIVES) {
-            $log.log("breakpoint");
-          }
+          //if (scope.SearchResultMenu.selectionMode === constants.selectionMode.RELATIVES) {
+          //  $log.log("breakpoint");
+          //}
 
           // find the selected class
           var foundSelected = false;
@@ -245,6 +245,7 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
       scope.selected = false;
       scope.name = scope.result.name;
       scope.classInfo = searchDataLocator.getClassInfo()[scope.name];
+      scope.loadingRelatives = false;
 
       var uniqueId = _.uniqueId();
       var relativesLoaded = false;
@@ -268,7 +269,7 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
 
 
       keyPressWatcher.addHandler(keyPressWatcher.events.LEFT, function() {
-        var selectedClassName = scope.SearchResultMenu.searchResults[scope.SearchResultMenu.selectedClassIndex];
+        var selectedClassName = scope.SearchResultMenu.getSelectedSearchResult();
         if (scope.name === selectedClassName) {
           scope.$apply(function() {
             scope.showRelatives = false;
@@ -283,11 +284,11 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
         if (scope.name === selectedClassName) {
           scope.$apply(function() {
             scope.showRelatives = true;
+            scope.loadingRelatives = true;
           });
 
           if (!relativesLoaded) {
-            //var classInfo = searchDataLocator.getSearchData('Classes')[scope.name];
-            var classInfo = searchDataLocator.getClassData()[scope.name];
+            var classInfo = searchDataLocator.getClassInfo()[scope.name];
 
             javadocService.retrieveRelatives(new URI(classInfo.url).toString(), function(relatives) {
 
@@ -298,6 +299,7 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
                 scope.classRelatives.push({name: relative});
               });
 
+              scope.loadingRelatives = false;
             });
           }
         }

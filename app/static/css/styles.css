@@ -140,6 +140,12 @@ nav.push-menu-left .class-relative-list li {
     background-color: #000;
 }
 
+nav.push-menu-left .relatives-loading {
+    position: relative;
+    float: right;
+    margin-right: 10px;
+}
+
 
 .top-container.menu-open nav.push-menu-left {
     left: 0;
