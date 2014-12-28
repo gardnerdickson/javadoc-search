@@ -141,9 +141,10 @@ nav.push-menu-left .class-relative-list li {
 }
 
 nav.push-menu-left .relatives-loading {
-    position: relative;
-    float: right;
-    margin-right: 10px;
+    position: absolute;
+    z-index: 100;
+    right: 10px;
+    top: 5px;
 }
 
 

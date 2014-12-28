@@ -66,7 +66,7 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
 
         var selectedSearchResult = searchResultMenu.getSelectedSearchResult();
         if (selectedSearchResult !== null) {
-          scope.query = selectedSearchResult;
+          scope.query = selectedSearchResult.replace(/#/g, '');
           if (scope.SearchBox.searchMode === 'Packages') {
             scope.query = ':' + scope.query;
           }
@@ -245,7 +245,7 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
       scope.selected = false;
       scope.name = scope.result.name;
       scope.classInfo = searchDataLocator.getClassInfo()[scope.name];
-      scope.loadingRelatives = false;
+      scope.loadingRelatives = false; // TODO: this isn't used for anything right now.
 
       var uniqueId = _.uniqueId();
       var relativesLoaded = false;
@@ -284,12 +284,12 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
         if (scope.name === selectedClassName) {
           scope.$apply(function() {
             scope.showRelatives = true;
-            scope.loadingRelatives = true;
           });
 
           if (!relativesLoaded) {
             var classInfo = searchDataLocator.getClassInfo()[scope.name];
 
+            scope.loadingRelatives = true;
             javadocService.retrieveRelatives(new URI(classInfo.url).toString(), function(relatives) {
 
               var classRelatives = _.extend(_.keys(relatives.ancestors), _.keys(relatives.descendants));
