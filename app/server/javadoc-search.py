@@ -69,6 +69,14 @@ def get_packages():
     return json.dumps(packages)
 
 
+@app.route('/javadocVersion', methods=['GET'])
+def get_javadoc_version():
+    scraper = JavadocScraper(session['base_url'])
+    version = scraper.get_javadoc_version()
+
+    return json.dumps(version)
+
+
 @app.route('/packagePageProxy', methods=['GET'])
 def proxy_package_page():
     encoded_package_relative_url = request.args['packageRelativeUrl']

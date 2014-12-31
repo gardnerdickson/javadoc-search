@@ -106,6 +106,12 @@ class JavadocScraper:
         return packages
 
 
+    def get_javadoc_version(self):
+        allclasses_doc = self._retrieve_response_as_doc(self._url + self._CLASSES_PATH)
+        javadoc_version = self._get_javadoc_version_from_allclasses_page(allclasses_doc)
+        return {'version': javadoc_version.name}
+
+
     @staticmethod
     def _find_class_links_new(class_page_doc):
         ancestors = {}

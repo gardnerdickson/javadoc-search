@@ -23,6 +23,12 @@ app.service('javadocService', ['$http', function($http) {
     });
   };
 
+  service.getJavadocVersion = function(onComplete) {
+    $http.get('./javadocVersion').then(function(response) {
+      onComplete(response.data);
+    });
+  };
+
   service.retrieveRelatives = function(encodedClassRelativeUrl, onComplete) {
     var config = {
       params: { classRelativeUrl: encodedClassRelativeUrl }

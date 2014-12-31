@@ -13,6 +13,7 @@ app.controller('LoadUrlController', ['$scope', '$log', '$location', function($sc
 
 app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', '$http', 'javadocService', 'searchDataLocator', 'matcherLocator', 'constants', function($scope, $log, $routeParams, $timeout, $sce, $http, javadocService, searchDataLocator , matcherLocator, constants) {
   var javadocUrl = null;
+  var javadocVersion = null;
 
   $scope.loading = true;
   $scope.searchResults = null;
@@ -44,7 +45,8 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   function retrieveClassesAndPackages(onComplete) {
     var finished = {
       classes: false,
-      packages: false
+      packages: false,
+      version: false
     };
 
     javadocService.retrieveClasses(function(classes) {
@@ -65,13 +67,20 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
     javadocService.retrievePackages(function(packages) {
       $log.debug("Got metadata for packages");
-      //searchDataLocator.setSearchData(packages, constants.metadata.PACKAGES);
       searchDataLocator.setPackageData(packages);
 
       var packageNames = _.pluck(packages, 'packageName');
       matcherLocator.createMatcher(packageNames, 'Fuzzy', 'Packages_Basic');
 
       finished.packages = true;
+      if (!_.contains(_.values(finished), false)) {
+        onComplete();
+      }
+    });
+
+    javadocService.getJavadocVersion(function(version) {
+      javadocVersion = version;
+      finished.version = true;
       if (!_.contains(_.values(finished), false)) {
         onComplete();
       }
@@ -104,10 +113,22 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     onLoad: function() {
       $log.log('PackageFrameOnLoadHandler called');
       var iframeBody = $(javadocFrame.contents().find('body'));
-      var links = iframeBody.find('.indexContainer a');
+
+      var links = [];
+      if (javadocVersion === 'New') {
+        links = iframeBody.find('.indexContainer a');
+      }
+      else {
+        links = iframeBody.find('table tbody tr td a')
+      }
+
       _.each(links, function(link) {
         link = $(link);
         var linkUrl = PackageFrameOnLoadHandler.path + link.attr('href');
+
+        $log.log("link: ", link[0].href);
+        $log.log("linkUrl: ", linkUrl);
+
         link.attr('href', "javascript: parent.setIframeSource('" + linkUrl + "')");
 
         javadocFrame.unbind('load');
