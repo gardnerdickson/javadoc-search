@@ -5,6 +5,13 @@ import urllib2
 
 import html5lib
 
+from enum import Enum
+
+
+class JavadocVersion(Enum):
+    Old = 1
+    New = 2
+
 
 class JavadocScraper:
 
@@ -31,11 +38,19 @@ class JavadocScraper:
     def __init__(self, url):
         self._url = url
 
-    def retrieve_classes(self):
-        classes_doc = self._retrieve_response_as_doc(self._url + self._CLASSES_PATH)
+
+    def retrieve_all_classes(self):
+        allclasses_doc = self._retrieve_response_as_doc(self._url + self._CLASSES_PATH)
+
+        javadoc_version = self._get_javadoc_version_from_allclasses_page(allclasses_doc)
+
+        if javadoc_version is JavadocVersion.New:
+            class_links_xpath = './/li/a'
+        else:
+            class_links_xpath = './/table/tbody/tr/td/font/a'
 
         classes = []
-        class_links = classes_doc.findall('.//li/a')
+        class_links = allclasses_doc.findall(class_links_xpath)
         for class_link in class_links:
             class_type_and_package = class_link.attrib['title'].split(' in ')
             class_type = class_type_and_package[0]
@@ -56,33 +71,29 @@ class JavadocScraper:
 
         return classes
 
+
     def retrieve_hierarchy_classes(self, class_relative_url):
         class_url = urlparse.urljoin(self._url, class_relative_url)
         class_page_doc = self._retrieve_response_as_doc(class_url)
 
-        ancestors = {}
-        descendants = {}
+        javadoc_version = self._get_javadoc_version_from_class_page(class_page_doc)
 
-        description_root = class_page_doc.find(".//div[@class='description']/ul[@class='blockList']/li[@class='blockList']")
-        for index, label in enumerate(description_root.findall('./dl/dt')):
-            if label.text in self._SUPER_CLASS_LABELS:
-                ancestors = self._find_class_links(description_root, index)
+        if javadoc_version is JavadocVersion.New:
+            return self._find_class_links_new(class_page_doc)
+        else:
+            return self._find_class_links_old(class_page_doc)
 
-            elif label.text in self._SUB_CLASS_LABELS:
-                descendants = self._find_class_links(description_root, index)
-
-            elif label.text is not None and label.text not in self._IGNORED_LABELS:
-                raise Exception("Unknown super or sub class label: ", label.text, ' at ', class_url)
-
-        return {
-            'ancestors': ancestors,
-            'descendants': descendants
-        }
 
     def retrieve_packages(self):
         packages = []
         package_page_doc = self._retrieve_response_as_doc(self._url + self._PACKAGES_PATH)
-        package_links = package_page_doc.findall('.//li/a')
+
+        javadoc_version = self._get_javadoc_version_from_packages_page(package_page_doc)
+        if javadoc_version is JavadocVersion.New:
+            package_links = package_page_doc.findall('.//li/a')
+        else:
+            package_links = package_page_doc.findall('.//table/tbody/tr/td/p/font/a')
+
         for package_link in package_links:
             package_name = package_link.text
             url = package_link.attrib['href']
@@ -93,6 +104,65 @@ class JavadocScraper:
             })
 
         return packages
+
+
+    @staticmethod
+    def _find_class_links_new(class_page_doc):
+        ancestors = {}
+        descendants = {}
+
+        description_root = class_page_doc.find(".//div[@class='description']/ul[@class='blockList']/li[@class='blockList']")
+        for index, label in enumerate(description_root.findall('./dl/dt')):
+            if label.text in JavadocScraper._SUPER_CLASS_LABELS:
+                ancestor_links = description_root.findall('./dl[' + str(index + 1) + ']/dd/a')
+                for ancestor_link in ancestor_links:
+                    class_name = ancestor_link.text
+                    url = ancestor_link.attrib['href']
+                    ancestors[class_name] = url
+
+            elif label.text in JavadocScraper._SUB_CLASS_LABELS:
+                descendant_links = description_root.findall('./dl[' + str(index + 1) + ']/dd/a')
+                for class_link in descendant_links:
+                    class_name = class_link.text
+                    url = class_link.attrib['href']
+                    descendants[class_name] = url
+
+            elif label.text is not None and label.text not in JavadocScraper._IGNORED_LABELS:
+                raise Exception("Unknown super or sub class label: ", label.text)
+
+        return {
+            'ancestors': ancestors,
+            'descendants': descendants
+        }
+
+
+    @staticmethod
+    def _find_class_links_old(class_page_doc):
+        ancestors = {}
+        descendants = {}
+
+        element = class_page_doc.findall('.//dl')
+        super_class_label = element[0].find('.//b').text
+        sub_class_label = element[1].find('.//b').text
+
+        if super_class_label in JavadocScraper._SUPER_CLASS_LABELS:
+            ancestor_links = element[0].findall('.//dd/a')
+            for ancestor_link in ancestor_links:
+                ancestor_name = ancestor_link.text
+                ancestor_url = ancestor_link.attrib['href']
+                ancestors[ancestor_name] = ancestor_url
+
+        if sub_class_label in JavadocScraper._SUB_CLASS_LABELS:
+            descendant_links = element[1].findall('.//dd/a')
+            for descendant_link in descendant_links:
+                descendant_name = descendant_link.text
+                descendant_url = descendant_link.attrib['href']
+                descendants[descendant_name] = descendant_url
+
+        return {
+            'ancestors': ancestors,
+            'descendants': descendants
+        }
 
 
     @staticmethod
@@ -112,3 +182,30 @@ class JavadocScraper:
         html_raw_response = urllib2.urlopen(url)
         html_doc = html5lib.parse(html_raw_response, encoding=html_raw_response.info().getparam('charset'), namespaceHTMLElements=False)
         return html_doc
+
+
+    @staticmethod
+    def _get_javadoc_version_from_allclasses_page(allclasses_doc):
+        index_container_div = allclasses_doc.find(".//div[@class='indexContainer']")
+        if index_container_div is not None:
+            return JavadocVersion.New
+        else:
+            return JavadocVersion.Old
+
+
+    @staticmethod
+    def _get_javadoc_version_from_class_page(class_doc):
+        content_container_div = class_doc.find(".//div[@class='contentContainer']")
+        if content_container_div is not None:
+            return JavadocVersion.New
+        else:
+            return JavadocVersion.Old
+
+
+    @staticmethod
+    def _get_javadoc_version_from_packages_page(package_doc):
+        index_container_div = package_doc.find(".//div[@class='indexContainer']")
+        if index_container_div is not None:
+            return JavadocVersion.New
+        else:
+            return JavadocVersion.Old

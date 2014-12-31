@@ -45,7 +45,7 @@ def post_base_url():
 @app.route('/classes', methods=['GET'])
 def get_classes():
     scraper = JavadocScraper(session['base_url'])
-    classes = scraper.retrieve_classes()
+    classes = scraper.retrieve_all_classes()
 
     return json.dumps(classes)
 
