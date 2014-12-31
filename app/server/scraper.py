@@ -114,24 +114,38 @@ class JavadocScraper:
 
     @staticmethod
     def _find_class_links_new(class_page_doc):
-        ancestors = {}
-        descendants = {}
+        # ancestors = {}
+        # descendants = {}
+        ancestors = []
+        descendants = []
 
         description_root = class_page_doc.find(".//div[@class='description']/ul[@class='blockList']/li[@class='blockList']")
         for index, label in enumerate(description_root.findall('./dl/dt')):
             if label.text in JavadocScraper._SUPER_CLASS_LABELS:
                 ancestor_links = description_root.findall('./dl[' + str(index + 1) + ']/dd/a')
                 for ancestor_link in ancestor_links:
+                    class_type_and_package = ancestor_link.attrib['title'].split(' in ')
+                    class_type = class_type_and_package[0]
                     class_name = ancestor_link.text
                     url = ancestor_link.attrib['href']
-                    ancestors[class_name] = url
+                    ancestors.append({
+                        'className': class_name,
+                        'classType': class_type,
+                        'url': url
+                    })
 
             elif label.text in JavadocScraper._SUB_CLASS_LABELS:
                 descendant_links = description_root.findall('./dl[' + str(index + 1) + ']/dd/a')
-                for class_link in descendant_links:
-                    class_name = class_link.text
-                    url = class_link.attrib['href']
-                    descendants[class_name] = url
+                for descendant_link in descendant_links:
+                    class_type_and_package = descendant_link.attrib['title'].split(' in ')
+                    class_type = class_type_and_package[0]
+                    class_name = descendant_link.text
+                    url = descendant_link.attrib['href']
+                    descendants.append({
+                        'className': class_name,
+                        'classType': class_type,
+                        'url': url
+                    })
 
             elif label.text is not None and label.text not in JavadocScraper._IGNORED_LABELS:
                 raise Exception("Unknown super or sub class label: ", label.text)

@@ -292,7 +292,7 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
             scope.loadingRelatives = true;
             javadocService.retrieveRelatives(new URI(classInfo.url).toString(), function(relatives) {
 
-              var classRelatives = _.extend(_.keys(relatives.ancestors), _.keys(relatives.descendants));
+              var classRelatives = _.extend(_.pluck(relatives.ancestors, 'className'), _.pluck(relatives.descendants, 'className'));
               relativesLoaded = true;
 
               _.each(classRelatives, function(relative) {
