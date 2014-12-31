@@ -35,6 +35,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     javadocService.setBaseJavadocUrl(URI.encode(javadocUrl), function() {
 
       retrieveClassesAndPackages(function() {
+        $log.debug("Done loading!!!");
         $scope.loading = false;
       });
 
@@ -79,6 +80,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     });
 
     javadocService.getJavadocVersion(function(version) {
+      $log.debug("Got javadoc version");
       javadocVersion = version;
       finished.version = true;
       if (!_.contains(_.values(finished), false)) {
@@ -111,11 +113,10 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   var PackageFrameOnLoadHandler = {
     path: '',
     onLoad: function() {
-      $log.log('PackageFrameOnLoadHandler called');
       var iframeBody = $(javadocFrame.contents().find('body'));
 
       var links = [];
-      if (javadocVersion === 'New') {
+      if (javadocVersion['version'] === 'New') {
         links = iframeBody.find('.indexContainer a');
       }
       else {

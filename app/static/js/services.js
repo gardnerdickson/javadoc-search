@@ -261,8 +261,6 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
 
 
   function FuzzyMatcher(values, maxResults) {
-    $log.debug("Creating FuzzyMatcher");
-
     this._values = values;
     this._maxResults = maxResults;
 
@@ -285,7 +283,6 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
   };
 
   function BasicMatcher(sortedValues, maxResults) {
-    $log.debug("Creating BasicMatcher");
     this._values = sortedValues;
     this._maxResults = maxResults;
   }
