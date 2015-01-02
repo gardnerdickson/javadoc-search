@@ -126,10 +126,6 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       _.each(links, function(link) {
         link = $(link);
         var linkUrl = PackageFrameOnLoadHandler.path + link.attr('href');
-
-        $log.log("link: ", link[0].href);
-        $log.log("linkUrl: ", linkUrl);
-
         link.attr('href', "javascript: parent.setIframeSource('" + linkUrl + "')");
 
         javadocFrame.unbind('load');

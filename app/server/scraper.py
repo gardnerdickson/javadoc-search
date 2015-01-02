@@ -114,8 +114,6 @@ class JavadocScraper:
 
     @staticmethod
     def _find_class_links_new(class_page_doc):
-        # ancestors = {}
-        # descendants = {}
         ancestors = []
         descendants = []
 
@@ -158,8 +156,8 @@ class JavadocScraper:
 
     @staticmethod
     def _find_class_links_old(class_page_doc):
-        ancestors = {}
-        descendants = {}
+        ancestors = []
+        descendants = []
 
         element = class_page_doc.findall('.//dl')
         super_class_label = element[0].find('.//b').text
@@ -168,16 +166,28 @@ class JavadocScraper:
         if super_class_label in JavadocScraper._SUPER_CLASS_LABELS:
             ancestor_links = element[0].findall('.//dd/a')
             for ancestor_link in ancestor_links:
-                ancestor_name = ancestor_link.text
-                ancestor_url = ancestor_link.attrib['href']
-                ancestors[ancestor_name] = ancestor_url
+                class_type_and_package = ancestor_link.attrib['title'].split(' in ')
+                class_type = class_type_and_package[0]
+                class_name = ancestor_link.text
+                url = ancestor_link.attrib['href']
+                ancestors.append({
+                    'className': class_name,
+                    'classType': class_type,
+                    'url': url
+                })
 
         if sub_class_label in JavadocScraper._SUB_CLASS_LABELS:
             descendant_links = element[1].findall('.//dd/a')
             for descendant_link in descendant_links:
-                descendant_name = descendant_link.text
-                descendant_url = descendant_link.attrib['href']
-                descendants[descendant_name] = descendant_url
+                class_type_and_package = descendant_link.attrib['title'].split(' in ')
+                class_type = class_type_and_package[0]
+                class_name = descendant_link.text
+                url = descendant_link.attrib['href']
+                descendants.append({
+                    'className': class_name,
+                    'classType': class_type,
+                    'url': url
+                })
 
         return {
             'ancestors': ancestors,
