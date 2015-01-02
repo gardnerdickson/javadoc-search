@@ -292,7 +292,7 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
             scope.loadingRelatives = true;
             javadocService.retrieveRelatives(new URI(classInfo.url).toString(), function(relatives) {
 
-              var classRelatives = _.extend(_.pluck(relatives.ancestors, 'className'), _.pluck(relatives.descendants, 'className'));
+              var classRelatives = _.pluck(relatives.ancestors, 'className').concat(_.pluck(relatives.descendants, 'className'));
               relativesLoaded = true;
 
               _.each(classRelatives, function(relative) {
@@ -319,7 +319,7 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
 }]);
 
 
-app.directive('classRelative', [function() {
+app.directive('classRelative', ['searchDataLocator', function(searchDataLocator) {
   return {
     templateUrl: 'static/partials/class-relative.html',
     restrict: 'A',
@@ -327,6 +327,8 @@ app.directive('classRelative', [function() {
 
       scope.selected = false;
       scope.visible = true;
+      scope.relativeInfo = searchDataLocator.getClassInfo()[scope.name];
+
 
       scope.loadClassRelative = function(name) {
         scope.loadJavadocClassPage(name);
