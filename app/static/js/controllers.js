@@ -18,7 +18,6 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   $scope.loading = true;
   $scope.searchResults = null;
 
-
   $scope.loadJavadocClassPage = function(className) {
     loadJavadocClassPage(searchDataLocator.getClassInfo()[className])
   };
@@ -61,6 +60,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       matcherLocator.createMatcher(searchDataLocator.getClassNames(), 'Fuzzy', 'Classes_Basic');
 
       finished.classes = true;
+      $scope.$broadcast('initialized.classes', classes);
       if (!_.contains(_.values(finished), false)) {
         onComplete();
       }
@@ -74,6 +74,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       matcherLocator.createMatcher(packageNames, 'Fuzzy', 'Packages_Basic');
 
       finished.packages = true;
+      $scope.$broadcast('initialized.packages', packages);
       if (!_.contains(_.values(finished), false)) {
         onComplete();
       }
@@ -147,6 +148,11 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       loadJavadocClassPage({url: url});
     });
   };
+
+
+  $(function () {
+    $('[data-toggle="popover"]').popover()
+  });
 
 
   init();

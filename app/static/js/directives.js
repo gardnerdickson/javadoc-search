@@ -352,3 +352,31 @@ app.directive('classRelative', ['$log', 'searchDataLocator', function($log, sear
     }
   }
 }]);
+
+
+app.directive('allClassesPopover', ['$log', function($log) {
+  return {
+    restrict: 'A',
+    link: function(scope, element, attrs) {
+
+      scope.testFunction = function(param) {
+        $log.log("the test function got called motherfuckers!!!", param);
+      };
+
+      scope.$on('initialized.classes', function(e, classes) {
+        var content = '';
+        _.each(classes, function(classInfo) {
+          content += '<a ng-click="testFunction(\'' + classInfo['className'] + '\')">' + classInfo['className'] + '</a><br>';
+        });
+        element.popover({
+          title: 'All Classes',
+          placement: 'bottom',
+          html: true,
+          content: content,
+          container: 'body'
+        });
+
+      });
+    }
+  }
+}]);
