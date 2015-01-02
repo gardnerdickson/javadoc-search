@@ -141,11 +141,17 @@ nav.push-menu-left .class-relative-list li {
     background-color: #000;
 }
 
-nav.push-menu-left .relatives-loading {
-    position: absolute;
-    z-index: 100;
-    right: 10px;
-    top: 5px;
+nav.push-menu-left .relative-label {
+    text-indent: 30px;
+    border-top: 1px solid #a3a3a3;
+    border-bottom: 1px solid #a3a3a3;
+    font-weight: bolder;
+    font-size: 12px;
+    color: #a3a3a3;
+}
+
+nav.push-menu-left .relative-label:hover {
+    cursor: auto;
 }
 
 

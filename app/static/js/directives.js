@@ -240,7 +240,8 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
 
       scope.SearchResult = {};
 
-      scope.classRelatives = [];
+      scope.ancestors = [];
+      scope.descendants = [];
       scope.showRelatives = false;
       scope.selected = false;
       scope.name = scope.result.name;
@@ -292,11 +293,16 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
             scope.loadingRelatives = true;
             javadocService.retrieveRelatives(new URI(classInfo.url).toString(), function(relatives) {
 
-              var classRelatives = _.pluck(relatives.ancestors, 'className').concat(_.pluck(relatives.descendants, 'className'));
+              var ancestors = _.pluck(relatives.ancestors, 'className');
+              var descendants = _.pluck(relatives.descendants, 'className');
               relativesLoaded = true;
 
-              _.each(classRelatives, function(relative) {
-                scope.classRelatives.push({name: relative});
+              _.each(ancestors ,function(ancestor) {
+                scope.ancestors.push({name: ancestor})
+              });
+
+              _.each(descendants, function(descendant) {
+                scope.descendants.push({name: descendant});
               });
 
               scope.loadingRelatives = false;

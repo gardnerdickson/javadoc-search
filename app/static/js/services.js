@@ -117,6 +117,9 @@ app.service('keyPressWatcher', ['$log', function($log) {
     else if (code === 27) {
       return service.events.ESC;
     }
+    else {
+      $log.warn("Unsupported key press code: ", code);
+    }
   }
 
 
