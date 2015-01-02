@@ -319,7 +319,7 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
 }]);
 
 
-app.directive('classRelative', ['searchDataLocator', function(searchDataLocator) {
+app.directive('classRelative', ['$log', 'searchDataLocator', function($log, searchDataLocator) {
   return {
     templateUrl: 'static/partials/class-relative.html',
     restrict: 'A',
@@ -327,8 +327,7 @@ app.directive('classRelative', ['searchDataLocator', function(searchDataLocator)
 
       scope.selected = false;
       scope.visible = true;
-      scope.relativeInfo = searchDataLocator.getClassInfo()[scope.name];
-
+      scope.relativeInfo = searchDataLocator.getClassInfo()[scope.relative.name];
 
       scope.loadClassRelative = function(name) {
         scope.loadJavadocClassPage(name);

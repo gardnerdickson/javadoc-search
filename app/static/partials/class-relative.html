@@ -1,3 +1,5 @@
-<div class="relative-class-name" ng-click="loadClassRelative(relative.name)">
+<div class="relative-class-name"
+     ng-click="loadClassRelative(relative.name)"
+     ng-class="{'interface': relativeInfo.classType == 'interface'}">
     {{relative.name}}
 </div>
