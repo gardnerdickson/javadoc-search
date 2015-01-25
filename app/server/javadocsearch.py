@@ -26,8 +26,10 @@ def init_logging():
     import logging
     import logging.config
     import yaml
+    import os
 
-    logging.config.dictConfig(yaml.load(open('../../logging.conf')))
+    logging_config = str(os.path.dirname(os.path.realpath(__file__)) + '/../../logging.conf')
+    logging.config.dictConfig(yaml.load(open(logging_config)))
 
 
 @app.route('/', defaults={'path': ''})
