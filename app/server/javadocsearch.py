@@ -1,6 +1,7 @@
 import urlparse
 import urllib2
 import json
+import os.path
 
 from flask import Flask
 from flask import request
@@ -21,6 +22,14 @@ class JavadocSearchFlaskApplication(Flask):
 
 app = JavadocSearchFlaskApplication(__name__, template_folder='../templates', static_folder='../static')
 
+if not app.debug:
+    import logging
+    from logging import handlers
+
+    file_handler = handlers.RotatingFileHandler('../../application.log')
+    file_handler.setLevel(logging.WARNING)
+    app.logger.addHandler(file_handler)
+
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
@@ -37,7 +46,10 @@ def index(path):
 @app.route('/baseUrl', methods=['POST'])
 def post_base_url():
     encoded_url = request.form['baseUrl']
-    session['base_url'] = urllib2.unquote(encoded_url)
+    base_url = urllib2.unquote(encoded_url)
+    session['base_url'] = base_url
+
+    app.logger.info("Setting baseUrl to %s", base_url)
 
     return '', 200
 
