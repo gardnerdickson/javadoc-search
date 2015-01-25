@@ -36,6 +36,8 @@ def init_logging():
 @app.route('/<path:path>')
 def index(path):
     if len(path) != 0:
+        if str(path).endswith('favicon.ico'):
+            return '', 404
         javadoc_resource = _retrieve_arbitrary_javadoc_resource(path)
         if javadoc_resource is not None:
             return Response(javadoc_resource.read(), mimetype=javadoc_resource.info().getheader('Content-Type'))
@@ -52,7 +54,7 @@ def post_base_url():
     base_url = urllib2.unquote(encoded_url)
 
     if base_url.endswith('/index.html'):
-        base_url = string.replace(base_url, '/index.html', '')
+        base_url = string.replace(base_url, '/index.html', '/')
 
     session['base_url'] = base_url
 
@@ -125,9 +127,6 @@ def _retrieve_arbitrary_javadoc_resource(relative_url):
         resource_url = urlparse.urljoin(session['base_url'], relative_url)
         app.logger.debug("Getting arbitrary javadoc resource: %s", resource_url)
         resource_response = urllib2.urlopen(resource_url)
-
-        if resource_response.getcode() != 200:
-            return None
         return resource_response
 
     return None

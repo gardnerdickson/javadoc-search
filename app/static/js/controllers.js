@@ -7,7 +7,7 @@ app.controller('LoadUrlController', ['$scope', '$log', '$location', function($sc
 
     var url = $scope.javadocUrl;
     if (url.indexOf('/index.html') !== -1) {
-      url = url.replace('/index.html', '')
+      url = url.replace('/index.html', '/')
     }
 
     var encodedUrl = URI.encode(url);
