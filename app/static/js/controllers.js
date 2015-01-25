@@ -4,7 +4,13 @@ app.controller('LoadUrlController', ['$scope', '$log', '$location', function($sc
   $scope.javadocUrl = null;
 
   $scope.loadJavadoc = function() {
-    var encodedUrl = URI.encode($scope.javadocUrl);
+
+    var url = $scope.javadocUrl;
+    if (url.indexOf('/index.html') !== -1) {
+      url = url.replace('/index.html', '')
+    }
+
+    var encodedUrl = URI.encode(url);
     $location.path('/url/' + encodedUrl);
   };
 

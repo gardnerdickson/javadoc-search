@@ -46,19 +46,26 @@ def index(path):
 
 @app.route('/baseUrl', methods=['POST'])
 def post_base_url():
+    import string
+
     encoded_url = request.form['baseUrl']
     base_url = urllib2.unquote(encoded_url)
+
+    if base_url.endswith('/index.html'):
+        base_url = string.replace(base_url, '/index.html', '')
+
     session['base_url'] = base_url
 
-    app.logger.info("Setting baseUrl to %s", base_url)
+    app.logger.info("Set session baseUrl to %s", base_url)
 
     return '', 200
 
 
 @app.route('/classes', methods=['GET'])
 def get_classes():
-    app.logger.info("Getting classes")
-    scraper = JavadocScraper(session['base_url'])
+    base_url = session['base_url']
+    app.logger.debug("Getting classes: %s", base_url)
+    scraper = JavadocScraper(base_url)
     classes = scraper.retrieve_all_classes()
 
     return json.dumps(classes)
@@ -66,11 +73,13 @@ def get_classes():
 
 @app.route('/relatives', methods=['GET'])
 def get_hierarchy_classes():
-    app.logger.info("Getting relatives")
+    base_url = session['base_url']
     encoded_class_relative_url = request.args['classRelativeUrl']
     class_relative_url = urllib2.unquote(encoded_class_relative_url)
 
-    scraper = JavadocScraper(session['base_url'])
+    app.logger.debug("Getting class relatives: %s", class_relative_url)
+
+    scraper = JavadocScraper(base_url)
     classes = scraper.retrieve_hierarchy_classes(class_relative_url)
 
     return json.dumps(classes)
@@ -78,8 +87,11 @@ def get_hierarchy_classes():
 
 @app.route('/packages', methods=['GET'])
 def get_packages():
-    app.logger.info("Getting packages")
-    scraper = JavadocScraper(session['base_url'])
+    base_url = session['base_url']
+    scraper = JavadocScraper(base_url)
+
+    app.logger.debug("Getting packages: %s", base_url)
+
     packages = scraper.retrieve_packages()
 
     return json.dumps(packages)
@@ -87,8 +99,11 @@ def get_packages():
 
 @app.route('/javadocVersion', methods=['GET'])
 def get_javadoc_version():
+    base_url = session['base_url']
     scraper = JavadocScraper(session['base_url'])
     version = scraper.get_javadoc_version()
+
+    app.logger.debug("Getting javadoc version: %s", base_url)
 
     return json.dumps(version)
 
@@ -99,6 +114,8 @@ def proxy_package_page():
     package_relative_url = urllib2.unquote(encoded_package_relative_url)
     package_url = urlparse.urljoin(session['base_url'], package_relative_url)
 
+    app.logger.debug("Proxying package page: %s", package_url)
+
     package_page_response = urllib2.urlopen(package_url)
     return package_page_response.read()
 
@@ -106,8 +123,13 @@ def proxy_package_page():
 def _retrieve_arbitrary_javadoc_resource(relative_url):
     if 'base_url' in session:
         resource_url = urlparse.urljoin(session['base_url'], relative_url)
+        app.logger.debug("Getting arbitrary javadoc resource: %s", resource_url)
         resource_response = urllib2.urlopen(resource_url)
+
+        if resource_response.getcode() != 200:
+            return None
         return resource_response
+
     return None
 
 
