@@ -1,3 +1,4 @@
 html5lib==0.999
 Flask==0.10.1
 enum34==1.0.4
+PyYAML==3.11

@@ -1,7 +1,6 @@
 import urlparse
 import urllib2
 import json
-import os.path
 
 from flask import Flask
 from flask import request
@@ -21,14 +20,6 @@ class JavadocSearchFlaskApplication(Flask):
     })
 
 app = JavadocSearchFlaskApplication(__name__, template_folder='../templates', static_folder='../static')
-
-if not app.debug:
-    import logging
-    from logging import handlers
-
-    file_handler = handlers.RotatingFileHandler('../../application.log')
-    file_handler.setLevel(logging.WARNING)
-    app.logger.addHandler(file_handler)
 
 
 @app.route('/', defaults={'path': ''})
@@ -56,6 +47,7 @@ def post_base_url():
 
 @app.route('/classes', methods=['GET'])
 def get_classes():
+    app.logger.info("Getting classes")
     scraper = JavadocScraper(session['base_url'])
     classes = scraper.retrieve_all_classes()
 
@@ -64,6 +56,7 @@ def get_classes():
 
 @app.route('/relatives', methods=['GET'])
 def get_hierarchy_classes():
+    app.logger.info("Getting relatives")
     encoded_class_relative_url = request.args['classRelativeUrl']
     class_relative_url = urllib2.unquote(encoded_class_relative_url)
 
@@ -75,6 +68,7 @@ def get_hierarchy_classes():
 
 @app.route('/packages', methods=['GET'])
 def get_packages():
+    app.logger.info("Getting packages")
     scraper = JavadocScraper(session['base_url'])
     packages = scraper.retrieve_packages()
 
@@ -108,5 +102,11 @@ def _retrieve_arbitrary_javadoc_resource(relative_url):
 
 
 if __name__ == '__main__':
-    app.secret_key = 'gardnerdickson' #TODO: change this
+    import logging
+    import logging.config
+    import yaml
+
+    logging.config.dictConfig(yaml.load(open('../../logging.conf')))
+
+    app.secret_key = 'gardnerdickson'  # TODO: change this
     app.run(debug=True)
