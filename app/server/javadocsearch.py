@@ -22,6 +22,14 @@ class JavadocSearchFlaskApplication(Flask):
 app = JavadocSearchFlaskApplication(__name__, template_folder='../templates', static_folder='../static')
 
 
+def init_logging():
+    import logging
+    import logging.config
+    import yaml
+
+    logging.config.dictConfig(yaml.load(open('../../logging.conf')))
+
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def index(path):
@@ -101,12 +109,7 @@ def _retrieve_arbitrary_javadoc_resource(relative_url):
     return None
 
 
+init_logging()
 if __name__ == '__main__':
-    import logging
-    import logging.config
-    import yaml
-
-    logging.config.dictConfig(yaml.load(open('../../logging.conf')))
-
     app.secret_key = 'gardnerdickson'  # TODO: change this
     app.run(debug=True)
