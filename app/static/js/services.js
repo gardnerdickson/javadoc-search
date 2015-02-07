@@ -42,13 +42,13 @@ app.service('javadocService', ['$q', '$http', function($q, $http) {
     return defer.promise;
   };
 
-  service.retrieveJavadocVersion = function(url) {
+  service.retrieveMiscMetadata = function(url) {
     var config = {
       params: { baseUrl: url }
     };
 
     var defer = $q.defer();
-    $http.get('./javadocVersion', config).then(function(response) {
+    $http.get('./miscMetadata', config).then(function(response) {
       defer.resolve(response.data);
     });
 

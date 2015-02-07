@@ -15,6 +15,7 @@ class JavadocScraper:
 
     _CLASSES_PATH = '/allclasses-frame.html'
     _PACKAGES_PATH = '/overview-frame.html'
+    _SUMMARY_PATH = '/overview-summary.html'
 
     _SUPER_CLASS_LABELS = (
         "All Superinterfaces:",
@@ -100,10 +101,17 @@ class JavadocScraper:
         return packages
 
 
-    def get_javadoc_version(self, base_url):
+    def get_misc_metadata(self, base_url):
         allclasses_doc = self._retrieve_response_as_doc(base_url + self._CLASSES_PATH)
         javadoc_version = self._get_javadoc_version_from_allclasses_page(allclasses_doc)
-        return {'version': javadoc_version.name}
+
+        summary_doc = self._retrieve_response_as_doc(base_url + self._SUMMARY_PATH)
+        javadoc_title = self._get_javadoc_title(summary_doc)
+
+        return {
+            'title': javadoc_title,
+            'version': javadoc_version.name
+        }
 
 
     @staticmethod
@@ -206,6 +214,12 @@ class JavadocScraper:
         html_raw_response = urllib2.urlopen(url)
         html_doc = html5lib.parse(html_raw_response, encoding=html_raw_response.info().getparam('charset'), namespaceHTMLElements=False)
         return html_doc
+
+
+    @staticmethod
+    def _get_javadoc_title(summary_doc):
+        title = summary_doc.find(".//title").text.strip()
+        return title
 
 
     @staticmethod

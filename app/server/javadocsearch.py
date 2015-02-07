@@ -104,14 +104,14 @@ def get_packages():
     return json.dumps(packages)
 
 
-@app.route('/javadocVersion', methods=['GET'])
-def get_javadoc_version():
+@app.route('/miscMetadata', methods=['GET'])
+def get_misc_metadata():
     encoded_base_url = request.args['baseUrl']
     base_url = urllib2.unquote(encoded_base_url)
 
-    app.logger.debug("Getting javadoc version: %s", base_url)
+    app.logger.debug("Getting miscellaneous metadata: %s", base_url)
     scraper = JavadocScraper()
-    version = scraper.get_javadoc_version(base_url)
+    version = scraper.get_misc_metadata(base_url)
 
     return json.dumps(version)
 

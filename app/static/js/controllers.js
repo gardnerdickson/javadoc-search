@@ -14,6 +14,8 @@ app.controller('LoadUrlController', ['$scope', '$log', '$location', function($sc
     $location.path('/url/' + encodedUrl);
   };
 
+  document.title = 'Javadoc Search';
+
 }]);
 
 
@@ -55,16 +57,19 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
     var classesPromise = javadocService.retrieveClasses($scope.javadocUrl);
     var packagePromise = javadocService.retrievePackages($scope.javadocUrl);
-    var javadocVersionPromise = javadocService.retrieveJavadocVersion($scope.javadocUrl);
+    var miscMetadataPromise = javadocService.retrieveMiscMetadata($scope.javadocUrl);
 
-    return $q.all([classesPromise, packagePromise, javadocVersionPromise]).then(function(results) {
+    return $q.all([classesPromise, packagePromise, miscMetadataPromise]).then(function(results) {
       var classes = results[0];
       var packages = results[1];
-      javadocVersion = results[2]; // Controller scope level variable
+      var miscMetadata = results[2];
+      javadocVersion = miscMetadata['version']; // Controller scope level variable
+
+      document.title = miscMetadata['title'] + ' - Javadoc Search';
 
       $log.debug("Got metadata for classes: ", classes);
       $log.debug("Got metadata for packages: ", packages);
-      $log.debug("Got javadoc version: ", javadocVersion);
+      $log.debug("Got misc metadata: ", miscMetadata);
 
       searchDataLocator.setClassData(classes);
       searchDataLocator.setPackageData(packages);
@@ -121,12 +126,12 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   };
 
 
-  window.onbeforeunload = function(e) {
-    if (e.srcElement.activeElement.id === 'javadoc-frame') {
-      return "You are about to leave Javadoc Search.";
-    }
-    return null;
-  };
+  //window.onbeforeunload = function(e) {
+  //  if (e.srcElement.activeElement.id === 'javadoc-frame') {
+  //    return "You are about to leave Javadoc Search.";
+  //  }
+  //  return null;
+  //};
 
 
   window.setIframeSource = function(url) {
