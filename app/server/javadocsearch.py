@@ -1,5 +1,5 @@
-import urlparse
 import urllib2
+import urlparse
 import json
 
 from flask import Flask
@@ -38,7 +38,12 @@ def index(path):
     if len(path) != 0:
         if str(path).endswith('favicon.ico'):
             return '', 404
-        javadoc_resource = _retrieve_arbitrary_javadoc_resource(path)
+
+        if 'base_url' not in session:
+            return "Session does not contain a 'base_url' value.", 500
+
+        resource_path = urlparse.urljoin(session['base_url'], path)
+        javadoc_resource = _retrieve_arbitrary_javadoc_resource(resource_path)
         if javadoc_resource is not None:
             return Response(javadoc_resource.read(), mimetype=javadoc_resource.info().getheader('Content-Type'))
         return '', 404
@@ -65,71 +70,72 @@ def post_base_url():
 
 @app.route('/classes', methods=['GET'])
 def get_classes():
-    base_url = session['base_url']
+    encoded_base_url = request.args['baseUrl']
+    base_url = urllib2.unquote(encoded_base_url)
+
     app.logger.debug("Getting classes: %s", base_url)
-    scraper = JavadocScraper(base_url)
-    classes = scraper.retrieve_all_classes()
+    scraper = JavadocScraper()
+    classes = scraper.retrieve_all_classes(base_url)
 
     return json.dumps(classes)
 
 
 @app.route('/relatives', methods=['GET'])
 def get_hierarchy_classes():
-    base_url = session['base_url']
-    encoded_class_relative_url = request.args['classRelativeUrl']
-    class_relative_url = urllib2.unquote(encoded_class_relative_url)
+    encoded_class_url = request.args['classUrl']
+    class_url = urllib2.unquote(encoded_class_url)
 
-    app.logger.debug("Getting class relatives: %s", class_relative_url)
-
-    scraper = JavadocScraper(base_url)
-    classes = scraper.retrieve_hierarchy_classes(class_relative_url)
+    app.logger.debug("Getting class relatives: %s", class_url)
+    scraper = JavadocScraper()
+    classes = scraper.retrieve_hierarchy_classes(class_url)
 
     return json.dumps(classes)
 
 
 @app.route('/packages', methods=['GET'])
 def get_packages():
-    base_url = session['base_url']
-    scraper = JavadocScraper(base_url)
+    encoded_base_url = request.args['baseUrl']
+    base_url = urllib2.unquote(encoded_base_url)
 
     app.logger.debug("Getting packages: %s", base_url)
-
-    packages = scraper.retrieve_packages()
+    scraper = JavadocScraper()
+    packages = scraper.retrieve_packages(base_url)
 
     return json.dumps(packages)
 
 
 @app.route('/javadocVersion', methods=['GET'])
 def get_javadoc_version():
-    base_url = session['base_url']
-    scraper = JavadocScraper(session['base_url'])
-    version = scraper.get_javadoc_version()
+    encoded_base_url = request.args['baseUrl']
+    base_url = urllib2.unquote(encoded_base_url)
 
     app.logger.debug("Getting javadoc version: %s", base_url)
+    scraper = JavadocScraper()
+    version = scraper.get_javadoc_version(base_url)
 
     return json.dumps(version)
 
 
 @app.route('/packagePageProxy', methods=['GET'])
 def proxy_package_page():
-    encoded_package_relative_url = request.args['packageRelativeUrl']
+    encoded_base_url = request.args['baseUrl']
+    base_url = urllib2.unquote(encoded_base_url)
+
+    encoded_package_relative_url = request.args['packageUrl']
     package_relative_url = urllib2.unquote(encoded_package_relative_url)
-    package_url = urlparse.urljoin(session['base_url'], package_relative_url)
+
+    package_url = urlparse.urljoin(base_url, package_relative_url)
 
     app.logger.debug("Proxying package page: %s", package_url)
-
     package_page_response = urllib2.urlopen(package_url)
+
     return package_page_response.read()
 
 
-def _retrieve_arbitrary_javadoc_resource(relative_url):
-    if 'base_url' in session:
-        resource_url = urlparse.urljoin(session['base_url'], relative_url)
-        app.logger.debug("Getting arbitrary javadoc resource: %s", resource_url)
-        resource_response = urllib2.urlopen(resource_url)
-        return resource_response
-
-    return None
+def _retrieve_arbitrary_javadoc_resource(resource_url):
+    app.logger.debug("Getting arbitrary javadoc resource: %s", resource_url)
+    resource_response = urllib2.urlopen(resource_url)
+    return resource_response
 
 
 init_logging()

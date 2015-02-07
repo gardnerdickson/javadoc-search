@@ -18,9 +18,9 @@ app.controller('LoadUrlController', ['$scope', '$log', '$location', function($sc
 
 
 app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', '$http', 'javadocService', 'searchDataLocator', 'matcherLocator', 'constants', function($scope, $log, $routeParams, $timeout, $sce, $http, javadocService, searchDataLocator , matcherLocator, constants) {
-  var javadocUrl = null;
   var javadocVersion = null;
 
+  $scope.javadocUrl = null;
   $scope.loading = true;
   $scope.searchResults = null;
 
@@ -35,16 +35,19 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
   function init() {
 
-    javadocUrl = URI.decode($routeParams.url);
+    $scope.javadocUrl = new URI(URI.decode($routeParams.url)).normalize().toString();
+    if ($scope.javadocUrl.charAt($scope.javadocUrl.length - 1) !== '/') {
+      $scope.javadocUrl += '/';
+    }
 
-    javadocService.setBaseJavadocUrl(URI.encode(javadocUrl), function() {
+    javadocService.setBaseJavadocUrl($scope.javadocUrl, function() {
 
       retrieveClassesAndPackages(function() {
         $log.debug("Done loading!!!");
         $scope.loading = false;
       });
 
-      loadJavadocSite(javadocUrl);
+      loadJavadocSite($scope.javadocUrl);
     });
   }
 
@@ -55,7 +58,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       version: false
     };
 
-    javadocService.retrieveClasses(function(classes) {
+    javadocService.retrieveClasses(new URI($scope.javadocUrl).toString(), function(classes) {
       $log.debug("Got metadata for classes");
 
       searchDataLocator.setClassData(classes);
@@ -72,7 +75,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       }
     });
 
-    javadocService.retrievePackages(function(packages) {
+    javadocService.retrievePackages(new URI($scope.javadocUrl).toString(), function(packages) {
       $log.debug("Got metadata for packages");
       searchDataLocator.setPackageData(packages);
 
@@ -86,7 +89,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       }
     });
 
-    javadocService.getJavadocVersion(function(version) {
+    javadocService.getJavadocVersion(new URI($scope.javadocUrl).toString(), function(version) {
       $log.debug("Got javadoc version");
       javadocVersion = version;
       finished.version = true;
@@ -102,8 +105,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   }
 
   function loadJavadocClassPage(classInfo) {
-
-    var url = new URI(javadocUrl).segment(classInfo.url);
+    var url = new URI($scope.javadocUrl).segment(classInfo.url);
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   }
 
@@ -111,7 +113,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     PackageFrameOnLoadHandler.path = packageInfo.url.replace('package-frame.html', ''); // TODO: Is there a nicer way of getting the package url??
     javadocFrame.bind('load', PackageFrameOnLoadHandler.onLoad);
 
-    var url = new URI('/packagePageProxy').addSearch('packageRelativeUrl', packageInfo.url);
+    var url = new URI('/packagePageProxy').addSearch('baseUrl', $scope.javadocUrl).addSearch('packageUrl', packageInfo.url);
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   }
 

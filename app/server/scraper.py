@@ -1,10 +1,8 @@
 __author__ = 'Gardner'
 
-import urlparse
 import urllib2
 
 import html5lib
-
 from enum import Enum
 
 
@@ -35,12 +33,9 @@ class JavadocScraper:
         "Enclosing interface:"
     )
 
-    def __init__(self, url):
-        self._url = url
 
-
-    def retrieve_all_classes(self):
-        allclasses_doc = self._retrieve_response_as_doc(self._url + self._CLASSES_PATH)
+    def retrieve_all_classes(self, base_url):
+        allclasses_doc = self._retrieve_response_as_doc(base_url + self._CLASSES_PATH)
 
         javadoc_version = self._get_javadoc_version_from_allclasses_page(allclasses_doc)
 
@@ -72,8 +67,7 @@ class JavadocScraper:
         return classes
 
 
-    def retrieve_hierarchy_classes(self, class_relative_url):
-        class_url = urlparse.urljoin(self._url, class_relative_url)
+    def retrieve_hierarchy_classes(self, class_url):
         class_page_doc = self._retrieve_response_as_doc(class_url)
 
         javadoc_version = self._get_javadoc_version_from_class_page(class_page_doc)
@@ -84,9 +78,9 @@ class JavadocScraper:
             return self._find_class_links_old(class_page_doc)
 
 
-    def retrieve_packages(self):
+    def retrieve_packages(self, base_url):
         packages = []
-        package_page_doc = self._retrieve_response_as_doc(self._url + self._PACKAGES_PATH)
+        package_page_doc = self._retrieve_response_as_doc(base_url + self._PACKAGES_PATH)
 
         javadoc_version = self._get_javadoc_version_from_packages_page(package_page_doc)
         if javadoc_version is JavadocVersion.New:
@@ -106,8 +100,8 @@ class JavadocScraper:
         return packages
 
 
-    def get_javadoc_version(self):
-        allclasses_doc = self._retrieve_response_as_doc(self._url + self._CLASSES_PATH)
+    def get_javadoc_version(self, base_url):
+        allclasses_doc = self._retrieve_response_as_doc(base_url + self._CLASSES_PATH)
         javadoc_version = self._get_javadoc_version_from_allclasses_page(allclasses_doc)
         return {'version': javadoc_version.name}
 

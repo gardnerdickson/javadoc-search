@@ -4,34 +4,43 @@ app.service('javadocService', ['$http', function($http) {
 
   var service = {};
 
-  service.setBaseJavadocUrl = function(encodedUrl, onComplete) {
-    var data = { baseUrl: encodedUrl };
+  service.setBaseJavadocUrl = function(url, onComplete) {
+    var data = { baseUrl: url };
     $http.post('./baseUrl', data).then(function() {
       onComplete();
     })
   };
 
-  service.retrieveClasses = function(onComplete) {
-    $http.get('./classes').then(function(response) {
-      onComplete(response.data);
-    });
-  };
-
-  service.retrievePackages = function(onComplete) {
-    $http.get('./packages').then(function(response) {
-      onComplete(response.data);
-    });
-  };
-
-  service.getJavadocVersion = function(onComplete) {
-    $http.get('./javadocVersion').then(function(response) {
-      onComplete(response.data);
-    });
-  };
-
-  service.retrieveRelatives = function(encodedClassRelativeUrl, onComplete) {
+  service.retrieveClasses = function(url, onComplete) {
     var config = {
-      params: { classRelativeUrl: encodedClassRelativeUrl }
+      params: { baseUrl: url }
+    };
+    $http.get('./classes', config).then(function(response) {
+      onComplete(response.data);
+    });
+  };
+
+  service.retrievePackages = function(url, onComplete) {
+    var config = {
+      params: { baseUrl: url }
+    };
+    $http.get('./packages', config).then(function(response) {
+      onComplete(response.data);
+    });
+  };
+
+  service.getJavadocVersion = function(url, onComplete) {
+    var config = {
+      params: { baseUrl: url }
+    };
+    $http.get('./javadocVersion', config).then(function(response) {
+      onComplete(response.data);
+    });
+  };
+
+  service.retrieveRelatives = function(url, onComplete) {
+    var config = {
+      params: { classUrl: url }
     };
     $http.get('./relatives', config).then(function(response) {
       onComplete(response.data);

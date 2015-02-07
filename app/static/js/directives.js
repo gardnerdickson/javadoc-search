@@ -110,7 +110,7 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
   }
 }]);
 
-app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'javadocService', 'keyPressWatcher', 'constants', function($log, $timeout, searchDataLocator, javadocService, keyPressWatcher, constants) {
+app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'keyPressWatcher', 'constants', function($log, $timeout, searchDataLocator, keyPressWatcher, constants) {
   return {
     templateUrl: 'static/partials/search-result-menu.html',
     restrict: 'A',
@@ -291,7 +291,9 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
             var classInfo = searchDataLocator.getClassInfo()[scope.name];
 
             scope.loadingRelatives = true;
-            javadocService.retrieveRelatives(new URI(classInfo.url).toString(), function(relatives) {
+
+            var classUrl = new URI(scope.javadocUrl).segment(classInfo.url);
+            javadocService.retrieveRelatives(classUrl.toString(), function(relatives) {
 
               var ancestors = _.pluck(relatives.ancestors, 'className');
               var descendants = _.pluck(relatives.descendants, 'className');
