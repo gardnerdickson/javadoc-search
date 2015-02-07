@@ -1,50 +1,71 @@
 'use strict';
 
-app.service('javadocService', ['$http', function($http) {
+app.service('javadocService', ['$q', '$http', function($q, $http) {
 
   var service = {};
 
-  service.setBaseJavadocUrl = function(url, onComplete) {
+  service.setBaseJavadocUrl = function(url) {
     var data = { baseUrl: url };
+
+    var defer = $q.defer();
     $http.post('./baseUrl', data).then(function() {
-      onComplete();
-    })
+      defer.resolve();
+    });
+
+    return defer.promise;
   };
 
-  service.retrieveClasses = function(url, onComplete) {
+  service.retrieveClasses = function(url) {
+    console.log("Retrieving classes for url: ", url);
     var config = {
       params: { baseUrl: url }
     };
+
+    var defer = $q.defer();
     $http.get('./classes', config).then(function(response) {
-      onComplete(response.data);
+      defer.resolve(response.data);
     });
+
+    return defer.promise;
   };
 
-  service.retrievePackages = function(url, onComplete) {
+  service.retrievePackages = function(url) {
     var config = {
       params: { baseUrl: url }
     };
+
+    var defer = $q.defer();
     $http.get('./packages', config).then(function(response) {
-      onComplete(response.data);
+      defer.resolve(response.data);
     });
+
+    return defer.promise;
   };
 
-  service.getJavadocVersion = function(url, onComplete) {
+  service.retrieveJavadocVersion = function(url) {
     var config = {
       params: { baseUrl: url }
     };
+
+    var defer = $q.defer();
     $http.get('./javadocVersion', config).then(function(response) {
-      onComplete(response.data);
+      defer.resolve(response.data);
     });
+
+    return defer.promise;
   };
 
-  service.retrieveRelatives = function(url, onComplete) {
+  service.retrieveRelatives = function(url) {
     var config = {
       params: { classUrl: url }
     };
+
+    var defer = $q.defer();
     $http.get('./relatives', config).then(function(response) {
-      onComplete(response.data);
+      defer.resolve(response.data);
     });
+
+    return defer.promise;
   };
 
   return service;
@@ -205,6 +226,7 @@ app.service('searchDataLocator', ['constants', function(constants) {
   var classNames = [];
 
   var packageInfo = {};
+  var packageNames = {};
 
   service.getClassInfo = function() {
     return classInfo
@@ -216,6 +238,10 @@ app.service('searchDataLocator', ['constants', function(constants) {
 
   service.getPackageData = function() {
     return packageInfo;
+  };
+
+  service.getPackageNames = function() {
+    return packageNames;
   };
 
   service.setClassData = function(classes) {
@@ -239,6 +265,7 @@ app.service('searchDataLocator', ['constants', function(constants) {
     });
 
     packageInfo = packageMap;
+    packageNames = _.pluck(packageInfo, 'packageName')
   };
 
 

@@ -17,7 +17,7 @@ app.controller('LoadUrlController', ['$scope', '$log', '$location', function($sc
 }]);
 
 
-app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', '$http', 'javadocService', 'searchDataLocator', 'matcherLocator', 'constants', function($scope, $log, $routeParams, $timeout, $sce, $http, javadocService, searchDataLocator , matcherLocator, constants) {
+app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', '$q', '$http', 'javadocService', 'searchDataLocator', 'matcherLocator', 'constants', function($scope, $log, $routeParams, $timeout, $sce, $q, $http, javadocService, searchDataLocator , matcherLocator, constants) {
   var javadocVersion = null;
 
   $scope.javadocUrl = null;
@@ -40,9 +40,9 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       $scope.javadocUrl += '/';
     }
 
-    javadocService.setBaseJavadocUrl($scope.javadocUrl, function() {
+    javadocService.setBaseJavadocUrl($scope.javadocUrl).then(function() {
 
-      retrieveClassesAndPackages(function() {
+      retrieveClassesAndPackages().then(function() {
         $log.debug("Done loading!!!");
         $scope.loading = false;
       });
@@ -51,51 +51,29 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     });
   }
 
-  function retrieveClassesAndPackages(onComplete) {
-    var finished = {
-      classes: false,
-      packages: false,
-      version: false
-    };
+  function retrieveClassesAndPackages() {
 
-    javadocService.retrieveClasses(new URI($scope.javadocUrl).toString(), function(classes) {
-      $log.debug("Got metadata for classes");
+    var classesPromise = javadocService.retrieveClasses($scope.javadocUrl);
+    var packagePromise = javadocService.retrievePackages($scope.javadocUrl);
+    var javadocVersionPromise = javadocService.retrieveJavadocVersion($scope.javadocUrl);
+
+    return $q.all([classesPromise, packagePromise, javadocVersionPromise]).then(function(results) {
+      var classes = results[0];
+      var packages = results[1];
+      javadocVersion = results[2]; // Controller scope level variable
+
+      $log.debug("Got metadata for classes: ", classes);
+      $log.debug("Got metadata for packages: ", packages);
+      $log.debug("Got javadoc version: ", javadocVersion);
 
       searchDataLocator.setClassData(classes);
-
-      //matcherLocator.createMatcher(_.keys(classes), 'Basic', 'Classes_Basic');
-      //matcherLocator.createMatcher(_.keys(classes), 'CamelCase', 'Classes_CamelCase');
-
-      matcherLocator.createMatcher(searchDataLocator.getClassNames(), 'Fuzzy', 'Classes_Basic');
-
-      finished.classes = true;
-      $scope.$broadcast('initialized.classes', classes);
-      if (!_.contains(_.values(finished), false)) {
-        onComplete();
-      }
-    });
-
-    javadocService.retrievePackages(new URI($scope.javadocUrl).toString(), function(packages) {
-      $log.debug("Got metadata for packages");
       searchDataLocator.setPackageData(packages);
 
-      var packageNames = _.pluck(packages, 'packageName');
-      matcherLocator.createMatcher(packageNames, 'Fuzzy', 'Packages_Basic');
+      matcherLocator.createMatcher(searchDataLocator.getClassNames(), 'Fuzzy', 'Classes_Basic');
+      matcherLocator.createMatcher(searchDataLocator.getPackageNames(), 'Fuzzy', 'Packages_Basic');
 
-      finished.packages = true;
+      $scope.$broadcast('initialized.classes', classes);
       $scope.$broadcast('initialized.packages', packages);
-      if (!_.contains(_.values(finished), false)) {
-        onComplete();
-      }
-    });
-
-    javadocService.getJavadocVersion(new URI($scope.javadocUrl).toString(), function(version) {
-      $log.debug("Got javadoc version");
-      javadocVersion = version;
-      finished.version = true;
-      if (!_.contains(_.values(finished), false)) {
-        onComplete();
-      }
     });
   }
 
