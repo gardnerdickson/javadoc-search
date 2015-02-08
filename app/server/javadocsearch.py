@@ -25,11 +25,10 @@ app = JavadocSearchFlaskApplication(__name__, template_folder='../templates', st
 def init_logging():
     import logging
     import logging.config
-    import yaml
     import os
 
     logging_config = str(os.path.dirname(os.path.realpath(__file__)) + '/../../logging.conf')
-    logging.config.dictConfig(yaml.load(open(logging_config)))
+    logging.config.dictConfig(json.load(open(logging_config)))
 
 
 @app.route('/', defaults={'path': ''})
