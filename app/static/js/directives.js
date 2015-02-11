@@ -239,7 +239,7 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
 }]);
 
 
-app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'keyPressWatcher', 'constants', function($log, searchDataLocator, javadocService, keyPressWatcher, constants) {
+app.directive('searchResult', ['$log', '$timeout', 'searchDataLocator', 'javadocService', 'keyPressWatcher', 'constants', function($log, $timeout, searchDataLocator, javadocService, keyPressWatcher, constants) {
   return {
     templateUrl: 'static/partials/search-result.html',
     restrict: 'A',
@@ -253,7 +253,7 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
       scope.selected = false;
       scope.name = scope.result.name;
       scope.classInfo = searchDataLocator.getClassInfo()[scope.name];
-      scope.loadingRelatives = false; // TODO: this isn't used for anything right now.
+      scope.loadingRelatives = false;
 
       var uniqueId = _.uniqueId();
       var relativesLoaded = false;
@@ -287,6 +287,10 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
 
       keyPressWatcher.addHandler(keyPressWatcher.events.RIGHT, function() {
 
+        if (scope.loadingRelatives) {
+          return;
+        }
+
         var selectedClassName = scope.SearchResultMenu.getSelectedSearchResult();
 
         if (scope.name === selectedClassName) {
@@ -300,7 +304,7 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
             scope.loadingRelatives = true;
 
             var classUrl = new URI(scope.javadocUrl).segment(classInfo.url);
-            javadocService.retrieveRelatives(classUrl.toString(), function(relatives) {
+            javadocService.retrieveRelatives(classUrl.toString()).then(function(relatives) {
 
               var ancestors = _.pluck(relatives.ancestors, 'className');
               var descendants = _.pluck(relatives.descendants, 'className');
