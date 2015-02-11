@@ -142,6 +142,7 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
         });
       };
 
+      // TODO: Should probably cache the selected search result.
       scope.SearchResultMenu.getSelectedSearchResult = function() {
         var selectedSearchResult = null;
         _.each(scope.SearchResultMenu.searchResults, function(searchResult) {
@@ -320,6 +321,9 @@ app.directive('searchResult', ['$log', 'searchDataLocator', 'javadocService', 'k
       }, uniqueId);
 
       scope.SearchResultMenu.setSearchResultScope(scope.name, scope);
+      if (scope.$first) {
+        scope.select();
+      }
 
       element.on('$destroy', function() {
         keyPressWatcher.removeHandler(keyPressWatcher.events.UP, uniqueId);
