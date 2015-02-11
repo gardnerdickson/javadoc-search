@@ -22,13 +22,6 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
 
       scope.onChange = function($event) {
 
-        if (lastQuery === null || lastQuery === '') {
-          openSearchResultMenu();
-        }
-        else if (scope.query === '') {
-          closeSearchResultMenu();
-        }
-
         if (basicClassesMatcher === null) {
           basicClassesMatcher = matcherLocator.getMatcher('Classes_Basic');
         }
@@ -36,21 +29,34 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
           basicPackagesMatcher = matcherLocator.getMatcher('Packages_Basic');
         }
 
+        var querySanitized = scope.query.replace(':', '');
+
+        if (lastQuery === null || lastQuery === '') {
+          if (scope.query !== '' && scope.query !== ':') {
+            $log.debug("Opening search result menu");
+            openSearchResultMenu();
+          }
+        }
+        else if (querySanitized === '') {
+          $log.debug("Closing search result menu");
+          closeSearchResultMenu();
+        }
+
         try {
-          if (scope.query.indexOf(':') === 0) {
+          if (scope.query.indexOf(':') === 0 && scope.query !== ':') {
             scope.SearchBox.searchMode = 'Packages';
-            matches = basicPackagesMatcher.findMatches(scope.query.substr(1));
+            matches = basicPackagesMatcher.findMatches(querySanitized);
           }
           else {
             scope.SearchBox.searchMode = 'Classes';
-            matches = basicClassesMatcher.findMatches(scope.query);
+            matches = basicClassesMatcher.findMatches(querySanitized);
           }
         }
         catch (ignore) { }
 
         searchResultMenu.updateResults(matches);
 
-        lastQuery = scope.query;
+        lastQuery = querySanitized;
       };
 
       scope.onFocus = function() {
