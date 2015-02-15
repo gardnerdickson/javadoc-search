@@ -106,7 +106,7 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
 
       keyPressWatcher.addHandler(keyPressWatcher.events.ENTER, function() {
         scope.$apply(function() {
-          if (scope.SearchBox.searchMode === 'Classes') {
+          if (scope.SearchBox_.searchMode === 'Classes') {
             scope.loadJavadocClassPage(scope.SearchResultMenu.getSelectedSearchResult())
           }
           else {
@@ -115,7 +115,7 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
         });
       });
 
-      scope.SearchBox.setSearchResultMenu(scope.SearchResultMenu);
+      scope.SearchBox_.setSearchResultMenu(scope.SearchResultMenu);
 
     }
   };

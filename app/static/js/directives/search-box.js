@@ -12,11 +12,11 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
       var focus = false;
       var matches = [];
 
-      scope.SearchBox = {};
+      scope.SearchBox_ = {};
 
-      scope.SearchBox.searchMode = 'Classes';
+      scope.SearchBox_.searchMode = 'Classes';
 
-      scope.SearchBox.setSearchResultMenu = function(menu) {
+      scope.SearchBox_.setSearchResultMenu = function(menu) {
         searchResultMenu = menu;
       };
 
@@ -44,11 +44,11 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
 
         try {
           if (scope.query.indexOf(':') === 0 && scope.query !== ':') {
-            scope.SearchBox.searchMode = 'Packages';
+            scope.SearchBox_.searchMode = 'Packages';
             matches = basicPackagesMatcher.findMatches(querySanitized);
           }
           else {
-            scope.SearchBox.searchMode = 'Classes';
+            scope.SearchBox_.searchMode = 'Classes';
             matches = basicClassesMatcher.findMatches(querySanitized);
           }
         }
@@ -73,7 +73,7 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
         var selectedSearchResult = searchResultMenu.getSelectedSearchResult();
         if (selectedSearchResult !== null) {
           scope.query = selectedSearchResult.replace(/#/g, '');
-          if (scope.SearchBox.searchMode === 'Packages') {
+          if (scope.SearchBox_.searchMode === 'Packages') {
             scope.query = ':' + scope.query;
           }
         }
