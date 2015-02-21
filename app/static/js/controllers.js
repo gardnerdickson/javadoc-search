@@ -108,7 +108,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       var iframeBody = $(javadocFrame.contents().find('body'));
 
       var links = [];
-      if (javadocVersion['version'] === 'New') {
+      if (javadocVersion === 'New') {
         links = iframeBody.find('.indexContainer a');
       }
       else {
@@ -124,14 +124,6 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       });
     }
   };
-
-
-  //window.onbeforeunload = function(e) {
-  //  if (e.srcElement.activeElement.id === 'javadoc-frame') {
-  //    return "You are about to leave Javadoc Search.";
-  //  }
-  //  return null;
-  //};
 
 
   window.setIframeSource = function(url) {
