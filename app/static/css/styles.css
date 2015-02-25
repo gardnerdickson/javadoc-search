@@ -201,16 +201,20 @@ nav.class-relative-menu div {
 
 nav.class-relative-push-menu-left {
     top: 60px;
-    width: 600px;
+    width: 300px;
     height: 100%;
 
-    left: -600px;
+    left: -300px;
     background-color: #00b3ee;
 }
 
 
-.top-container.class-relative-menu-open nav.class-relative-push-menu-left {
+.top-container.search-result-menu-open nav.class-relative-push-menu-left {
     left: 0;
+}
+
+.top-container.class-relative-menu-open nav.class-relative-push-menu-left {
+    left: 300px;
 }
 
 .top-container.class-relative-menu-open #javadoc-frame {

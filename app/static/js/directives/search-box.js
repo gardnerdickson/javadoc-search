@@ -112,19 +112,6 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
         $('.top-container').removeClass('search-result-menu-open');
       }
 
-
-      // DEBUG
-      scope.toggleClassRelativeMenu = function() {
-        $log.debug("toggling class relative menu");
-        var topContainer = $('.top-container');
-        if (topContainer.hasClass('class-relative-menu-open')) {
-          topContainer.removeClass('class-relative-menu-open')
-        }
-        else {
-          topContainer.addClass('class-relative-menu-open');
-        }
-      }
-
     }
   }
 }]);
