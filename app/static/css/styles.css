@@ -79,7 +79,7 @@
     /*overflow-x: hidden;*/
 /*}*/
 
-nav.menu {
+nav.search-result-menu {
     position: fixed;
     z-index: 20;
     background-color: #000000;
@@ -92,66 +92,66 @@ nav.menu {
 }
 
 
-nav.menu ul {
+nav.search-result-menu ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
 }
 
-nav.push-menu-left {
+nav.search-result-push-menu-left {
     top: 60px;
     width: 300px;
     height: 100%;
 }
 
-nav.push-menu-left li {
+nav.search-result-push-menu-left li {
     display: block;
     text-align: left;
     color: #fff;
     line-height: 30px;
 }
 
-nav.push-menu-left .selected div.class-name {
+nav.search-result-push-menu-left .selected div.class-name {
     background-color: #fff;
     color: #000;
 }
 
-nav.push-menu-left li:hover {
+nav.search-result-push-menu-left li:hover {
     cursor: pointer;
 }
 
-nav.push-menu-left .class-name {
+nav.search-result-push-menu-left .class-name {
     text-indent: 15px;
 }
 
-nav.push-menu-left .class-name.interface,
-nav.push-menu-left .relative-class-name.interface{
+nav.search-result-push-menu-left .class-name.interface,
+nav.search-result-push-menu-left .relative-class-name.interface{
     font-style: italic;
 }
 
-nav.push-menu-left .relative-class-name {
+nav.search-result-push-menu-left .relative-class-name {
     text-indent: 30px;
 }
 
-nav.push-menu-left .selected.relative-class-name {
+nav.search-result-push-menu-left .selected.relative-class-name {
     background-color: #fff;
     color: #000;
 }
 
-nav.push-menu-left .class-package-name {
+nav.search-result-push-menu-left .class-package-name {
     color: #a3a3a3;
     font-style: italic;
 }
 
-nav.push-menu-left {
+nav.search-result-push-menu-left {
     left: -300px;
 }
 
-nav.push-menu-left .class-relative-list li {
+nav.search-result-push-menu-left .class-relative-list li {
     background-color: #000;
 }
 
-nav.push-menu-left .relative-label {
+nav.search-result-push-menu-left .relative-label {
     text-indent: 30px;
     border-top: 1px solid #a3a3a3;
     border-bottom: 1px solid #a3a3a3;
@@ -160,23 +160,62 @@ nav.push-menu-left .relative-label {
     color: #a3a3a3;
 }
 
-nav.push-menu-left .relative-label:hover {
+nav.search-result-push-menu-left .relative-label:hover {
     cursor: auto;
 }
 
 
-.top-container.menu-open nav.push-menu-left {
+.top-container.search-result-menu-open nav.search-result-push-menu-left {
     left: 0;
 }
 
-.top-container.menu-open #javadoc-frame {
+.top-container.search-result-menu-open #javadoc-frame {
     left: 300px;
 }
 
-.top-container.menu-open nav.push-menu-left {
+.top-container.search-result-menu-open nav.search-result-push-menu-left {
 
 }
 
+nav.class-relative-menu {
+    position: fixed;
+    z-index: 20;
+    background-color: #000000;
+    overflow: hidden;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -ms-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+}
+
+nav.class-relative-menu div {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: block;
+    text-align: left;
+    color: #fff;
+    line-height: 30px;
+}
+
+nav.class-relative-push-menu-left {
+    top: 60px;
+    width: 600px;
+    height: 100%;
+
+    left: -600px;
+    background-color: #00b3ee;
+}
+
+
+.top-container.class-relative-menu-open nav.class-relative-push-menu-left {
+    left: 0;
+}
+
+.top-container.class-relative-menu-open #javadoc-frame {
+    left: 600px;
+}
 
 
 #javadoc-frame {
