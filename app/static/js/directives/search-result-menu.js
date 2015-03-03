@@ -1,5 +1,5 @@
 
-app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'keyPressWatcher', 'constants', function($log, $timeout, searchDataLocator, keyPressWatcher, constants) {
+app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'keyPressWatcher', 'constants', 'searchResultManager', function($log, $timeout, searchDataLocator, keyPressWatcher, constants, searchResultManager) {
   return {
     templateUrl: 'static/partials/search-result-menu.html',
     restrict: 'A',
@@ -51,6 +51,7 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
               if (i - 1 >= 0) {
                 scope.SearchResultMenu.searchResults[i].scope.selected = false;
                 scope.SearchResultMenu.searchResults[i - 1].scope.selected = true;
+                searchResultManager.setSelectedSearchResult(scope.SearchResultMenu.searchResults[i + 1].scope.name);
               }
               break;
             }
@@ -58,6 +59,7 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
 
           if (!foundSelected) {
             scope.SearchResultMenu.searchResults[0].scope.selected = true;
+            searchResultManager.setSelectedSearchResult(scope.SearchResultMenu.searchResults[i + 1].scope.name);
           }
 
         });
@@ -82,6 +84,8 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
               if (i + 1 < scope.SearchResultMenu.searchResults.length) {
                 scope.SearchResultMenu.searchResults[i].scope.selected = false;
                 scope.SearchResultMenu.searchResults[i + 1].scope.selected = true;
+
+                searchResultManager.setSelectedSearchResult(scope.SearchResultMenu.searchResults[i + 1].scope.name);
               }
               break;
             }
@@ -89,6 +93,7 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
 
           if (!foundSelected) {
             scope.SearchResultMenu.searchResults[0].scope.selected = true;
+            searchResultManager.setSelectedSearchResult(scope.SearchResultMenu.searchResults[i + 1].scope.name);
           }
 
         });
