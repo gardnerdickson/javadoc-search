@@ -19,12 +19,16 @@ app.controller('LoadUrlController', ['$scope', '$log', '$location', function($sc
 }]);
 
 
-app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', '$q', '$http', 'javadocService', 'searchDataLocator', 'matcherLocator', 'constants', function($scope, $log, $routeParams, $timeout, $sce, $q, $http, javadocService, searchDataLocator , matcherLocator, constants) {
+app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', '$q', '$http', 'javadocService', 'searchDataLocator', 'matcherLocator', 'keyPressWatcher', 'constants', function($scope, $log, $routeParams, $timeout, $sce, $q, $http, javadocService, searchDataLocator , matcherLocator, keyPressWatcher, constants) {
   var javadocVersion = null;
 
   $scope.javadocUrl = null;
   $scope.loading = true;
   $scope.searchResults = null;
+  $scope.selectedSearchResult = null;
+
+  $scope.classMenuEnabled = false;
+  $scope.relativeMenuEnabled = false;
 
   $scope.loadJavadocClassPage = function(className) {
     loadJavadocClassPage(searchDataLocator.getClassInfo()[className])
@@ -34,8 +38,14 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     loadJavadocPackagePage(searchDataLocator.getPackageData()[packageName]);
   };
 
+  $scope.$watch('selectedSearchResult', function() {
+    $log.log('Selected search result changed to ', $scope.selectedSearchResult);
+  });
+
 
   function init() {
+
+    $scope.classMenuEnabled = true;
 
     $scope.javadocUrl = new URI(URI.decode($routeParams.url)).normalize().toString();
     if ($scope.javadocUrl.charAt($scope.javadocUrl.length - 1) !== '/') {
@@ -89,6 +99,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
   function loadJavadocClassPage(classInfo) {
     var url = new URI($scope.javadocUrl).segment(classInfo.url);
+    $log.debug("Setting iframe source to ", url.toString());
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   }
 
@@ -99,6 +110,47 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     var url = new URI('/packagePageProxy').addSearch('baseUrl', $scope.javadocUrl).addSearch('packageUrl', packageInfo.url);
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   }
+
+  function enableClassMenu() {
+    $scope.classMenuEnabled = true;
+    $scope.relativeMenuEnabled = false;
+  }
+
+  function enableRelativeMenu() {
+    $scope.classMenuEnabled = false;
+    $scope.relativeMenuEnabled = true;
+  }
+
+
+  keyPressWatcher.addHandler(keyPressWatcher.events.ENTER, function() {
+    $scope.$apply(function() {
+      if ($scope.selectedSearchResult.type === 'Class') {
+        $log.debug("Loading javadoc class page.");
+        $scope.loadJavadocClassPage($scope.selectedSearchResult.value)
+      }
+      else {
+        $log.debug("Loading package page.");
+        $scope.loadJavadocPackagePage($scope.selectedSearchResult.value);
+      }
+    });
+  });
+
+
+  keyPressWatcher.addHandler(keyPressWatcher.events.LEFT, function() {
+    $scope.$apply(function() {
+      if ($scope.classMenuEnabled) {
+        enableRelativeMenu();
+      }
+    });
+  });
+
+  keyPressWatcher.addHandler(keyPressWatcher.events.RIGHT, function() {
+    $scope.$apply(function() {
+      if ($scope.relativeMenuEnabled) {
+        enableClassMenu();
+      }
+    });
+  });
 
 
   var javadocFrame = $('#javadoc-frame');

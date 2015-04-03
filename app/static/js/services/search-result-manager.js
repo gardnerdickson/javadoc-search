@@ -1,4 +1,5 @@
 
+// TODO: This is kind of an ugly "global variable" way of sharing the selectedSearchResult.
 app.service('searchResultManager', ['$log', function($log) {
 
   var service = {};
@@ -7,7 +8,7 @@ app.service('searchResultManager', ['$log', function($log) {
   var selectedSearchResultWatchers = [];
 
   service.setSelectedSearchResult = function(className) {
-    $log.debug("Setting selected search result to ", className);
+    //$log.debug("Setting selected search result to ", className);
     selectedSearchResult = className;
     _.each(selectedSearchResultWatchers, function(watcher) {
       watcher(selectedSearchResult);

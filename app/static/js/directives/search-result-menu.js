@@ -51,6 +51,15 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
               if (i - 1 >= 0) {
                 scope.SearchResultMenu.searchResults[i].scope.selected = false;
                 scope.SearchResultMenu.searchResults[i - 1].scope.selected = true;
+
+                var searchResultName = scope.SearchResultMenu.getSelectedSearchResult();
+                if (scope.SearchBox_.searchMode === 'Classes') {
+                  scope.selectedSearchResult = {type: 'Class', value: searchResultName};
+                }
+                else {
+                  scope.selectedSearchResult = {type: 'Package', value: searchResultName};
+                }
+
                 searchResultManager.setSelectedSearchResult(scope.SearchResultMenu.searchResults[i + 1].scope.name);
               }
               break;
@@ -85,6 +94,14 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
                 scope.SearchResultMenu.searchResults[i].scope.selected = false;
                 scope.SearchResultMenu.searchResults[i + 1].scope.selected = true;
 
+                var searchResultName = scope.SearchResultMenu.getSelectedSearchResult();
+                if (scope.SearchBox_.searchMode === 'Classes') {
+                  scope.selectedSearchResult = {type: 'Class', value: searchResultName};
+                }
+                else {
+                  scope.selectedSearchResult = {type: 'Package', value: searchResultName};
+                }
+
                 searchResultManager.setSelectedSearchResult(scope.SearchResultMenu.searchResults[i + 1].scope.name);
               }
               break;
@@ -109,16 +126,17 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
         $log.log("switching selectionMode to ", scope.SearchResultMenu.selectionMode);
       });
 
-      keyPressWatcher.addHandler(keyPressWatcher.events.ENTER, function() {
-        scope.$apply(function() {
-          if (scope.SearchBox_.searchMode === 'Classes') {
-            scope.loadJavadocClassPage(scope.SearchResultMenu.getSelectedSearchResult())
-          }
-          else {
-            scope.loadJavadocPackagePage(scope.SearchResultMenu.getSelectedSearchResult())
-          }
-        });
-      });
+      //keyPressWatcher.addHandler(keyPressWatcher.events.ENTER, function() {
+      //  scope.$apply(function() {
+      //    var searchResultName = scope.SearchResultMenu.getSelectedSearchResult();
+      //    if (scope.SearchBox_.searchMode === 'Classes') {
+      //      scope.selectedSearchResult = {type: 'Class', value: searchResultName};
+      //    }
+      //    else {
+      //      scope.selectedSearchResult = {type: 'Package', value: searchResultName};
+      //    }
+      //  });
+      //});
 
       scope.SearchBox_.setSearchResultMenu(scope.SearchResultMenu);
 

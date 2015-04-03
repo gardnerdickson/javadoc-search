@@ -55,6 +55,8 @@ app.directive('searchResult', ['$log', '$timeout', 'searchDataLocator', 'javadoc
 
         if (scope.name === selectedClassName) {
 
+          scope.selectedSearchResult = scope.SearchResultMenu.getSelectedSearchResult();
+
           $log.log("toggling class relative menu");
           var topContainer = $('.top-container');
           if (topContainer.hasClass('class-relative-menu-open')) {
