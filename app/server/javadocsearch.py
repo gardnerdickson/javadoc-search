@@ -27,7 +27,7 @@ def init_logging():
     import logging.config
     import os
 
-    logging_config = str(os.path.dirname(os.path.realpath(__file__)) + '/../../logging.conf')
+    logging_config = str(os.path.dirname(os.path.realpath(__file__)) + '/../../logging.json')
     logging.config.dictConfig(json.load(open(logging_config)))
 
 
