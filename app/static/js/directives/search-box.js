@@ -67,41 +67,46 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
         focus = false;
       };
 
-      keyPressWatcher.addHandler(keyPressWatcher.events.ENTER, function() {
-        closeSearchResultMenu();
 
-        var selectedSearchResult = searchResultMenu.getSelectedSearchResult();
-        if (selectedSearchResult !== null) {
-          scope.query = selectedSearchResult.replace(/#/g, '');
-          if (scope.SearchBox_.searchMode === 'Packages') {
-            scope.query = ':' + scope.query;
+      keyPressWatcher.register({
+
+        enter: function() {
+          closeSearchResultMenu();
+
+          var selectedSearchResult = searchResultMenu.getSelectedSearchResult();
+          if (selectedSearchResult !== null) {
+            scope.query = selectedSearchResult.replace(/#/g, '');
+            if (scope.SearchBox_.searchMode === 'Packages') {
+              scope.query = ':' + scope.query;
+            }
+          }
+
+          lastQuery = '';
+        },
+
+        esc: function() {
+          scope.$apply(function() {
+            closeSearchResultMenu();
+            scope.query = '';
+            lastQuery = '';
+          });
+        },
+
+        printable: function() {
+          if (!focus) {
+            element.find('input').focus();
+            scope.query += String.fromCharCode(charCode);
+            scope.onChange(null);
+          }
+        },
+
+        backspace: function() {
+          if (!focus) {
+            element.find('input').focus();
+            scope.query = scope.query.slice(0, scope.query.length - 2)
           }
         }
 
-        lastQuery = '';
-      });
-
-      keyPressWatcher.addHandler(keyPressWatcher.events.ESC, function() {
-        scope.$apply(function() {
-          closeSearchResultMenu();
-          scope.query = '';
-          lastQuery = '';
-        });
-      });
-
-      keyPressWatcher.addHandler(keyPressWatcher.events.PRINTABLE, function(charCode) {
-        if (!focus) {
-          element.find('input').focus();
-          scope.query += String.fromCharCode(charCode);
-          scope.onChange(null);
-        }
-      });
-
-      keyPressWatcher.addHandler(keyPressWatcher.events.BACKSPACE, function() {
-        if (!focus) {
-          element.find('input').focus();
-          scope.query = scope.query.slice(0, scope.query.length - 2)
-        }
       });
 
       function openSearchResultMenu() {

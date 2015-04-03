@@ -4,49 +4,45 @@ app.service('keyPressWatcher', ['$log', function($log) {
   var service = {};
 
   service.events = {
-    UP: 'Up',
-    DOWN: 'Down',
-    LEFT: 'Left',
-    RIGHT: 'Right',
-    BACKSPACE: 'Backspace',
-    PRINTABLE: 'Printable',
-    ENTER: 'Enter',
-    ESC: 'Esc'
+    UP: 'up',
+    DOWN: 'down',
+    LEFT: 'left',
+    RIGHT: 'right',
+    BACKSPACE: 'backspace',
+    PRINTABLE: 'printable',
+    ENTER: 'enter',
+    ESC: 'esc'
   };
 
-  var handlers = {};
+  var handlerConfigs = [];
 
-  service.addHandler = function(keyPressEvent, callback, uniqueId) {
-    tryValidateKeyPressEvent(keyPressEvent);
+  service.register = function(handlerConfig, uniqueId) {
+    tryValidateHandlers(handlerConfig);
 
     if (uniqueId === undefined) {
       uniqueId = _.unique();
     }
 
-    if (!_.has(handlers, keyPressEvent)) {
-      handlers[keyPressEvent] = [];
-    }
-
-    handlers[keyPressEvent].push({
-      callback: callback,
+    handlerConfigs.push({
+      handlerConfig: handlerConfig,
       uniqueId: uniqueId
-    });
+    })
   };
 
-  service.removeHandler = function(keyPressEvent, uniqueId) {
-    tryValidateKeyPressEvent(keyPressEvent);
-
-    for (var i = 0; i < handlers[keyPressEvent].length; i++) {
-      if (handlers[keyPressEvent][i].uniqueId === uniqueId) {
-        handlers[keyPressEvent].splice(i, 1);
+  service.unregister = function(uniqueId) {
+    for (var i = 0; i < handlerConfigs.length; i++) {
+      if (handlerConfigs[i].uniqueId === uniqueId) {
+        handlerConfigs.splice(i, 1);
       }
     }
   };
 
-  function tryValidateKeyPressEvent(event) {
-    if (!_.contains(_.values(service.events), event)) {
-      throw event + " is not a valid key press event";
-    }
+  function tryValidateHandlers(handlers) {
+    _.each(_.keys(handlers), function(eventKey) {
+      if (!_.contains(_.values(service.events), eventKey)) {
+        throw eventKey + " is not a valid key press event";
+      }
+    });
   }
 
   function getEvent(code) {
@@ -89,8 +85,10 @@ app.service('keyPressWatcher', ['$log', function($log) {
       event.preventDefault();
     }
 
-    _.each(handlers[keyEvent], function(handler) {
-      handler.callback(event.which);
+    _.each(_.pluck(handlerConfigs, 'handlerConfig'), function(handlerConfig) {
+      if (_.has(handlerConfig, keyEvent)) {
+        handlerConfig[keyEvent](event.which);
+      }
     });
   });
 

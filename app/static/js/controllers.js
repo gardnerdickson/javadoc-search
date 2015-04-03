@@ -122,34 +122,37 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   }
 
 
-  keyPressWatcher.addHandler(keyPressWatcher.events.ENTER, function() {
-    $scope.$apply(function() {
-      if ($scope.selectedSearchResult.type === 'Class') {
-        $log.debug("Loading javadoc class page.");
-        $scope.loadJavadocClassPage($scope.selectedSearchResult.value)
-      }
-      else {
-        $log.debug("Loading package page.");
-        $scope.loadJavadocPackagePage($scope.selectedSearchResult.value);
-      }
-    });
-  });
+  keyPressWatcher.register({
 
+    enter: function() {
+      $scope.$apply(function() {
+        if ($scope.selectedSearchResult.type === 'Class') {
+          $log.debug("Loading javadoc class page.");
+          $scope.loadJavadocClassPage($scope.selectedSearchResult.value)
+        }
+        else {
+          $log.debug("Loading package page.");
+          $scope.loadJavadocPackagePage($scope.selectedSearchResult.value);
+        }
+      });
+    },
 
-  keyPressWatcher.addHandler(keyPressWatcher.events.LEFT, function() {
-    $scope.$apply(function() {
-      if ($scope.classMenuEnabled) {
-        enableRelativeMenu();
-      }
-    });
-  });
+    left: function() {
+      $scope.$apply(function() {
+        if ($scope.classMenuEnabled) {
+          enableRelativeMenu();
+        }
+      });
+    },
 
-  keyPressWatcher.addHandler(keyPressWatcher.events.RIGHT, function() {
-    $scope.$apply(function() {
-      if ($scope.relativeMenuEnabled) {
-        enableClassMenu();
-      }
-    });
+    right: function() {
+      $scope.$apply(function() {
+        if ($scope.relativeMenuEnabled) {
+          enableClassMenu();
+        }
+      });
+    }
+
   });
 
 
