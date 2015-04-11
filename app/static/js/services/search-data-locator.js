@@ -36,7 +36,7 @@ app.service('searchDataLocator', ['constants', function(constants) {
     return classNames;
   };
 
-  service.getPackageData = function() {
+  service.getPackageInfo = function() {
     return packageInfo;
   };
 

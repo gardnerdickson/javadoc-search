@@ -1,16 +1,12 @@
 
-app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyPressWatcher', function($log, matcherLocator, searchDataLocator, keyPressWatcher) {
+app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyPressWatcher', 'searchResultManager', function($log, matcherLocator, searchDataLocator, keyPressWatcher, searchResultManager) {
   return {
     templateUrl: 'static/partials/search-box.html',
     restrict: 'A',
     link: function(scope, element, attrs) {
 
-      var basicClassesMatcher = null;
-      var basicPackagesMatcher = null;
       var searchResultMenu = {};
-      var lastQuery = null;
       var focus = false;
-      var matches = [];
 
       scope.SearchBox_ = {};
 
@@ -22,41 +18,17 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
 
       scope.onChange = function($event) {
 
-        if (basicClassesMatcher === null) {
-          basicClassesMatcher = matcherLocator.getMatcher('Classes_Basic');
-        }
-        if (basicPackagesMatcher === null) {
-          basicPackagesMatcher = matcherLocator.getMatcher('Packages_Basic');
-        }
+        var matches = searchResultManager.search(scope.query);
 
-        var querySanitized = scope.query.replace(':', '');
-
-        if (lastQuery === null || lastQuery === '') {
-          if (scope.query !== '' && scope.query !== ':') {
-            $log.debug("Opening search result menu");
-            openSearchResultMenu();
-          }
-        }
-        else if (querySanitized === '') {
-          $log.debug("Closing search result menu");
+        var lastQuery = searchResultManager.getLastQuery();
+        if (lastQuery === '') {
           closeSearchResultMenu();
         }
-
-        try {
-          if (scope.query.indexOf(':') === 0 && scope.query !== ':') {
-            scope.SearchBox_.searchMode = 'Packages';
-            matches = basicPackagesMatcher.findMatches(querySanitized);
-          }
-          else {
-            scope.SearchBox_.searchMode = 'Classes';
-            matches = basicClassesMatcher.findMatches(querySanitized);
-          }
+        else {
+          openSearchResultMenu();
         }
-        catch (ignore) { }
 
         searchResultMenu.updateResults(matches);
-
-        lastQuery = querySanitized;
       };
 
       scope.onFocus = function() {
@@ -68,31 +40,32 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
       };
 
 
-      keyPressWatcher.register({
+      searchResultManager.registerSearchResultSelectWatcher(function(searchResult) {
+        closeSearchResultMenu();
 
-        enter: function() {
-          closeSearchResultMenu();
-
-          var selectedSearchResult = searchResultMenu.getSelectedSearchResult();
-          if (selectedSearchResult !== null) {
-            scope.query = selectedSearchResult.replace(/#/g, '');
-            if (scope.SearchBox_.searchMode === 'Packages') {
-              scope.query = ':' + scope.query;
-            }
+        scope.$apply(function() {
+          if (searchResultManager.getSearchMode() === 'Classes') {
+            scope.query = searchResult.className.replace(/#/g, '');
           }
+          else {
+            scope.query = searchResult.packageName.replace(/#/g, '');
+            scope.query = ':' + scope.query;
+          }
+        });
 
-          lastQuery = '';
-        },
+      });
+
+
+      keyPressWatcher.register({
 
         esc: function() {
           scope.$apply(function() {
             closeSearchResultMenu();
             scope.query = '';
-            lastQuery = '';
           });
         },
 
-        printable: function() {
+        printable: function(charCode) {
           if (!focus) {
             element.find('input').focus();
             scope.query += String.fromCharCode(charCode);
@@ -109,6 +82,7 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
 
       });
 
+      // TODO: should use ng-class here instead of flipping classes
       function openSearchResultMenu() {
         $('.top-container').addClass('search-result-menu-open');
       }

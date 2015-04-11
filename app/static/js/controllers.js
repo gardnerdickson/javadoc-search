@@ -19,7 +19,7 @@ app.controller('LoadUrlController', ['$scope', '$log', '$location', function($sc
 }]);
 
 
-app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', '$q', '$http', 'javadocService', 'searchDataLocator', 'matcherLocator', 'keyPressWatcher', 'constants', function($scope, $log, $routeParams, $timeout, $sce, $q, $http, javadocService, searchDataLocator , matcherLocator, keyPressWatcher, constants) {
+app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', '$q', '$http', 'javadocService', 'searchDataLocator', 'matcherLocator', 'keyPressWatcher', 'constants', 'searchResultManager', function($scope, $log, $routeParams, $timeout, $sce, $q, $http, javadocService, searchDataLocator , matcherLocator, keyPressWatcher, constants, searchResultManager) {
   var javadocVersion = null;
 
   $scope.javadocUrl = null;
@@ -35,7 +35,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   };
 
   $scope.loadJavadocPackagePage = function(packageName) {
-    loadJavadocPackagePage(searchDataLocator.getPackageData()[packageName]);
+    loadJavadocPackagePage(searchDataLocator.getPackageInfo()[packageName]);
   };
 
   $scope.$watch('selectedSearchResult', function() {
@@ -122,20 +122,19 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   }
 
 
-  keyPressWatcher.register({
+  searchResultManager.registerSearchResultSelectWatcher(function(searchResult) {
+    $scope.$apply(function() {
+      if (searchResultManager.getSearchMode() === 'Classes') {
+        loadJavadocClassPage(searchResult);
+      }
+      else {
+        loadJavadocPackagePage(searchResult);
+      }
+    });
+  });
 
-    enter: function() {
-      $scope.$apply(function() {
-        if ($scope.selectedSearchResult.type === 'Class') {
-          $log.debug("Loading javadoc class page.");
-          $scope.loadJavadocClassPage($scope.selectedSearchResult.value)
-        }
-        else {
-          $log.debug("Loading package page.");
-          $scope.loadJavadocPackagePage($scope.selectedSearchResult.value);
-        }
-      });
-    },
+
+  keyPressWatcher.register({
 
     left: function() {
       $scope.$apply(function() {

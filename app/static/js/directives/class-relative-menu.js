@@ -5,7 +5,7 @@ app.directive('classRelativeMenu', ['$log', 'searchResultManager', 'searchDataLo
     restrict: 'A',
     link: function(scope, element, attr) {
 
-      //searchResultManager.registerSelectedSearchResultWatcher(function(className) {
+      //searchResultManager.registerHighlightedSearchResultWatcher(function(className) {
       //  $log.debug("class-relative-menu watcher got called!");
       //  scope.classInfo = searchDataLocator.getClassInfo()[className];
       //});

@@ -26,7 +26,7 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
       };
 
       // TODO: Should probably cache the selected search result.
-      scope.SearchResultMenu.getSelectedSearchResult = function() {
+      scope.SearchResultMenu.getHighlightedSearchResult = function() {
         var selectedSearchResult = null;
         _.each(scope.SearchResultMenu.searchResults, function(searchResult) {
           if (searchResult.scope.selected) {
@@ -37,96 +37,38 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
       };
 
 
+      searchResultManager.registerHighlightedSearchResultWatcher(function(currentIndex, lastIndex) {
+        scope.$apply(function() {
+
+          scope.SearchResultMenu.searchResults[lastIndex].scope.selected = false;
+          scope.SearchResultMenu.searchResults[currentIndex].scope.selected = true;
+
+          if (searchResultManager.getSearchMode() === 'Classes') {
+            scope.selectedSearchResult = {
+              type: 'Class',
+              value: searchResultManager.getHighlightedSearchResult()
+            };
+          }
+          else {
+            scope.selectedSearchResult = {
+              type: 'Packages',
+              value: searchResultManager.getHighlightedSearchResult()
+            };
+          }
+
+        });
+      });
+
 
       keyPressWatcher.register({
 
-        up: function() {
-          scope.$apply(function() {
-
-            if (scope.SearchResultMenu.searchResults.length === 0) {
-              return;
-            }
-
-            var foundSelected = false;
-            for (var i = 0; i < scope.SearchResultMenu.searchResults.length; i++) {
-              if (scope.SearchResultMenu.searchResults[i].scope.selected && i > 0) {
-                foundSelected = true;
-                if (i - 1 >= 0) {
-                  scope.SearchResultMenu.searchResults[i].scope.selected = false;
-                  scope.SearchResultMenu.searchResults[i - 1].scope.selected = true;
-
-                  var searchResultName = scope.SearchResultMenu.getSelectedSearchResult();
-                  if (scope.SearchBox_.searchMode === 'Classes') {
-                    scope.selectedSearchResult = {type: 'Class', value: searchResultName};
-                  }
-                  else {
-                    scope.selectedSearchResult = {type: 'Package', value: searchResultName};
-                  }
-
-                  searchResultManager.setSelectedSearchResult(scope.SearchResultMenu.searchResults[i + 1].scope.name);
-                }
-                break;
-              }
-            }
-
-            if (!foundSelected) {
-              scope.SearchResultMenu.searchResults[0].scope.selected = true;
-              searchResultManager.setSelectedSearchResult(scope.SearchResultMenu.searchResults[i + 1].scope.name);
-            }
-
-          });
-        },
-
-        down: function() {
-          scope.$apply(function() {
-
-            if (scope.SearchResultMenu.searchResults.length === 0) {
-              return;
-            }
-
-            //if (scope.SearchResultMenu.selectionMode === constants.selectionMode.RELATIVES) {
-            //  $log.log("breakpoint");
-            //}
-
-            // find the selected class
-            var foundSelected = false;
-            for (var i = 0; i < scope.SearchResultMenu.searchResults.length; i++) {
-              if (scope.SearchResultMenu.searchResults[i].scope.selected) {
-                foundSelected = true;
-                if (i + 1 < scope.SearchResultMenu.searchResults.length) {
-                  scope.SearchResultMenu.searchResults[i].scope.selected = false;
-                  scope.SearchResultMenu.searchResults[i + 1].scope.selected = true;
-
-                  var searchResultName = scope.SearchResultMenu.getSelectedSearchResult();
-                  if (scope.SearchBox_.searchMode === 'Classes') {
-                    scope.selectedSearchResult = {type: 'Class', value: searchResultName};
-                  }
-                  else {
-                    scope.selectedSearchResult = {type: 'Package', value: searchResultName};
-                  }
-
-                  searchResultManager.setSelectedSearchResult(scope.SearchResultMenu.searchResults[i + 1].scope.name);
-                }
-                break;
-              }
-            }
-
-            if (!foundSelected) {
-              scope.SearchResultMenu.searchResults[0].scope.selected = true;
-              searchResultManager.setSelectedSearchResult(scope.SearchResultMenu.searchResults[i + 1].scope.name);
-            }
-
-          });
-
+        left: function() {
+          scope.SearchResultMenu.selectionMode = constants.selectionMode.CLASSES;
+          $log.log("switching selectionMode to ", scope.SearchResultMenu.selectionMode);
         },
 
         right: function() {
           scope.SearchResultMenu.selectionMode = constants.selectionMode.RELATIVES;
-          $log.log("switching selectionMode to ", scope.SearchResultMenu.selectionMode);
-        },
-
-        left: function() {
-          scope.SearchResultMenu.selectionMode = constants.selectionMode.CLASSES;
           $log.log("switching selectionMode to ", scope.SearchResultMenu.selectionMode);
         }
       });
