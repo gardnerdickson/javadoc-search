@@ -1,5 +1,5 @@
-import urllib2
-import urlparse
+import urllib.request
+import urllib.parse
 import json
 
 from flask import Flask
@@ -41,7 +41,7 @@ def index(path):
         if 'base_url' not in session:
             return "Session does not contain a 'base_url' value.", 500
 
-        resource_path = urlparse.urljoin(session['base_url'], path)
+        resource_path = urllib.parse.urljoin(session['base_url'], path)
         javadoc_resource = _retrieve_arbitrary_javadoc_resource(resource_path)
         if javadoc_resource is not None:
             return Response(javadoc_resource.read(), mimetype=javadoc_resource.info().getheader('Content-Type'))
@@ -52,13 +52,11 @@ def index(path):
 
 @app.route('/baseUrl', methods=['POST'])
 def post_base_url():
-    import string
-
     encoded_url = request.form['baseUrl']
-    base_url = urllib2.unquote(encoded_url)
+    base_url = urllib.parse.unquote(encoded_url)
 
     if base_url.endswith('/index.html'):
-        base_url = string.replace(base_url, '/index.html', '/')
+        base_url = str.replace(base_url, '/index.html', '/')
 
     session['base_url'] = base_url
 
@@ -70,7 +68,7 @@ def post_base_url():
 @app.route('/classes', methods=['GET'])
 def get_classes():
     encoded_base_url = request.args['baseUrl']
-    base_url = urllib2.unquote(encoded_base_url)
+    base_url = urllib.parse.unquote(encoded_base_url)
 
     app.logger.debug("Getting classes: %s", base_url)
     scraper = JavadocScraper()
@@ -82,7 +80,7 @@ def get_classes():
 @app.route('/relatives', methods=['GET'])
 def get_hierarchy_classes():
     encoded_class_url = request.args['classUrl']
-    class_url = urllib2.unquote(encoded_class_url)
+    class_url = urllib.parse.unquote(encoded_class_url)
 
     app.logger.debug("Getting class relatives: %s", class_url)
     scraper = JavadocScraper()
@@ -94,7 +92,7 @@ def get_hierarchy_classes():
 @app.route('/packages', methods=['GET'])
 def get_packages():
     encoded_base_url = request.args['baseUrl']
-    base_url = urllib2.unquote(encoded_base_url)
+    base_url = urllib.parse.unquote(encoded_base_url)
 
     app.logger.debug("Getting packages: %s", base_url)
     scraper = JavadocScraper()
@@ -106,7 +104,7 @@ def get_packages():
 @app.route('/miscMetadata', methods=['GET'])
 def get_misc_metadata():
     encoded_base_url = request.args['baseUrl']
-    base_url = urllib2.unquote(encoded_base_url)
+    base_url = urllib.parse.unquote(encoded_base_url)
 
     app.logger.debug("Getting miscellaneous metadata: %s", base_url)
     scraper = JavadocScraper()
@@ -118,22 +116,22 @@ def get_misc_metadata():
 @app.route('/packagePageProxy', methods=['GET'])
 def proxy_package_page():
     encoded_base_url = request.args['baseUrl']
-    base_url = urllib2.unquote(encoded_base_url)
+    base_url = urllib.parse.unquote(encoded_base_url)
 
     encoded_package_relative_url = request.args['packageUrl']
-    package_relative_url = urllib2.unquote(encoded_package_relative_url)
+    package_relative_url = urllib.parse.unquote(encoded_package_relative_url)
 
-    package_url = urlparse.urljoin(base_url, package_relative_url)
+    package_url = urllib.parse.urljoin(base_url, package_relative_url)
 
     app.logger.debug("Proxying package page: %s", package_url)
-    package_page_response = urllib2.urlopen(package_url)
+    package_page_response = urllib.request.urlopen(package_url)
 
     return package_page_response.read()
 
 
 def _retrieve_arbitrary_javadoc_resource(resource_url):
     app.logger.debug("Getting arbitrary javadoc resource: %s", resource_url)
-    resource_response = urllib2.urlopen(resource_url)
+    resource_response = urllib.request.urlopen(resource_url)
     return resource_response
 
 
