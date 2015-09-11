@@ -1,5 +1,5 @@
 
-app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'keyPressWatcher', 'constants', 'searchResultManager', function($log, $timeout, searchDataLocator, keyPressWatcher, constants, searchResultManager) {
+app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'keyPressWatcher', 'constants', function($log, $timeout, searchDataLocator, keyPressWatcher, constants) {
   return {
     templateUrl: 'static/partials/search-result-menu.html',
     restrict: 'A',
@@ -62,8 +62,6 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
                   else {
                     scope.selectedSearchResult = {type: 'Package', value: searchResultName};
                   }
-
-                  searchResultManager.setSelectedSearchResult(scope.SearchResultMenu.searchResults[i + 1].scope.name);
                 }
                 break;
               }
@@ -71,7 +69,6 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
 
             if (!foundSelected) {
               scope.SearchResultMenu.searchResults[0].scope.selected = true;
-              searchResultManager.setSelectedSearchResult(scope.SearchResultMenu.searchResults[i + 1].scope.name);
             }
 
           });
@@ -104,8 +101,6 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
                   else {
                     scope.selectedSearchResult = {type: 'Package', value: searchResultName};
                   }
-
-                  searchResultManager.setSelectedSearchResult(scope.SearchResultMenu.searchResults[i + 1].scope.name);
                 }
                 break;
               }
@@ -113,7 +108,6 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
 
             if (!foundSelected) {
               scope.SearchResultMenu.searchResults[0].scope.selected = true;
-              searchResultManager.setSelectedSearchResult(scope.SearchResultMenu.searchResults[i + 1].scope.name);
             }
 
           });
