@@ -39,7 +39,7 @@ app.directive('searchResult', ['$log', '$timeout', 'searchDataLocator', 'javadoc
       keyPressWatcher.register({
 
         left: function() {
-          var selectedClassName = scope.SearchResultMenu.getHighlightedSearchResult();
+          var selectedClassName = scope.SearchResultMenu.getSelectedSearchResult();
           if (scope.name === selectedClassName) {
             scope.$apply(function() {
               scope.showRelatives = false;
@@ -52,11 +52,11 @@ app.directive('searchResult', ['$log', '$timeout', 'searchDataLocator', 'javadoc
             return;
           }
 
-          var selectedClassName = scope.SearchResultMenu.getHighlightedSearchResult();
+          var selectedClassName = scope.SearchResultMenu.getSelectedSearchResult();
 
           if (scope.name === selectedClassName) {
 
-            scope.selectedSearchResult = scope.SearchResultMenu.getHighlightedSearchResult();
+            scope.selectedSearchResult = scope.SearchResultMenu.getSelectedSearchResult();
 
             $log.log("toggling class relative menu");
             var topContainer = $('.top-container');
