@@ -24,6 +24,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
   $scope.javadocUrl = null;
   $scope.loading = true;
+
   $scope.searchResults = null;
   $scope.selectedSearchResult = null;
 
@@ -36,6 +37,13 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
   $scope.loadJavadocPackagePage = function(packageName) {
     loadJavadocPackagePage(searchDataLocator.getPackageData()[packageName]);
+  };
+
+  $scope.updateSearchResults = function(results) {
+    $scope.searchResults = [];
+    _.each(results, function(result) {
+      $scope.searchResults.push({name: result})
+    });
   };
 
   $scope.$watch('selectedSearchResult', function() {

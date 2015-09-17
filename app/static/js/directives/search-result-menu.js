@@ -9,16 +9,8 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
 
       scope.SearchResultMenu.selectionMode = constants.selectionMode.CLASSES;
 
-
-      scope.SearchResultMenu.updateResults = function(searchResults) {
-        scope.SearchResultMenu.searchResults = [];
-        _.each(searchResults, function(result) {
-          scope.SearchResultMenu.searchResults.push({name: result});
-        });
-      };
-
       scope.SearchResultMenu.setSearchResultScope = function(name, searchResultScope) {
-        _.each(scope.SearchResultMenu.searchResults, function(searchResult) {
+        _.each(scope.searchResults, function(searchResult) {
           if (searchResult.name === name) {
             searchResult.scope = searchResultScope;
           }
@@ -28,7 +20,7 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
       // TODO: Should probably cache the selected search result.
       scope.SearchResultMenu.getSelectedSearchResult = function() {
         var selectedSearchResult = null;
-        _.each(scope.SearchResultMenu.searchResults, function(searchResult) {
+        _.each(scope.searchResults, function(searchResult) {
           if (searchResult.scope.selected) {
             selectedSearchResult = searchResult.name;
           }
@@ -43,17 +35,17 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
         up: function() {
           scope.$apply(function() {
 
-            if (scope.SearchResultMenu.searchResults.length === 0) {
+            if (scope.searchResults.length === 0) {
               return;
             }
 
             var foundSelected = false;
-            for (var i = 0; i < scope.SearchResultMenu.searchResults.length; i++) {
-              if (scope.SearchResultMenu.searchResults[i].scope.selected && i > 0) {
+            for (var i = 0; i < scope.searchResults.length; i++) {
+              if (scope.searchResults[i].scope.selected && i > 0) {
                 foundSelected = true;
                 if (i - 1 >= 0) {
-                  scope.SearchResultMenu.searchResults[i].scope.selected = false;
-                  scope.SearchResultMenu.searchResults[i - 1].scope.selected = true;
+                  scope.searchResults[i].scope.selected = false;
+                  scope.searchResults[i - 1].scope.selected = true;
 
                   var searchResultName = scope.SearchResultMenu.getSelectedSearchResult();
                   if (scope.SearchBox_.searchMode === 'Classes') {
@@ -68,7 +60,7 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
             }
 
             if (!foundSelected) {
-              scope.SearchResultMenu.searchResults[0].scope.selected = true;
+              scope.searchResults[0].scope.selected = true;
             }
 
           });
@@ -77,7 +69,7 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
         down: function() {
           scope.$apply(function() {
 
-            if (scope.SearchResultMenu.searchResults.length === 0) {
+            if (scope.searchResults.length === 0) {
               return;
             }
 
@@ -87,12 +79,12 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
 
             // find the selected class
             var foundSelected = false;
-            for (var i = 0; i < scope.SearchResultMenu.searchResults.length; i++) {
-              if (scope.SearchResultMenu.searchResults[i].scope.selected) {
+            for (var i = 0; i < scope.searchResults.length; i++) {
+              if (scope.searchResults[i].scope.selected) {
                 foundSelected = true;
-                if (i + 1 < scope.SearchResultMenu.searchResults.length) {
-                  scope.SearchResultMenu.searchResults[i].scope.selected = false;
-                  scope.SearchResultMenu.searchResults[i + 1].scope.selected = true;
+                if (i + 1 < scope.searchResults.length) {
+                  scope.searchResults[i].scope.selected = false;
+                  scope.searchResults[i + 1].scope.selected = true;
 
                   var searchResultName = scope.SearchResultMenu.getSelectedSearchResult();
                   if (scope.SearchBox_.searchMode === 'Classes') {
@@ -107,7 +99,7 @@ app.directive('searchResultMenu', ['$log', '$timeout', 'searchDataLocator', 'key
             }
 
             if (!foundSelected) {
-              scope.SearchResultMenu.searchResults[0].scope.selected = true;
+              scope.searchResults[0].scope.selected = true;
             }
 
           });

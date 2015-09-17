@@ -54,7 +54,7 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
         }
         catch (ignore) { }
 
-        searchResultMenu.updateResults(matches);
+        scope.updateSearchResults(matches);
 
         lastQuery = querySanitized;
       };
