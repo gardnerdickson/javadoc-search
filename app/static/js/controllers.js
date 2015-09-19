@@ -4,15 +4,24 @@ app.controller('LoadUrlController', ['$scope', '$log', '$location', function($sc
   $scope.javadocUrl = null;
 
   $scope.loadJavadoc = function() {
+    var normalizedUrl = normalizeUrl($scope.javadocUrl);
+    $log.debug("Normalized URL: " + normalizedUrl);
+    $location.path('/url/' + URI.encode(normalizedUrl));
+  };
 
-    var url = $scope.javadocUrl;
-    if (url.indexOf('/index.html') !== -1) {
-      url = url.replace('/index.html', '/')
+  function normalizeUrl(url) {
+    var uri = new URI(url);
+
+    if (uri.filename() === 'index.html') {
+      uri.filename('');
     }
 
-    var encodedUrl = URI.encode(url);
-    $location.path('/url/' + encodedUrl);
-  };
+    if (uri.protocol() === '') {
+      uri.protocol('http')
+    }
+
+    return uri.toString();
+  }
 
   document.title = 'Javadoc Search';
 
