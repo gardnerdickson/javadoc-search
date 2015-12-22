@@ -7,25 +7,20 @@ app.directive('searchResult', ['$log', '$timeout', 'searchDataLocator', 'javadoc
 
       scope.SearchResult = {};
 
-      scope.ancestors = [];
-      scope.descendants = [];
-      scope.showRelatives = false;
       scope.selected = false;
-      scope.name = scope.result.name;
+      scope.name = scope.result;
       scope.classInfo = searchDataLocator.getClassInfo()[scope.name];
-      scope.loadingRelatives = false;
 
       var uniqueId = _.uniqueId();
-      var relativesLoaded = false;
 
 
-      scope.SearchResult.setRelativeScope = function(name, scope) {
-        _.each(scope.classRelatives, function(relative) {
-          if (relative.name === name) {
-            relative.scope = scope;
-          }
-        });
-      };
+      //scope.SearchResult.setRelativeScope = function(name, scope) {
+      //  _.each(scope.classRelatives, function(relative) {
+      //    if (relative.name === name) {
+      //      relative.scope = scope;
+      //    }
+      //  });
+      //};
 
       scope.select = function() {
         scope.selected = true;
@@ -47,6 +42,7 @@ app.directive('searchResult', ['$log', '$timeout', 'searchDataLocator', 'javadoc
           }
         },
 
+        // TODO(gdickson): Showing relatives should be controlled in the MainController
         right: function() {
           if (scope.loadingRelatives) {
             return;
@@ -66,34 +62,6 @@ app.directive('searchResult', ['$log', '$timeout', 'searchDataLocator', 'javadoc
             else {
               topContainer.addClass('class-relative-menu-open');
             }
-
-            //scope.$apply(function() {
-            //  scope.showRelatives = true;
-            //});
-            //
-            //if (!relativesLoaded) {
-            //  var classInfo = searchDataLocator.getClassInfo()[scope.name];
-            //
-            //  scope.loadingRelatives = true;
-            //
-            //  var classUrl = new URI(scope.javadocUrl).segment(classInfo.url);
-            //  javadocService.retrieveRelatives(classUrl.toString()).then(function(relatives) {
-            //
-            //    var ancestors = _.pluck(relatives.ancestors, 'className');
-            //    var descendants = _.pluck(relatives.descendants, 'className');
-            //    relativesLoaded = true;
-            //
-            //    _.each(ancestors ,function(ancestor) {
-            //      scope.ancestors.push({name: ancestor})
-            //    });
-            //
-            //    _.each(descendants, function(descendant) {
-            //      scope.descendants.push({name: descendant});
-            //    });
-            //
-            //    scope.loadingRelatives = false;
-            //  });
-            //}
           }
         }
 

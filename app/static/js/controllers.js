@@ -36,6 +36,10 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
   $scope.searchResults = null;
   $scope.selectedSearchResult = null;
+  $scope.searchMode = null;
+
+  $scope.classRelativeResults = null;
+  $scope.selectedClassRelative = null;
 
   $scope.classMenuEnabled = false;
   $scope.relativeMenuEnabled = false;
@@ -49,10 +53,26 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   };
 
   $scope.updateSearchResults = function(results) {
+
     $scope.searchResults = [];
     _.each(results, function(result) {
-      $scope.searchResults.push({name: result})
+      $scope.searchResults.push(result);
     });
+
+    // First search result should be selected here because the list just got refreshed.
+    if ($scope.searchResults.length > 0) {
+      if ($scope.searchMode === 'Classes') {
+        $scope.selectedSearchResult = {type: 'Class', value: $scope.searchResults[0]}
+      }
+      else {
+        $scope.selectedSearchResult = {type: 'Package', value: $scope.searchResults[0]}
+      }
+    }
+  };
+
+  // TODO(gdickson): This probably doesn't have to be on the $scope
+  $scope.updateClassRelatives = function(relatives) {
+
   };
 
   $scope.$watch('selectedSearchResult', function() {
@@ -109,6 +129,13 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     });
   }
 
+  function retrieveClassRelatives() {
+    //javadocService.retrieveRelatives($scope.selectedSearchResult.url);
+    // TODO(gdickson): Need to lookup the search result in searchDataLocator (I think)
+    $log.log("quoi?", $scope.selectedSearchResult.url)
+
+  }
+
   function loadJavadocSite(url) {
     url = new URI(url).segment('overview-summary.html');
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString())
@@ -143,6 +170,9 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
     enter: function() {
       $scope.$apply(function() {
+
+        $log.debug("selected search result type: " + $scope.selectedSearchResult.type);
+
         if ($scope.selectedSearchResult.type === 'Class') {
           $log.debug("Loading javadoc class page.");
           $scope.loadJavadocClassPage($scope.selectedSearchResult.value)
@@ -167,6 +197,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
         if ($scope.relativeMenuEnabled) {
           enableClassMenu();
         }
+        retrieveClassRelatives();
       });
     }
 

@@ -14,8 +14,6 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
 
       scope.SearchBox_ = {};
 
-      scope.SearchBox_.searchMode = 'Classes';
-
       scope.SearchBox_.setSearchResultMenu = function(menu) {
         searchResultMenu = menu;
       };
@@ -44,11 +42,11 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
 
         try {
           if (scope.query.indexOf(':') === 0 && scope.query !== ':') {
-            scope.SearchBox_.searchMode = 'Packages';
+            scope.searchMode = 'Packages';
             matches = basicPackagesMatcher.findMatches(querySanitized);
           }
           else {
-            scope.SearchBox_.searchMode = 'Classes';
+            scope.searchMode = 'Classes';
             matches = basicClassesMatcher.findMatches(querySanitized);
           }
         }
@@ -76,7 +74,7 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
           var selectedSearchResult = searchResultMenu.getSelectedSearchResult();
           if (selectedSearchResult !== null) {
             scope.query = selectedSearchResult.replace(/#/g, '');
-            if (scope.SearchBox_.searchMode === 'Packages') {
+            if (scope.searchMode === 'Packages') {
               scope.query = ':' + scope.query;
             }
           }
