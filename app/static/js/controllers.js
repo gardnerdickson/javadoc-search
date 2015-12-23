@@ -67,6 +67,8 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       else {
         $scope.selectedSearchResult = {type: 'Package', value: $scope.searchResults[0]}
       }
+
+      $scope.$broadcast('JavadocSearchController.setSelectedSearchResult', $scope.searchResults[0]);
     }
   };
 
@@ -183,6 +185,39 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
         }
       });
     },
+
+
+    up: function() {
+      $scope.$apply(function() {
+        var selectedSearchResultIndex = _.indexOf($scope.searchResults, $scope.selectedSearchResult.value);
+        selectedSearchResultIndex--;
+        var selectedSearchResult = $scope.searchResults[selectedSearchResultIndex];
+
+        $scope.selectedSearchResult = {
+          value: selectedSearchResult,
+          type: $scope.searchMode === 'Classes' ? 'Class' : 'Package'
+        };
+
+        $scope.$broadcast('JavadocSearchController.setSelectedSearchResult', selectedSearchResult);
+      });
+    },
+
+
+    down: function() {
+      $scope.$apply(function() {
+        var selectedSearchResultIndex = _.indexOf($scope.searchResults, $scope.selectedSearchResult.value);
+        selectedSearchResultIndex++;
+        var selectedSearchResult = $scope.searchResults[selectedSearchResultIndex];
+
+        $scope.selectedSearchResult = {
+          value: selectedSearchResult,
+          type: $scope.searchMode === 'Classes' ? 'Class' : 'Package'
+        };
+
+        $scope.$broadcast('JavadocSearchController.setSelectedSearchResult', selectedSearchResult);
+      })
+    },
+
 
     left: function() {
       $scope.$apply(function() {

@@ -70,10 +70,9 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
 
         enter: function() {
           closeSearchResultMenu();
-
-          var selectedSearchResult = searchResultMenu.getSelectedSearchResult();
-          if (selectedSearchResult !== null) {
-            scope.query = selectedSearchResult.replace(/#/g, '');
+          var selectedSearchResultName = scope.selectedSearchResult.value;
+          if (selectedSearchResultName !== null) {
+            scope.query = selectedSearchResultName.replace(/#/g, '');
             if (scope.searchMode === 'Packages') {
               scope.query = ':' + scope.query;
             }

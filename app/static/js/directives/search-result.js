@@ -13,7 +13,6 @@ app.directive('searchResult', ['$log', '$timeout', 'searchDataLocator', 'javadoc
 
       var uniqueId = _.uniqueId();
 
-
       //scope.SearchResult.setRelativeScope = function(name, scope) {
       //  _.each(scope.classRelatives, function(relative) {
       //    if (relative.name === name) {
@@ -31,11 +30,22 @@ app.directive('searchResult', ['$log', '$timeout', 'searchDataLocator', 'javadoc
       };
 
 
+      scope.$on('JavadocSearchController.setSelectedSearchResult', function(event, resultName) {
+        scope.selected = scope.name === resultName;
+      });
+
+
+      scope.$on('searchResultMenu.findSelectedSearchResult', function(event) {
+        if (scope.selected) {
+          scope.$emit('searchResult.foundSelectedSearchResult', scope.name);
+        }
+      });
+
+
       keyPressWatcher.register({
 
         left: function() {
-          var selectedClassName = scope.SearchResultMenu.getSelectedSearchResult();
-          if (scope.name === selectedClassName) {
+          if (scope.name === scope.selectedSearchResult) {
             scope.$apply(function() {
               scope.showRelatives = false;
             });
@@ -48,12 +58,7 @@ app.directive('searchResult', ['$log', '$timeout', 'searchDataLocator', 'javadoc
             return;
           }
 
-          var selectedClassName = scope.SearchResultMenu.getSelectedSearchResult();
-
-          if (scope.name === selectedClassName) {
-
-            scope.selectedSearchResult = scope.SearchResultMenu.getSelectedSearchResult();
-
+          if (scope.name === scope.selectedSearchResult) {
             $log.log("toggling class relative menu");
             var topContainer = $('.top-container');
             if (topContainer.hasClass('class-relative-menu-open')) {
@@ -66,12 +71,6 @@ app.directive('searchResult', ['$log', '$timeout', 'searchDataLocator', 'javadoc
         }
 
       }, uniqueId);
-
-
-      scope.SearchResultMenu.setSearchResultScope(scope.name, scope);
-      if (scope.$first) {
-        scope.select();
-      }
 
       element.on('$destroy', function() {
         keyPressWatcher.unregister(uniqueId);
