@@ -13,14 +13,6 @@ app.directive('searchResult', ['$log', '$timeout', 'searchDataLocator', 'javadoc
 
       var uniqueId = _.uniqueId();
 
-      //scope.SearchResult.setRelativeScope = function(name, scope) {
-      //  _.each(scope.classRelatives, function(relative) {
-      //    if (relative.name === name) {
-      //      relative.scope = scope;
-      //    }
-      //  });
-      //};
-
       scope.select = function() {
         scope.selected = true;
       };
@@ -41,36 +33,6 @@ app.directive('searchResult', ['$log', '$timeout', 'searchDataLocator', 'javadoc
         }
       });
 
-
-      keyPressWatcher.register({
-
-        left: function() {
-          if (scope.name === scope.selectedSearchResult) {
-            scope.$apply(function() {
-              scope.showRelatives = false;
-            });
-          }
-        },
-
-        // TODO(gdickson): Showing relatives should be controlled in the MainController
-        right: function() {
-          if (scope.loadingRelatives) {
-            return;
-          }
-
-          if (scope.name === scope.selectedSearchResult) {
-            $log.log("toggling class relative menu");
-            var topContainer = $('.top-container');
-            if (topContainer.hasClass('class-relative-menu-open')) {
-              topContainer.removeClass('class-relative-menu-open')
-            }
-            else {
-              topContainer.addClass('class-relative-menu-open');
-            }
-          }
-        }
-
-      }, uniqueId);
 
       element.on('$destroy', function() {
         keyPressWatcher.unregister(uniqueId);

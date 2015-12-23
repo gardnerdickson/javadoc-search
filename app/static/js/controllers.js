@@ -30,6 +30,7 @@ app.controller('LoadUrlController', ['$scope', '$log', '$location', function($sc
 
 app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', '$q', '$http', 'javadocService', 'searchDataLocator', 'matcherLocator', 'keyPressWatcher', 'constants', function($scope, $log, $routeParams, $timeout, $sce, $q, $http, javadocService, searchDataLocator , matcherLocator, keyPressWatcher, constants) {
   var javadocVersion = null;
+  var loadingRelatives = false;
 
   $scope.javadocUrl = null;
   $scope.loading = true;
@@ -59,26 +60,37 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       $scope.searchResults.push(result);
     });
 
-    // First search result should be selected here because the list just got refreshed.
-    if ($scope.searchResults.length > 0) {
-      if ($scope.searchMode === 'Classes') {
-        $scope.selectedSearchResult = {type: 'Class', value: $scope.searchResults[0]}
-      }
-      else {
-        $scope.selectedSearchResult = {type: 'Package', value: $scope.searchResults[0]}
-      }
-
-      $scope.$broadcast('JavadocSearchController.setSelectedSearchResult', $scope.searchResults[0]);
-    }
+    $scope.selectedSearchResult = null;
   };
 
-  // TODO(gdickson): This probably doesn't have to be on the $scope
+
   $scope.updateClassRelatives = function(relatives) {
+    $log.log("Updating relatives: ", relatives);
 
+    $scope.classRelativeResults = {
+      ancestors: [],
+      descendants: []
+    };
+
+    _.each(relatives.ancestors, function(ancestor) {
+      $scope.classRelativeResults.ancestors.push(ancestor.className);
+    });
+    _.each(relatives.descendants, function(descendant) {
+      $scope.classRelativeResults.descendants.push(descendant.className);
+    });
+
+    loadingRelatives = false;
   };
+
 
   $scope.$watch('selectedSearchResult', function() {
     $log.log('Selected search result changed to ', $scope.selectedSearchResult);
+    if ($scope.selectedSearchResult === null) {
+      $scope.$broadcast('JavadocSearchController.focusSearchBox');
+    }
+    else {
+      $scope.$broadcast('JavadocSearchController.setSelectedSearchResult', $scope.selectedSearchResult.value);
+    }
   });
 
 
@@ -132,10 +144,15 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   }
 
   function retrieveClassRelatives() {
-    //javadocService.retrieveRelatives($scope.selectedSearchResult.url);
-    // TODO(gdickson): Need to lookup the search result in searchDataLocator (I think)
-    $log.log("quoi?", $scope.selectedSearchResult.url)
+    if ($scope.searchMode !== 'Classes') {
+      $log.info("Not loading relatives because search mode is ", $scope.searchMode);
+      return;
+    }
 
+    var classInfo = searchDataLocator.getClassInfo()[$scope.selectedSearchResult.value];
+    var url = new URI($scope.javadocUrl).segment(classInfo.url);
+
+    javadocService.retrieveRelatives(url.toString()).then($scope.updateClassRelatives);
   }
 
   function loadJavadocSite(url) {
@@ -167,6 +184,25 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     $scope.relativeMenuEnabled = true;
   }
 
+  function isRelativeMenuVisible() {
+    return $('.top-container').hasClass('class-relative-menu-open');
+  }
+
+
+  function showRelativeMenu() {
+    var topContainer = $('.top-container');
+    if (!topContainer.hasClass('class-relative-menu-open')) {
+      topContainer.addClass('class-relative-menu-open');
+    }
+  }
+
+  function hideRelativeMenu() {
+    var topContainer = $('.top-container');
+    if (topContainer.hasClass('class-relative-menu-open')) {
+      topContainer.removeClass('class-relative-menu-open');
+    }
+  }
+
 
   keyPressWatcher.register({
 
@@ -189,8 +225,19 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
     up: function() {
       $scope.$apply(function() {
-        var selectedSearchResultIndex = _.indexOf($scope.searchResults, $scope.selectedSearchResult.value);
+
+        var selectedSearchResultIndex = 0;
+        if ($scope.selectedSearchResult !== null) {
+          selectedSearchResultIndex = _.indexOf($scope.searchResults, $scope.selectedSearchResult.value);
+        }
+
         selectedSearchResultIndex--;
+
+        if (selectedSearchResultIndex < 0) {
+          $scope.selectedSearchResult = null;
+          return;
+        }
+
         var selectedSearchResult = $scope.searchResults[selectedSearchResultIndex];
 
         $scope.selectedSearchResult = {
@@ -198,15 +245,28 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
           type: $scope.searchMode === 'Classes' ? 'Class' : 'Package'
         };
 
-        $scope.$broadcast('JavadocSearchController.setSelectedSearchResult', selectedSearchResult);
+        $scope.$broadcast('JavadocSearchController.blurSearchBox');
+
+        if (isRelativeMenuVisible()) {
+          hideRelativeMenu();
+        }
+
       });
     },
 
 
     down: function() {
       $scope.$apply(function() {
-        var selectedSearchResultIndex = _.indexOf($scope.searchResults, $scope.selectedSearchResult.value);
-        selectedSearchResultIndex++;
+
+        var selectedSearchResultIndex;
+        if ($scope.selectedSearchResult === null) {
+          selectedSearchResultIndex = 0;
+        }
+        else {
+          selectedSearchResultIndex = _.indexOf($scope.searchResults, $scope.selectedSearchResult.value);
+          selectedSearchResultIndex++;
+        }
+
         var selectedSearchResult = $scope.searchResults[selectedSearchResultIndex];
 
         $scope.selectedSearchResult = {
@@ -214,25 +274,40 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
           type: $scope.searchMode === 'Classes' ? 'Class' : 'Package'
         };
 
-        $scope.$broadcast('JavadocSearchController.setSelectedSearchResult', selectedSearchResult);
+        $scope.$broadcast('JavadocSearchController.blurSearchBox');
+
+        if (isRelativeMenuVisible()) {
+          hideRelativeMenu();
+        }
       })
     },
 
 
     left: function() {
       $scope.$apply(function() {
-        if ($scope.classMenuEnabled) {
-          enableRelativeMenu();
+        if (isRelativeMenuVisible()) {
+          hideRelativeMenu();
         }
       });
     },
 
     right: function() {
       $scope.$apply(function() {
+
+        if ($scope.selectedSearchResult === null) {
+          return;
+        }
+
         if ($scope.relativeMenuEnabled) {
           enableClassMenu();
         }
-        retrieveClassRelatives();
+
+        if (!loadingRelatives) {
+          loadingRelatives = true;
+          retrieveClassRelatives();
+        }
+
+        showRelativeMenu();
       });
     }
 

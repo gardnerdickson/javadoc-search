@@ -1,29 +1,10 @@
-<!--<nav class="class-relative-menu class-relative-push-menu-left">-->
-    <!--<div ng-if="classInfo">-->
-        <!--<div class="class-name"-->
-             <!--ng-class="{'interface': classInfo.classType == 'interface'}"-->
-             <!--ng-click="loadJavadocClassPage(result.name)"-->
-             <!--ng-mouseover="select()"-->
-             <!--ng-mouseleave="deselect()">-->
-            <!--{{classInfo.className | hashMask}}&nbsp;&nbsp;-->
-            <!--<span class="class-package-name" ng-show="selected">{{classInfo.package}}</span>-->
-        <!--</div>-->
-    <!--</div>-->
-    <!--<div ng-show="!loadingRelatives && ancestors.length != 0" class="relative-label">Ancestors</div>-->
-    <!--<ul class="class-relative-list">-->
-        <!--<li class-relative="" ng-repeat="relative in ancestors">-->
-        <!--</li>-->
-    <!--</ul>-->
-    <!--<div ng-show="!loadingRelatives && descendants.length != 0" class="relative-label">Descendants</div>-->
-    <!--<ul class="class-relative-list">-->
-        <!--<li class-relative="" ng-repeat="relative in descendants">-->
-        <!--</li>-->
-    <!--</ul>-->
-<!--</nav>-->
-
 <nav class="class-relative-menu class-relative-push-menu-left">
     <ul>
-        <li search-result="" ng-repeat="relative in classRelatives" ng-class="{'selected': selected}">
+        <li class-relative="" ng-repeat="relative in classRelativeResults.ancestors" ng-class="{'selected': selected}">
+        </li>
+    </ul>
+    <ul>
+        <li class-relative="" ng-repeat="relative in classRelativeResults.descendants" ng-class="{'selected': selected}">
         </li>
     </ul>
 </nav>

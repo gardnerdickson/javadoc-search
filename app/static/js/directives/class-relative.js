@@ -7,7 +7,7 @@ app.directive('classRelative', ['$log', 'searchDataLocator', function($log, sear
 
       scope.selected = false;
       scope.visible = true;
-      scope.relativeInfo = searchDataLocator.getClassInfo()[scope.relative.name];
+      scope.relativeInfo = searchDataLocator.getClassInfo()[scope.relative];
 
       scope.loadClassRelative = function(name) {
         scope.loadJavadocClassPage(name);
@@ -21,7 +21,7 @@ app.directive('classRelative', ['$log', 'searchDataLocator', function($log, sear
         scope.selected = false;
       };
 
-      scope.SearchResult.setRelativeScope(scope.$parent.name, name, scope);
+      //scope.SearchResult.setRelativeScope(scope.$parent.name, name, scope);
 
     }
   }

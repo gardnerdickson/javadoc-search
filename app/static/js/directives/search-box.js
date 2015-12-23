@@ -18,6 +18,18 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
         searchResultMenu = menu;
       };
 
+      scope.$on('JavadocSearchController.focusSearchBox', function(event) {
+        if (!focus) {
+          element.find('input').focus();
+        }
+      });
+
+      scope.$on('JavadocSearchController.blurSearchBox', function(event) {
+        if (focus) {
+          element.find('input').blur();
+        }
+      });
+
       scope.onChange = function($event) {
 
         if (basicClassesMatcher === null) {
