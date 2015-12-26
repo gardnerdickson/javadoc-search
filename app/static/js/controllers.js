@@ -30,7 +30,7 @@ app.controller('LoadUrlController', ['$scope', '$log', '$location', function($sc
 
 app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', '$q', '$http', 'javadocService', 'searchDataLocator', 'matcherLocator', 'keyPressWatcher', 'constants', function($scope, $log, $routeParams, $timeout, $sce, $q, $http, javadocService, searchDataLocator , matcherLocator, keyPressWatcher, constants) {
   var javadocVersion = null;
-  var loadingRelatives = false;
+  var relativesCache = new Cache(10);
 
   $scope.javadocUrl = null;
   $scope.loading = true;
@@ -44,6 +44,8 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
   $scope.classMenuEnabled = false;
   $scope.relativeMenuEnabled = false;
+
+  $scope.loadingRelatives = false;
 
   $scope.loadJavadocClassPage = function(className) {
     loadJavadocClassPage(searchDataLocator.getClassInfo()[className])
@@ -65,7 +67,6 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
 
   $scope.updateClassRelatives = function(relatives) {
-    $log.log("Updating relatives: ", relatives);
 
     $scope.classRelativeResults = {
       ancestors: [],
@@ -79,7 +80,9 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       $scope.classRelativeResults.descendants.push(descendant.className);
     });
 
-    loadingRelatives = false;
+    relativesCache.put($scope.selectedSearchResult.value, relatives);
+
+    $scope.loadingRelatives = false;
   };
 
 
@@ -152,7 +155,12 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     var classInfo = searchDataLocator.getClassInfo()[$scope.selectedSearchResult.value];
     var url = new URI($scope.javadocUrl).segment(classInfo.url);
 
-    javadocService.retrieveRelatives(url.toString()).then($scope.updateClassRelatives);
+    if (relativesCache.contains($scope.selectedSearchResult.value)) {
+      $scope.updateClassRelatives(relativesCache.get($scope.selectedSearchResult.value));
+    }
+    else {
+      javadocService.retrieveRelatives(url.toString()).then($scope.updateClassRelatives);
+    }
   }
 
   function loadJavadocSite(url) {
@@ -302,8 +310,8 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
           enableClassMenu();
         }
 
-        if (!loadingRelatives) {
-          loadingRelatives = true;
+        if (!$scope.loadingRelatives) {
+          $scope.loadingRelatives = true;
           retrieveClassRelatives();
         }
 

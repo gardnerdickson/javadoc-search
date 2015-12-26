@@ -1,12 +1,18 @@
 <nav class="class-relative-menu class-relative-push-menu-left">
-    <ul>
-        <li class-relative="" ng-repeat="relative in classRelativeResults.ancestors" ng-class="{'selected': selected}">
-        </li>
-    </ul>
-    <ul>
-        <li class-relative="" ng-repeat="relative in classRelativeResults.descendants" ng-class="{'selected': selected}">
-        </li>
-    </ul>
+    <div ng-if="loadingRelatives" class="relative-class-name">
+        Loading...
+    </div>
+    <div ng-if="!loadingRelatives">
+        <ul>
+            <li class-relative="" ng-repeat="relative in classRelativeResults.ancestors" ng-class="{'selected': selected}">
+            </li>
+        </ul>
+        <div style="border-top: 1px solid #333"/>
+        <ul>
+            <li class-relative="" ng-repeat="relative in classRelativeResults.descendants" ng-class="{'selected': selected}">
+            </li>
+        </ul>
+    </div>
 </nav>
 
 
