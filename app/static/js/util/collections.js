@@ -87,3 +87,40 @@ Cache.prototype.contains = function(key) {
   return this.orderedMap.contains(key);
 };
 
+
+function LoadingCache(config) {
+  this.orderedMap = new OrderedMap();
+
+  this.limit = config.limit || 10;
+
+  if (config.load === undefined || !_.isFunction(config.load)) {
+    throw "config parameter must contain a 'load' property that is a function."
+  }
+  this.load = config.load;
+}
+
+LoadingCache.prototype.get = function(key) {
+
+  var that = this;
+  function put(key) {
+    while (that.orderedMap.size() > that.limit) {
+      that.orderedMap.remove(that.orderedMap.getFirstKey());
+    }
+
+    return that.load(key).then(function(data) {
+      that.orderedMap.put(key, data);
+      return data;
+    });
+  }
+
+  var value = this.orderedMap.get(key);
+  if (value === undefined) {
+    return put(key);
+  }
+  else {
+    var defer = angular.injector(['javadocSearch']).get('$q').defer();
+    defer.resolve(that.orderedMap.get(key));
+    return defer.promise;
+  }
+};
+

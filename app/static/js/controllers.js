@@ -30,7 +30,10 @@ app.controller('LoadUrlController', ['$scope', '$log', '$location', function($sc
 
 app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', '$q', '$http', 'javadocService', 'searchDataLocator', 'matcherLocator', 'keyPressWatcher', 'constants', function($scope, $log, $routeParams, $timeout, $sce, $q, $http, javadocService, searchDataLocator , matcherLocator, keyPressWatcher, constants) {
   var javadocVersion = null;
-  var relativesCache = new Cache(10);
+  var relativesCache = new LoadingCache({
+    limit: 10,
+    load: relativeCacheLoad
+  });
 
   $scope.javadocUrl = null;
   $scope.loading = true;
@@ -67,21 +70,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
 
   $scope.updateClassRelatives = function(relatives) {
-
-    $scope.classRelativeResults = {
-      ancestors: [],
-      descendants: []
-    };
-
-    _.each(relatives.ancestors, function(ancestor) {
-      $scope.classRelativeResults.ancestors.push(ancestor.className);
-    });
-    _.each(relatives.descendants, function(descendant) {
-      $scope.classRelativeResults.descendants.push(descendant.className);
-    });
-
-    relativesCache.put($scope.selectedSearchResult.value, relatives);
-
+    $scope.classRelativeResults = relatives;
     $scope.loadingRelatives = false;
   };
 
@@ -152,15 +141,9 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       return;
     }
 
-    var classInfo = searchDataLocator.getClassInfo()[$scope.selectedSearchResult.value];
-    var url = new URI($scope.javadocUrl).segment(classInfo.url);
-
-    if (relativesCache.contains($scope.selectedSearchResult.value)) {
-      $scope.updateClassRelatives(relativesCache.get($scope.selectedSearchResult.value));
-    }
-    else {
-      javadocService.retrieveRelatives(url.toString()).then($scope.updateClassRelatives);
-    }
+    relativesCache.get($scope.selectedSearchResult.value).then(function(relatives) {
+      $scope.updateClassRelatives(relatives);
+    });
   }
 
   function loadJavadocSite(url) {
@@ -196,7 +179,6 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     return $('.top-container').hasClass('class-relative-menu-open');
   }
 
-
   function showRelativeMenu() {
     var topContainer = $('.top-container');
     if (!topContainer.hasClass('class-relative-menu-open')) {
@@ -209,6 +191,23 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     if (topContainer.hasClass('class-relative-menu-open')) {
       topContainer.removeClass('class-relative-menu-open');
     }
+  }
+
+
+  function relativeCacheLoad(key) {
+    var classInfo = searchDataLocator.getClassInfo()[key];
+    var url = new URI($scope.javadocUrl).segment(classInfo.url);
+
+    return javadocService.retrieveRelatives(url.toString()).then(function(relatives) {
+      var filtered = {};
+      filtered.ancestors = _.map(relatives.ancestors, function(ancestor) {
+        return ancestor.className;
+      });
+      filtered.descendants = _.map(relatives.descendants, function(descendant) {
+        return descendant.className;
+      });
+      return filtered;
+    });
   }
 
 
