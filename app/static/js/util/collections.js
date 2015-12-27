@@ -57,37 +57,7 @@ OrderedMap.prototype.size = function() {
 };
 
 
-
-function Cache(limit) {
-  this.limit = limit;
-  this.orderedMap = new OrderedMap();
-}
-
-Cache.prototype.put = function(key, object) {
-  if (this.orderedMap.contains(key)) {
-    this.orderedMap.remove(key);
-  }
-
-  while (this.orderedMap.size() > this.limit) {
-    this.orderedMap.remove(this.orderedMap.getFirstKey());
-  }
-
-  this.orderedMap.put(key, object);
-};
-
-Cache.prototype.get = function(key) {
-  return this.orderedMap.get(key);
-};
-
-Cache.prototype.contains = function(key) {
-  if (this.orderedMap.size() === 0) {
-    return false;
-  }
-
-  return this.orderedMap.contains(key);
-};
-
-
+// TODO(gdickson): Can this be put into the service or factory?
 function LoadingCache(config) {
   this.orderedMap = new OrderedMap();
 
@@ -118,9 +88,7 @@ LoadingCache.prototype.get = function(key) {
     return put(key);
   }
   else {
-    var defer = angular.injector(['javadocSearch']).get('$q').defer();
-    defer.resolve(that.orderedMap.get(key));
-    return defer.promise;
+    return Promise.resolve(that.orderedMap.get(key));
   }
 };
 

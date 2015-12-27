@@ -142,7 +142,15 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     }
 
     relativesCache.get($scope.selectedSearchResult.value).then(function(relatives) {
-      $scope.updateClassRelatives(relatives);
+      // TODO(gdickson): Checking $$phase is yucky.
+      if (!$scope.$$phase) {
+        $scope.$apply(function() {
+          $scope.updateClassRelatives(relatives);
+        })
+      }
+      else {
+        $scope.updateClassRelatives(relatives);
+      }
     });
   }
 
@@ -199,14 +207,10 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     var url = new URI($scope.javadocUrl).segment(classInfo.url);
 
     return javadocService.retrieveRelatives(url.toString()).then(function(relatives) {
-      var filtered = {};
-      filtered.ancestors = _.map(relatives.ancestors, function(ancestor) {
-        return ancestor.className;
-      });
-      filtered.descendants = _.map(relatives.descendants, function(descendant) {
-        return descendant.className;
-      });
-      return filtered;
+      return {
+        ancestors: _.pluck(relatives.ancestors, 'className'),
+        descendants: _.pluck(relatives.descendants, 'className')
+      };
     });
   }
 
