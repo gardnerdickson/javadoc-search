@@ -21,7 +21,10 @@ app.directive('classRelative', ['$log', 'searchDataLocator', function($log, sear
         scope.selected = false;
       };
 
-      //scope.SearchResult.setRelativeScope(scope.$parent.name, name, scope);
+      scope.selectAndNavigate = function(name) {
+        scope.select();
+        scope.loadClassRelative(name);
+      };
 
     }
   }

@@ -199,6 +199,8 @@ nav.class-relative-push-menu-left {
 
     left: -300px;
     background-color: #00b3ee;
+
+    text-indent: 15px;
 }
 
 nav.class-relative-push-menu-left li {
@@ -217,8 +219,9 @@ nav.class-relative-push-menu-left li:hover {
     cursor: pointer;
 }
 
-nav.class-relative-push-menu-left .relative-class-name {
-    text-indent: 15px;
+nav.class-relative-push-menu-left .class-package-name {
+    color: #a3a3a3;
+    font-style: italic;
 }
 
 nav.class-relative-menu div {

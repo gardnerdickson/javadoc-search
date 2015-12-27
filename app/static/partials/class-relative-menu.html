@@ -3,12 +3,14 @@
         Loading...
     </div>
     <div ng-if="!loadingRelatives">
-        <ul>
+        <div>
+            {{package}}
+        </div>
+        <ul style="border-top: 1px solid #333">
             <li class-relative="" ng-repeat="relative in classRelativeResults.ancestors" ng-class="{'selected': selected}">
             </li>
         </ul>
-        <div style="border-top: 1px solid #333"/>
-        <ul>
+        <ul style="border-top: 1px solid #333">
             <li class-relative="" ng-repeat="relative in classRelativeResults.descendants" ng-class="{'selected': selected}">
             </li>
         </ul>

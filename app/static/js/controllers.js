@@ -55,7 +55,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   };
 
   $scope.loadJavadocPackagePage = function(packageName) {
-    loadJavadocPackagePage(searchDataLocator.getPackageData()[packageName]);
+    loadJavadocPackagePage(searchDataLocator.getPackageInfo()[packageName]);
   };
 
   $scope.updateSearchResults = function(results) {
@@ -84,6 +84,13 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       $scope.$broadcast('JavadocSearchController.setSelectedSearchResult', $scope.selectedSearchResult.value);
     }
   });
+
+  $scope.setSelectedSearchResult = function(resultName) {
+    $scope.selectedSearchResult = {
+      value: resultName,
+      type: $scope.searchMode === 'Classes' ? 'Class' : 'Package'
+    }
+  };
 
 
   function init() {
@@ -303,23 +310,25 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     },
 
     right: function() {
-      $scope.$apply(function() {
+      if ($scope.searchMode === 'Classes') {
+        $scope.$apply(function() {
 
-        if ($scope.selectedSearchResult === null) {
-          return;
-        }
+          if ($scope.selectedSearchResult === null) {
+            return;
+          }
 
-        if ($scope.relativeMenuEnabled) {
-          enableClassMenu();
-        }
+          if ($scope.relativeMenuEnabled) {
+            enableClassMenu();
+          }
 
-        if (!$scope.loadingRelatives) {
-          $scope.loadingRelatives = true;
-          retrieveClassRelatives();
-        }
+          if (!$scope.loadingRelatives) {
+            $scope.loadingRelatives = true;
+            retrieveClassRelatives();
+          }
 
-        showRelativeMenu();
-      });
+          showRelativeMenu();
+        });
+      }
     }
 
   });

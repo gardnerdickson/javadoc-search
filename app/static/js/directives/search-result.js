@@ -11,14 +11,17 @@ app.directive('searchResult', ['$log', '$timeout', 'searchDataLocator', 'javadoc
       scope.name = scope.result;
       scope.classInfo = searchDataLocator.getClassInfo()[scope.name];
 
-      var uniqueId = _.uniqueId();
-
       scope.select = function() {
         scope.selected = true;
       };
 
       scope.deselect = function() {
         scope.selected = false;
+      };
+
+      scope.selectAndLoadPage = function(resultName) {
+        scope.setSelectedSearchResult(resultName);
+        scope.searchMode === 'Classes' ? scope.loadJavadocClassPage(resultName) : scope.loadJavadocPackagePage(resultName)
       };
 
 
@@ -31,11 +34,6 @@ app.directive('searchResult', ['$log', '$timeout', 'searchDataLocator', 'javadoc
         if (scope.selected) {
           scope.$emit('searchResult.foundSelectedSearchResult', scope.name);
         }
-      });
-
-
-      element.on('$destroy', function() {
-        keyPressWatcher.unregister(uniqueId);
       });
 
     }
