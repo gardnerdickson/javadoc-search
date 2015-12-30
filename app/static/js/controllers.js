@@ -38,14 +38,13 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   $scope.javadocUrl = null;
   $scope.loading = true;
 
-  $scope.searchResults = null;
   $scope.selectedSearchResult = null;
   $scope.searchMode = null;
 
   $scope.classRelativeResults = null;
   $scope.selectedClassRelative = null;
 
-  $scope.classMenuEnabled = false;
+  $scope.searchResultMenuEnabled = false;
   $scope.relativeMenuEnabled = false;
 
   $scope.loadingRelatives = false;
@@ -58,44 +57,22 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     loadJavadocPackagePage(searchDataLocator.getPackageInfo()[packageName]);
   };
 
-  $scope.updateSearchResults = function(results) {
-
-    $scope.searchResults = [];
-    _.each(results, function(result) {
-      $scope.searchResults.push(result);
-    });
-
-    $scope.selectedSearchResult = null;
-  };
-
-
   $scope.updateClassRelatives = function(relatives) {
     $scope.classRelativeResults = relatives;
     $scope.loadingRelatives = false;
   };
 
-
-  $scope.$watch('selectedSearchResult', function() {
-    $log.log('Selected search result changed to ', $scope.selectedSearchResult);
-    if ($scope.selectedSearchResult === null) {
-      $scope.$broadcast('JavadocSearchController.focusSearchBox');
-    }
-    else {
-      $scope.$broadcast('JavadocSearchController.setSelectedSearchResult', $scope.selectedSearchResult.value);
-    }
-  });
-
-  $scope.setSelectedSearchResult = function(resultName) {
+  $scope.$on('SELECTED_SEARCH_RESULT_CHANGED', function(event, searchResult) {
     $scope.selectedSearchResult = {
-      value: resultName,
+      value: searchResult,
       type: $scope.searchMode === 'Classes' ? 'Class' : 'Package'
-    }
-  };
+    };
+  });
 
 
   function init() {
 
-    $scope.classMenuEnabled = true;
+    $scope.searchResultMenuEnabled = true;
 
     $scope.javadocUrl = new URI(URI.decode($routeParams.url)).normalize().toString();
     if ($scope.javadocUrl.charAt($scope.javadocUrl.length - 1) !== '/') {
@@ -181,12 +158,12 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   }
 
   function enableClassMenu() {
-    $scope.classMenuEnabled = true;
+    $scope.searchResultMenuEnabled = true;
     $scope.relativeMenuEnabled = false;
   }
 
   function enableRelativeMenu() {
-    $scope.classMenuEnabled = false;
+    $scope.searchResultMenuEnabled = false;
     $scope.relativeMenuEnabled = true;
   }
 
@@ -223,83 +200,6 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
 
   keyPressWatcher.register({
-
-    enter: function() {
-      $scope.$apply(function() {
-
-        $log.debug("selected search result type: " + $scope.selectedSearchResult.type);
-
-        if ($scope.selectedSearchResult.type === 'Class') {
-          $log.debug("Loading javadoc class page.");
-          $scope.loadJavadocClassPage($scope.selectedSearchResult.value)
-        }
-        else {
-          $log.debug("Loading package page.");
-          $scope.loadJavadocPackagePage($scope.selectedSearchResult.value);
-        }
-      });
-    },
-
-
-    up: function() {
-      $scope.$apply(function() {
-
-        var selectedSearchResultIndex = 0;
-        if ($scope.selectedSearchResult !== null) {
-          selectedSearchResultIndex = _.indexOf($scope.searchResults, $scope.selectedSearchResult.value);
-        }
-
-        selectedSearchResultIndex--;
-
-        if (selectedSearchResultIndex < 0) {
-          $scope.selectedSearchResult = null;
-          return;
-        }
-
-        var selectedSearchResult = $scope.searchResults[selectedSearchResultIndex];
-
-        $scope.selectedSearchResult = {
-          value: selectedSearchResult,
-          type: $scope.searchMode === 'Classes' ? 'Class' : 'Package'
-        };
-
-        $scope.$broadcast('JavadocSearchController.blurSearchBox');
-
-        if (isRelativeMenuVisible()) {
-          hideRelativeMenu();
-        }
-
-      });
-    },
-
-
-    down: function() {
-      $scope.$apply(function() {
-
-        var selectedSearchResultIndex;
-        if ($scope.selectedSearchResult === null) {
-          selectedSearchResultIndex = 0;
-        }
-        else {
-          selectedSearchResultIndex = _.indexOf($scope.searchResults, $scope.selectedSearchResult.value);
-          selectedSearchResultIndex++;
-        }
-
-        var selectedSearchResult = $scope.searchResults[selectedSearchResultIndex];
-
-        $scope.selectedSearchResult = {
-          value: selectedSearchResult,
-          type: $scope.searchMode === 'Classes' ? 'Class' : 'Package'
-        };
-
-        $scope.$broadcast('JavadocSearchController.blurSearchBox');
-
-        if (isRelativeMenuVisible()) {
-          hideRelativeMenu();
-        }
-      })
-    },
-
 
     left: function() {
       $scope.$apply(function() {

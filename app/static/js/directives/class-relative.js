@@ -1,5 +1,5 @@
 
-app.directive('classRelative', ['$log', 'searchDataLocator', function($log, searchDataLocator) {
+app.directive('classRelative', ['$rootScope', '$log', 'searchDataLocator', function($rootScope, $log, searchDataLocator) {
   return {
     templateUrl: 'static/partials/class-relative.html',
     restrict: 'A',
@@ -21,9 +21,9 @@ app.directive('classRelative', ['$log', 'searchDataLocator', function($log, sear
         scope.selected = false;
       };
 
-      scope.selectAndNavigate = function(name) {
-        scope.select();
-        scope.loadClassRelative(name);
+      scope.selectAndLoadPage = function(resultName) {
+        scope.searchMode === 'Classes' ? scope.loadJavadocClassPage(resultName) : scope.loadJavadocPackagePage(resultName);
+        $rootScope.$broadcast('SELECTED_SEARCH_RESULT_CHANGED', resultName)
       };
 
     }

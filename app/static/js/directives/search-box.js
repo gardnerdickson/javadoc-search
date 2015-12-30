@@ -1,5 +1,5 @@
 
-app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyPressWatcher', function($log, matcherLocator, searchDataLocator, keyPressWatcher) {
+app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataLocator', 'keyPressWatcher', function($rootScope, $log, matcherLocator, searchDataLocator, keyPressWatcher) {
   return {
     templateUrl: 'static/partials/search-box.html',
     restrict: 'A',
@@ -20,12 +20,21 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
 
       scope.$on('JavadocSearchController.focusSearchBox', function(event) {
         if (!focus) {
+          // TODO(gdickson): focus text box without selecting the input element
           element.find('input').focus();
         }
       });
 
-      scope.$on('JavadocSearchController.blurSearchBox', function(event) {
+      //scope.$on('JavadocSearchController.blurSearchBox', function(event) {
+      //  if (focus) {
+      //    element.find('input').blur();
+      //  }
+      //});
+
+      scope.$on('SELECTED_SEARCH_RESULT_CHANGED', function(event, selectedItem) {
         if (focus) {
+          // TODO(gdickson): blur text box without selecting the input element
+          $log.debug("Got event: " , event);
           element.find('input').blur();
         }
       });
@@ -64,7 +73,7 @@ app.directive('searchBox', ['$log', 'matcherLocator', 'searchDataLocator', 'keyP
         }
         catch (ignore) { }
 
-        scope.updateSearchResults(matches);
+        $rootScope.$broadcast('SEARCH_RESULTS_UPDATED', matches);
 
         lastQuery = querySanitized;
       };
