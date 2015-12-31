@@ -7,34 +7,24 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataL
 
       var basicClassesMatcher = null;
       var basicPackagesMatcher = null;
-      var searchResultMenu = {};
       var lastQuery = null;
       var focus = false;
       var matches = [];
 
-      scope.SearchBox_ = {};
-
-      scope.SearchBox_.setSearchResultMenu = function(menu) {
-        searchResultMenu = menu;
-      };
-
-      scope.$on('JavadocSearchController.focusSearchBox', function(event) {
+      scope.$on('FOCUS_SEARCH_BOX', function(event) {
         if (!focus) {
-          // TODO(gdickson): focus text box without selecting the input element
           element.find('input').focus();
         }
       });
 
-      //scope.$on('JavadocSearchController.blurSearchBox', function(event) {
-      //  if (focus) {
-      //    element.find('input').blur();
-      //  }
-      //});
+      scope.$on('BLUR_SEARCH_BOX', function(event) {
+        if (focus) {
+          element.find('input').blur();
+        }
+      });
 
       scope.$on('SELECTED_SEARCH_RESULT_CHANGED', function(event, selectedItem) {
         if (focus) {
-          // TODO(gdickson): blur text box without selecting the input element
-          $log.debug("Got event: " , event);
           element.find('input').blur();
         }
       });
@@ -63,11 +53,11 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataL
 
         try {
           if (scope.query.indexOf(':') === 0 && scope.query !== ':') {
-            scope.searchMode = 'Packages';
+            scope.searchMode = 'Package';
             matches = basicPackagesMatcher.findMatches(querySanitized);
           }
           else {
-            scope.searchMode = 'Classes';
+            scope.searchMode = 'Class';
             matches = basicClassesMatcher.findMatches(querySanitized);
           }
         }
@@ -94,7 +84,7 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataL
           var selectedSearchResultName = scope.selectedSearchResult.value;
           if (selectedSearchResultName !== null) {
             scope.query = selectedSearchResultName.replace(/#/g, '');
-            if (scope.searchMode === 'Packages') {
+            if (scope.searchMode === 'Package') {
               scope.query = ':' + scope.query;
             }
           }

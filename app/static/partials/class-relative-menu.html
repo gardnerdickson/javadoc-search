@@ -3,15 +3,16 @@
         Loading...
     </div>
     <div ng-if="!loadingRelatives">
-        <div>
-            {{package}}
-        </div>
+        <!--<ul>-->
+            <!--<li search-result-menu-item="" search-result-type="Package" ng-class="{'selected': selected}">-->
+            <!--</li>-->
+        <!--</ul>-->
         <ul style="border-top: 1px solid #333">
-            <li class-relative="" ng-repeat="relative in classRelativeResults.ancestors" ng-class="{'selected': selected}">
+            <li search-result-menu-item="" search-result-type="Class" ng-repeat="item in classRelativeResults.ancestors" ng-class="{'selected': selected}">
             </li>
         </ul>
         <ul style="border-top: 1px solid #333">
-            <li class-relative="" ng-repeat="relative in classRelativeResults.descendants" ng-class="{'selected': selected}">
+            <li search-result-menu-item="" search-result-type="Class" ng-repeat="item in classRelativeResults.descendants" ng-class="{'selected': selected}">
             </li>
         </ul>
     </div>

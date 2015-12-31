@@ -1,5 +1,5 @@
 <div class="class-name"
-     ng-class="{'interface': classInfo.classType == 'interface'}"
+     ng-class="{'interface': details.classType == 'interface'}"
      ng-click="selectAndLoadPage(item)">
-    {{item | hashMask}}&nbsp;&nbsp;<span class="class-package-name" ng-show="selected">{{classInfo.package}}</span>
+    {{item | hashMask}}&nbsp;&nbsp;<span class="class-package-name" ng-show="selected">{{details.package}}</span>
 </div>

@@ -5,30 +5,33 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', '$timeout', 'searchData
     restrict: 'A',
     link: function(scope, element, attrs) {
 
-      scope.SearchResultMenu = {};
-
-      scope.SearchBox_.setSearchResultMenu(scope.SearchResultMenu);
-
       scope.items = [];
+      scope.enabled = false;
+      scope.menuName = attrs['menuName'];
 
       var selectedItem = null;
 
-
       scope.$on('SEARCH_RESULTS_UPDATED', function(event, searchResults) {
-        scope.items = searchResults.slice();
+        if (scope.enabled) {
+          scope.items = searchResults.slice();
+        }
       });
 
       scope.$on('SELECTED_SEARCH_RESULT_CHANGED', function(event, searchResult) {
-        if (scope.searchResultMenuEnabled) {
+        if (scope.enabled) {
           selectedItem = searchResult;
         }
+      });
+
+      scope.$on('ENABLE_SEARCH_RESULT_MENU', function(event, menuName) {
+        scope.enabled = scope.menuName === menuName;
       });
 
 
       keyPressWatcher.register({
 
         up: function() {
-          if (!scope.searchResultMenuEnabled) {
+          if (!scope.enabled) {
             return;
           }
 
@@ -44,7 +47,7 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', '$timeout', 'searchData
         },
 
         down: function() {
-          if (!scope.searchResultMenuEnabled) {
+          if (!scope.enabled) {
             return;
           }
 
@@ -61,8 +64,8 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', '$timeout', 'searchData
 
         enter: function() {
           scope.$apply(function() {
-            if (scope.searchResultMenuEnabled) {
-              scope.searchMode === 'Classes' ? scope.loadJavadocClassPage(selectedItem) : scope.loadJavadocPackagePage(selectedItem);
+            if (scope.enabled) {
+              scope.searchMode === 'Class' ? scope.loadJavadocClassPage(selectedItem) : scope.loadJavadocPackagePage(selectedItem);
               selectedItem = null;
             }
           });

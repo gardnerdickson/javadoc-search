@@ -6,7 +6,16 @@ app.directive('searchResultMenuItem', ['$rootScope', '$log', '$timeout', 'search
     link: function(scope, element, attrs) {
 
       scope.selected = false;
-      scope.classInfo = searchDataLocator.getClassInfo()[scope.item];
+
+      var loadFunction = null;
+      if (attrs['searchResultType'] === 'Class') {
+        scope.details = searchDataLocator.getClassInfo()[scope.item];
+        loadFunction = scope.loadJavadocClassPage;
+      }
+      else {
+        scope.details = searchDataLocator.getPackageInfo()[scope.item];
+        loadFunction = scope.loadJavadocPackagePage;
+      }
 
       scope.select = function() {
         scope.selected = true;
@@ -17,19 +26,12 @@ app.directive('searchResultMenuItem', ['$rootScope', '$log', '$timeout', 'search
       };
 
       scope.selectAndLoadPage = function(resultName) {
-        scope.searchMode === 'Classes' ? scope.loadJavadocClassPage(resultName) : scope.loadJavadocPackagePage(resultName)
+        loadFunction(resultName);
         $rootScope.$broadcast('SELECTED_SEARCH_RESULT_CHANGED', resultName)
       };
 
       scope.$on('SELECTED_SEARCH_RESULT_CHANGED', function(event, searchResult) {
         scope.selected = scope.item === searchResult;
-      });
-
-
-      scope.$on('searchResultMenu.findSelectedSearchResult', function(event) {
-        if (scope.selected) {
-          scope.$emit('searchResult.foundSelectedSearchResult', scope.item);
-        }
       });
 
     }

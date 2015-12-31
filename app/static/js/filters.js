@@ -1,7 +1,12 @@
 'use strict';
 
-app.filter('hashMask', [function() {
+app.filter('hashMask', ['$log', function($log) {
   return function(input) {
-    return input.replace(/#/g, '');
+    try {
+      return input.replace(/#/g, '');
+    }
+    catch (e) {
+      $log.error("hashMask filter failed on: " + input);
+    }
   }
 }]);

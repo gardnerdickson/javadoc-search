@@ -44,7 +44,6 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   $scope.classRelativeResults = null;
   $scope.selectedClassRelative = null;
 
-  $scope.searchResultMenuEnabled = false;
   $scope.relativeMenuEnabled = false;
 
   $scope.loadingRelatives = false;
@@ -65,15 +64,12 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   $scope.$on('SELECTED_SEARCH_RESULT_CHANGED', function(event, searchResult) {
     $scope.selectedSearchResult = {
       value: searchResult,
-      type: $scope.searchMode === 'Classes' ? 'Class' : 'Package'
+      type: $scope.searchMode
     };
   });
 
 
   function init() {
-
-    $scope.searchResultMenuEnabled = true;
-
     $scope.javadocUrl = new URI(URI.decode($routeParams.url)).normalize().toString();
     if ($scope.javadocUrl.charAt($scope.javadocUrl.length - 1) !== '/') {
       $scope.javadocUrl += '/';
@@ -114,13 +110,12 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       matcherLocator.createMatcher(searchDataLocator.getClassNames(), 'Fuzzy', 'Classes_Basic');
       matcherLocator.createMatcher(searchDataLocator.getPackageNames(), 'Fuzzy', 'Packages_Basic');
 
-      $scope.$broadcast('initialized.classes', classes);
-      $scope.$broadcast('initialized.packages', packages);
+      $scope.$broadcast('ENABLE_SEARCH_RESULT_MENU', 'PRIMARY');
     });
   }
 
   function retrieveClassRelatives() {
-    if ($scope.searchMode !== 'Classes') {
+    if ($scope.searchMode !== 'Class') {
       $log.info("Not loading relatives because search mode is ", $scope.searchMode);
       return;
     }
@@ -158,13 +153,11 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   }
 
   function enableClassMenu() {
-    $scope.searchResultMenuEnabled = true;
-    $scope.relativeMenuEnabled = false;
+    $scope.$broadcast('ENABLE_SEARCH_RESULT_MENU', 'PRIMARY');
   }
 
   function enableRelativeMenu() {
-    $scope.searchResultMenuEnabled = false;
-    $scope.relativeMenuEnabled = true;
+    $scope.$broadcast('ENABLE_SEARCH_RESULT_MENU', 'SECONDARY');
   }
 
   function isRelativeMenuVisible() {
@@ -210,7 +203,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     },
 
     right: function() {
-      if ($scope.searchMode === 'Classes') {
+      if ($scope.searchMode === 'Class') {
         $scope.$apply(function() {
 
           if ($scope.selectedSearchResult === null) {

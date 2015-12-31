@@ -10,12 +10,11 @@
             <div class="search">
                 <span search-box=""></span>
             </div>
-            <!--<div class="header-element" all-classes-popover="" title="All Classes" content="{{allClasses}}">All Classes</div>-->
         </header>
 
         <div class="javadoc-content">
-            <div class-relative-menu="" selection-enabled="{{ classMenuEnabled }}"></div>
-            <div search-result-menu="" selection-enabled="{{ relativeMenuEnabled }}"></div>
+            <div class-relative-menu="" menu-name="SECONDARY"></div>
+            <div search-result-menu="" menu-name="PRIMARY"></div>
             <iframe id="javadoc-frame" ng-src="{{ iframeSource }}"></iframe>
         </div>
     </div>
