@@ -43,12 +43,12 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataL
         if (lastQuery === null || lastQuery === '') {
           if (scope.query !== '' && scope.query !== ':') {
             $log.debug("Opening search result menu");
-            openSearchResultMenu();
+            scope.openSearchResultMenu();
           }
         }
         else if (querySanitized === '') {
           $log.debug("Closing search result menu");
-          closeSearchResultMenu();
+          scope.closeSearchResultMenu();
         }
 
         try {
@@ -80,7 +80,7 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataL
       keyPressWatcher.register({
 
         enter: function() {
-          closeSearchResultMenu();
+          scope.closeSearchResultMenu();
           var selectedSearchResultName = scope.selectedSearchResult.value;
           if (selectedSearchResultName !== null) {
             scope.query = selectedSearchResultName.replace(/#/g, '');
@@ -94,7 +94,8 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataL
 
         esc: function() {
           scope.$apply(function() {
-            closeSearchResultMenu();
+            scope.closeSearchResultMenu();
+            scope.closeClassRelativeMenu();
             scope.query = '';
             lastQuery = '';
           });
@@ -116,14 +117,6 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataL
         }
 
       });
-
-      function openSearchResultMenu() {
-        $('.top-container').addClass('search-result-menu-open');
-      }
-
-      function closeSearchResultMenu() {
-        $('.top-container').removeClass('search-result-menu-open');
-      }
 
     }
   }

@@ -9,6 +9,8 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', '$timeout', 'searchData
       scope.enabled = false;
       scope.menuName = attrs['menuName'];
 
+      $log.log("Created menu with name: ", scope.menuName);
+
       var selectedItem = null;
 
       scope.$on('SEARCH_RESULTS_UPDATED', function(event, searchResults) {
@@ -25,12 +27,16 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', '$timeout', 'searchData
 
       scope.$on('ENABLE_SEARCH_RESULT_MENU', function(event, menuName) {
         scope.enabled = scope.menuName === menuName;
+        $log.log("Enabled search result menu is: ", scope.menuName);
       });
 
 
       keyPressWatcher.register({
 
         up: function() {
+
+          $log.log(scope.menuName, " is enabled: ", scope.enabled);
+
           if (!scope.enabled) {
             return;
           }
@@ -47,6 +53,9 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', '$timeout', 'searchData
         },
 
         down: function() {
+
+          $log.log(scope.menuName, " is enabled: ", scope.enabled);
+
           if (!scope.enabled) {
             return;
           }

@@ -61,6 +61,28 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     $scope.loadingRelatives = false;
   };
 
+  $scope.openSearchResultMenu = function() {
+    var topContainer = $('.top-container');
+    if (!topContainer.hasClass('search-result-menu-open')) {
+      topContainer.addClass('search-result-menu-open');
+    }
+  };
+
+  $scope.closeSearchResultMenu = function() {
+    $('.top-container').removeClass('search-result-menu-open');
+  };
+
+  $scope.openClassRelativeMenu = function() {
+    var topContainer = $('.top-container');
+    if (!topContainer.hasClass('class-relative-menu-open')) {
+      topContainer.addClass('class-relative-menu-open');
+    }
+  };
+
+  $scope.closeClassRelativeMenu = function() {
+    $('.top-container').removeClass('class-relative-menu-open');
+  };
+
   $scope.$on('SELECTED_SEARCH_RESULT_CHANGED', function(event, searchResult) {
     $scope.selectedSearchResult = {
       value: searchResult,
@@ -164,20 +186,6 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     return $('.top-container').hasClass('class-relative-menu-open');
   }
 
-  function showRelativeMenu() {
-    var topContainer = $('.top-container');
-    if (!topContainer.hasClass('class-relative-menu-open')) {
-      topContainer.addClass('class-relative-menu-open');
-    }
-  }
-
-  function hideRelativeMenu() {
-    var topContainer = $('.top-container');
-    if (topContainer.hasClass('class-relative-menu-open')) {
-      topContainer.removeClass('class-relative-menu-open');
-    }
-  }
-
 
   function relativeCacheLoad(key) {
     var classInfo = searchDataLocator.getClassInfo()[key];
@@ -197,7 +205,8 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     left: function() {
       $scope.$apply(function() {
         if (isRelativeMenuVisible()) {
-          hideRelativeMenu();
+          $scope.closeClassRelativeMenu();
+          enableClassMenu();
         }
       });
     },
@@ -219,7 +228,8 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
             retrieveClassRelatives();
           }
 
-          showRelativeMenu();
+          $scope.openClassRelativeMenu();
+          enableRelativeMenu();
         });
       }
     }
