@@ -64,6 +64,8 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataL
         catch (ignore) { }
 
         $rootScope.$broadcast('SEARCH_RESULTS_UPDATED', matches);
+        $rootScope.$broadcast('ENABLE_SEARCH_RESULT_MENU', true);
+        $rootScope.$broadcast('ENABLE_CLASS_RELATIVE_MENU', false);
 
         lastQuery = querySanitized;
       };

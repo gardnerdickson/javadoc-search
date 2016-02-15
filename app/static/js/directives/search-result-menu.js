@@ -1,79 +1,67 @@
 
-app.directive('searchResultMenu', ['$rootScope' ,'$log', '$timeout', 'searchDataLocator', 'keyPressWatcher', function($rootScope, $log, $timeout, searchDataLocator, keyPressWatcher) {
+app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', function($rootScope, $log, keyPressWatcher) {
   return {
     templateUrl: 'static/partials/search-result-menu.html',
     restrict: 'A',
     link: function(scope, element, attrs) {
 
-      scope.items = [];
-      scope.enabled = false;
-      scope.menuName = attrs['menuName'];
-
-      $log.log("Created menu with name: ", scope.menuName);
+      scope.classes = [];
+      scope.classMenuEnabled = false;
 
       var selectedItem = null;
 
       scope.$on('SEARCH_RESULTS_UPDATED', function(event, searchResults) {
-        if (scope.enabled) {
-          scope.items = searchResults.slice();
-        }
+        scope.classes = searchResults.slice();
       });
 
       scope.$on('SELECTED_SEARCH_RESULT_CHANGED', function(event, searchResult) {
-        if (scope.enabled) {
+        if (scope.classMenuEnabled) {
           selectedItem = searchResult;
         }
       });
 
-      scope.$on('ENABLE_SEARCH_RESULT_MENU', function(event, menuName) {
-        scope.enabled = scope.menuName === menuName;
-        $log.log("Enabled search result menu is: ", scope.menuName);
+      scope.$on('ENABLE_SEARCH_RESULT_MENU', function(event, value) {
+        scope.classMenuEnabled = value;
       });
 
 
       keyPressWatcher.register({
 
         up: function() {
-
-          $log.log(scope.menuName, " is enabled: ", scope.enabled);
-
-          if (!scope.enabled) {
+          if (!scope.classMenuEnabled) {
             return;
           }
 
           scope.$apply(function() {
             var selectedItemIndex = 0;
             if (selectedItem !== null) {
-              selectedItemIndex = _.indexOf(scope.items, selectedItem);
+              selectedItemIndex = _.indexOf(scope.classes, selectedItem);
               selectedItemIndex--;
             }
 
-            $rootScope.$broadcast('SELECTED_SEARCH_RESULT_CHANGED', scope.items[selectedItemIndex]);
+            $rootScope.$broadcast('SELECTED_SEARCH_RESULT_CHANGED', scope.classes[selectedItemIndex]);
           });
         },
 
         down: function() {
-
-          $log.log(scope.menuName, " is enabled: ", scope.enabled);
-
-          if (!scope.enabled) {
+          if (!scope.classMenuEnabled) {
             return;
           }
 
           scope.$apply(function() {
             var selectedItemIndex = 0;
             if (selectedItem !== null) {
-              selectedItemIndex = _.indexOf(scope.items, selectedItem);
+              selectedItemIndex = _.indexOf(scope.classes, selectedItem);
               selectedItemIndex++;
             }
 
-            $rootScope.$broadcast('SELECTED_SEARCH_RESULT_CHANGED', scope.items[selectedItemIndex]);
+            $rootScope.$broadcast('SELECTED_SEARCH_RESULT_CHANGED', scope.classes[selectedItemIndex]);
           });
         },
 
         enter: function() {
           scope.$apply(function() {
-            if (scope.enabled) {
+            if (scope.classMenuEnabled) {
               scope.searchMode === 'Class' ? scope.loadJavadocClassPage(selectedItem) : scope.loadJavadocPackagePage(selectedItem);
               selectedItem = null;
             }
