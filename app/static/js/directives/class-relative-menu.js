@@ -11,17 +11,22 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
       scope.relativeMenuEnabled = false;
 
       var selectedItem = null;
+      var items = [];
 
       scope.$on('CLASS_RELATIVES_UPDATED', function(event, classRelatives) {
         scope.relatives.ancestors = classRelatives.ancestors.slice();
         scope.relatives.descendants = classRelatives.descendants.slice();
 
-        // TODO(gdickson): package should be selected first.
-        if (!_.isEmpty(scope.relatives.ancestors)) {
-          selectedItem = scope.relatives.ancestors[0];
-        }
-        else if (!_.isEmpty(scope.relatives.descendants)) {
-          selectedItem = scope.relatives.descendants[0];
+        var index = 0;
+        _.each(scope.relatives.ancestors, function(ancestor) {
+          items[index++] = ancestor;
+        });
+        _.each(scope.relatives.descendants, function(descendant) {
+          items[index++] = descendant;
+        });
+
+        if (!_.isEmpty(items)) {
+          selectedItem = items[0];
         }
       });
 
@@ -44,36 +49,14 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
 
           scope.$apply(function() {
             var selectedItemIndex = 0;
-            var selectedCollection = null;
-
             if (selectedItem !== null) {
-              if (_.contains(scope.relatives.ancestors, selectedItem)) {
-                selectedItemIndex = _.indexOf(scope.relatives.ancestors, selectedItem);
-                selectedCollection = scope.relatives.ancestors;
-                selectedItemIndex--;
-              }
-              else if (_.contains(scope.relatives.descendants, selectedItem)) {
-                selectedItemIndex = _.indexOf(scope.relatives.descendants, selectedItem);
-                selectedCollection = scope.relatives.descendants;
-                selectedItemIndex--;
-
-                if (selectedItemIndex < 0 && !_.isEmpty(scope.relatives.ancestors)) {
-                  if (!_.isEmpty(scope.relatives.ancestors)) {
-                    selectedItemIndex = scope.relatives.ancestors.length - 1;
-                    selectedCollection = scope.relatives.ancestors;
-                  }
-                  else {
-                    selectedItemIndex = scope.relatives.descendants.length - 1;
-                  }
-                }
-              }
-
+              selectedItemIndex = _.indexOf(items, selectedItem);
+              selectedItemIndex = selectedItemIndex - 1 >= 0 ? selectedItemIndex - 1 : 0;
             }
 
-            $rootScope.$broadcast('SELECTED_SEARCH_RESULT_CHANGED', selectedCollection[selectedItemIndex]);
+            $rootScope.$broadcast('SELECTED_SEARCH_RESULT_CHANGED', items[selectedItemIndex]);
           });
         },
-
 
         down: function() {
           if (!scope.relativeMenuEnabled) {
@@ -82,34 +65,14 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
 
           scope.$apply(function() {
             var selectedItemIndex = 0;
-            var selectedCollection = null;
-
             if (selectedItem !== null) {
-              if (_.contains(scope.relatives.ancestors, selectedItem)) {
-                selectedItemIndex = _.indexOf(scope.relatives.ancestors, selectedItem);
-                selectedCollection = scope.relatives.ancestors;
-                selectedItemIndex++;
-
-                if (selectedItemIndex >= scope.relatives.ancestors.length) {
-                  if (!_.isEmpty(scope.relatives.descendants)) {
-                    selectedItemIndex = 0;
-                    selectedCollection = scope.relatives.descendants;
-                  }
-                  else {
-                    selectedItemIndex = scope.relatives.ancestors.length - 1;
-                  }
-                }
-              }
-              else if (_.contains(scope.relatives.descendants, selectedItem)) {
-                selectedItemIndex = _.indexOf(scope.relatives.descendants, selectedItem);
-                selectedCollection = scope.relatives.descendants;
-                selectedItemIndex++;
-              }
-
+              selectedItemIndex = _.indexOf(items, selectedItem);
+              selectedItemIndex = selectedItemIndex + 1 < items.length ? selectedItemIndex + 1 : items.length - 1;
             }
 
-            $rootScope.$broadcast('SELECTED_SEARCH_RESULT_CHANGED', selectedCollection[selectedItemIndex]);
+            $rootScope.$broadcast('SELECTED_SEARCH_RESULT_CHANGED', items[selectedItemIndex]);
           });
+
         },
 
         enter: function() {
