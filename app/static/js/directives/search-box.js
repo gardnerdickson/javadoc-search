@@ -31,6 +31,10 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataL
 
       scope.onChange = function($event) {
 
+        if (scope.selectedSearchResult !== null) {
+          $rootScope.$broadcast('DESELECT_SEARCH_RESULT', scope.selectedSearchResult.value); // deselect current search result
+        }
+
         if (basicClassesMatcher === null) {
           basicClassesMatcher = matcherLocator.getMatcher('Classes_Basic');
         }
@@ -49,6 +53,7 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataL
         else if (querySanitized === '') {
           $log.debug("Closing search result menu");
           scope.closeSearchResultMenu();
+          scope.closeClassRelativeMenu();
         }
 
         try {
@@ -82,7 +87,6 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataL
       keyPressWatcher.register({
 
         enter: function() {
-          scope.closeSearchResultMenu();
           var selectedSearchResultName = scope.selectedSearchResult.value;
           if (selectedSearchResultName !== null) {
             scope.query = selectedSearchResultName.replace(/#/g, '');

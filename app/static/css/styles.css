@@ -124,14 +124,9 @@ nav.search-result-push-menu-left .class-name {
     text-indent: 15px;
 }
 
-nav.search-result-push-menu-left .class-name.interface,
-nav.search-result-push-menu-left .relative-class-name.interface{
+nav.search-result-push-menu-left .class-name.interface {
     font-style: italic;
 }
-
-/*nav.search-result-push-menu-left .relative-class-name {*/
-    /*text-indent: 30px;*/
-/*}*/
 
 nav.search-result-push-menu-left .selected.relative-class-name {
     background-color: #fff;
@@ -210,7 +205,7 @@ nav.class-relative-push-menu-left li {
     line-height: 30px;
 }
 
-nav.class-relative-push-menu-left .selected div.relative-class-name {
+nav.class-relative-push-menu-left .selected div.class-name {
     background-color: #fff;
     color: #000;
 }

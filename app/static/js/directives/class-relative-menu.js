@@ -77,6 +77,7 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
 
         enter: function() {
           scope.$apply(function() {
+            scope.closeClassRelativeMenu();
             if (scope.relativeMenuEnabled) {
               scope.searchMode === 'Class' ? scope.loadJavadocClassPage(selectedItem) : scope.loadJavadocPackagePage(selectedItem);
               selectedItem = null;

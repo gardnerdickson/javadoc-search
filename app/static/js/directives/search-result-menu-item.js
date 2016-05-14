@@ -34,6 +34,12 @@ app.directive('searchResultMenuItem', ['$rootScope', '$log', '$timeout', 'search
         scope.selected = scope.item === searchResult;
       });
 
+      scope.$on('DESELECT_SEARCH_RESULT', function(event, searchResult) {
+        if (scope.item === searchResult) {
+          scope.deselect();
+        }
+      });
+
     }
   }
 }]);
