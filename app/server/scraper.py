@@ -30,7 +30,8 @@ class JavadocScraper:
 
     _IGNORED_LABELS = (
         "Enclosing class:",
-        "Enclosing interface:"
+        "Enclosing interface:",
+        "Functional Interface:"
     )
 
 
