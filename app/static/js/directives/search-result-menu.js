@@ -3,6 +3,12 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', func
   return {
     templateUrl: 'static/partials/search-result-menu.html',
     restrict: 'A',
+    controller: function($scope, $element) {
+      $scope.resultItems = {};
+      this.addResultItem = function(resultItemScope) {
+        $scope.resultItems[resultItemScope.item] = resultItemScope;
+      };
+    },
     link: function(scope, element, attrs) {
 
       scope.classes = [];
@@ -14,12 +20,6 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', func
         scope.classes = searchResults.slice();
       });
 
-      scope.$on('SELECTED_SEARCH_RESULT_CHANGED', function(event, searchResult) {
-        if (scope.classMenuEnabled) {
-          selectedItem = searchResult;
-        }
-      });
-      
       scope.$on('DESELECT_SEARCH_RESULT', function(event, searchResult) {
         selectedItem = null;
       });
@@ -40,10 +40,12 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', func
             var selectedItemIndex = 0;
             if (selectedItem !== null) {
               selectedItemIndex = _.indexOf(scope.classes, selectedItem);
+              scope.resultItems[scope.classes[selectedItemIndex]].deselect();
               selectedItemIndex--;
             }
 
-            $rootScope.$broadcast('SELECTED_SEARCH_RESULT_CHANGED', scope.classes[selectedItemIndex]);
+            selectedItem = scope.classes[selectedItemIndex];
+            scope.resultItems[selectedItem].select();
           });
         },
 
@@ -56,10 +58,12 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', func
             var selectedItemIndex = 0;
             if (selectedItem !== null) {
               selectedItemIndex = _.indexOf(scope.classes, selectedItem);
+              scope.resultItems[scope.classes[selectedItemIndex]].deselect();
               selectedItemIndex++;
             }
-            $log.debug("trying to select item at index: ", selectedItemIndex);
-            $rootScope.$broadcast('SELECTED_SEARCH_RESULT_CHANGED', scope.classes[selectedItemIndex]);
+            
+            selectedItem = scope.classes[selectedItemIndex];
+            scope.resultItems[selectedItem].select();
           });
         },
 

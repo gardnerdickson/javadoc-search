@@ -1,7 +1,7 @@
 
 app.service('menuItemLinkFunction', ['$log', 'searchDataLocator', function($log, searchDataLocator) {
 
-  this.link = function(scope, element, attrs, $rootScope) {
+  this.link = function(scope, element, attrs, menuController, $rootScope) {
     scope.selected = false;
 
     var loadFunction = null;
@@ -16,26 +16,14 @@ app.service('menuItemLinkFunction', ['$log', 'searchDataLocator', function($log,
 
     scope.select = function () {
       scope.selected = true;
+      scope.$emit('SELECTED_SEARCH_RESULT_CHANGED', scope.item);
     };
 
     scope.deselect = function () {
       scope.selected = false;
     };
-
-    scope.selectAndLoadPage = function (resultName) {
-      loadFunction(resultName);
-      $rootScope.$broadcast('SELECTED_SEARCH_RESULT_CHANGED', resultName)
-    };
-
-    scope.$on('SELECTED_SEARCH_RESULT_CHANGED', function (event, searchResult) {
-      scope.selected = scope.item === searchResult;
-    });
-
-    scope.$on('DESELECT_SEARCH_RESULT', function (event, searchResult) {
-      if (scope.item === searchResult) {
-        scope.deselect();
-      }
-    });
+    
+    menuController.addResultItem(scope);
   }
 
 }]);

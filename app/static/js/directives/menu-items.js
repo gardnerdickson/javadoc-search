@@ -3,8 +3,9 @@ app.directive('searchResultMenuItem', ['$rootScope', 'menuItemLinkFunction', fun
   return {
     templateUrl: 'static/partials/search-result-menu-item.html',
     restrict: 'A',
-    link: function(scope, element, attrs) {
-      menuItemLinkFunction.link(scope, element, attrs, $rootScope);
+    require: '^searchResultMenu',
+    link: function(scope, element, attrs, menuController) {
+      menuItemLinkFunction.link(scope, element, attrs, menuController, $rootScope);
     }
   }
 }]);
@@ -14,8 +15,9 @@ app.directive('classRelativeMenuItem', ['$rootScope', 'menuItemLinkFunction', fu
   return {
     templateUrl: 'static/partials/search-result-menu-item.html',
     restrict: 'A',
-    link: function(scope, element, attrs) {
-      menuItemLinkFunction.link(scope, element, attrs, $rootScope);
+    require: '^classRelativeMenu',
+    link: function(scope, element, attrs, menuController) {
+      menuItemLinkFunction.link(scope, element, attrs, menuController, $rootScope);
     }
   }
 }]);

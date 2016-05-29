@@ -3,6 +3,12 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
   return {
     templateUrl: 'static/partials/class-relative-menu.html',
     restrict: 'A',
+    controller: function($scope, $element) {
+      $scope.resultItems = {};
+      this.addResultItem = function(resultItemScope) {
+        $scope.resultItems[resultItemScope.item] = resultItemScope;
+      };
+    },
     link: function(scope, element, attr) {
 
       $log.log("class relative menu enabled: ", attr['selection-enabled']);
@@ -30,12 +36,6 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
         }
       });
 
-      scope.$on('SELECTED_SEARCH_RESULT_CHANGED', function(event, searchResult) {
-        if (scope.relativeMenuEnabled) {
-          selectedItem = searchResult;
-        }
-      });
-
       scope.$on('ENABLE_CLASS_RELATIVE_MENU', function(event, value) {
         scope.relativeMenuEnabled = value;
       });
@@ -51,10 +51,12 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
             var selectedItemIndex = 0;
             if (selectedItem !== null) {
               selectedItemIndex = _.indexOf(items, selectedItem);
+              scope.resultItems[items[selectedItemIndex]].deselect();
               selectedItemIndex = selectedItemIndex - 1 >= 0 ? selectedItemIndex - 1 : 0;
             }
 
-            $rootScope.$broadcast('SELECTED_SEARCH_RESULT_CHANGED', items[selectedItemIndex]);
+            selectedItem = items[selectedItemIndex];
+            scope.resultItems[items[selectedItemIndex]].select();
           });
         },
 
@@ -67,10 +69,12 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
             var selectedItemIndex = 0;
             if (selectedItem !== null) {
               selectedItemIndex = _.indexOf(items, selectedItem);
+              scope.resultItems[items[selectedItemIndex]].deselect();
               selectedItemIndex = selectedItemIndex + 1 < items.length ? selectedItemIndex + 1 : items.length - 1;
             }
 
-            $rootScope.$broadcast('SELECTED_SEARCH_RESULT_CHANGED', items[selectedItemIndex]);
+            selectedItem = items[selectedItemIndex];
+            scope.resultItems[items[selectedItemIndex]].select();
           });
 
         },
