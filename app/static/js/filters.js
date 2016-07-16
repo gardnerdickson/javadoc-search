@@ -1,12 +1,16 @@
 'use strict';
 
-app.filter('hashMask', ['$log', function($log) {
+app.filter('packageMask', ['$log', function($log) {
   return function(input) {
     try {
-      return input.replace(/#/g, '');
+      var index = input.lastIndexOf('.');
+      if (index !== -1) {
+        return input.substr(input.lastIndexOf('.') + 1, input.length - 1);
+      }
+      return input;
     }
     catch (e) {
-      $log.error("hashMask filter failed on: " + input);
+      $log.error("packageMask filter failed on: ", input);
     }
   }
 }]);

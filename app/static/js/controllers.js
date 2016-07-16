@@ -48,7 +48,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   $scope.loadingRelatives = false;
 
   $scope.loadJavadocClassPage = function(className) {
-    loadJavadocClassPage(searchDataLocator.getClassInfo()[className])
+    loadJavadocClassPage(searchDataLocator.getClassesByClassName()[className])
   };
 
   $scope.loadJavadocPackagePage = function(packageName) {
@@ -189,11 +189,19 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
 
   function relativeCacheLoad(key) {
-    var classInfo = searchDataLocator.getClassInfo()[key];
+    var classInfo = searchDataLocator.getClassesByClassName()[key];
     var url = new URI($scope.javadocUrl).segment(classInfo.url);
 
     return javadocService.retrieveRelatives(url.toString()).then(function(relatives) {
-      return relatives;
+      var indexByFunction = function(classInfo) {
+        return classInfo['package'] + '.' + classInfo['className'];
+      };
+      var dbg = {
+        ancestors: _.indexBy(relatives.ancestors, indexByFunction),
+        descendants: _.indexBy(relatives.descendants, indexByFunction)
+      };
+
+      return dbg;
     });
   }
 

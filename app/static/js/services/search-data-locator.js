@@ -22,14 +22,19 @@ app.service('searchDataLocator', ['constants', function(constants) {
 
   var service = {};
 
-  var classInfo = {};
+  var classesByClassName = {};
+  var classesByPackage = {};
   var classNames = [];
 
   var packageInfo = {};
   var packageNames = {};
 
-  service.getClassInfo = function() {
-    return classInfo
+  service.getClassesByClassName = function() {
+    return classesByClassName;
+  };
+
+  service.getClassesByPackage = function() {
+    return classesByPackage;
   };
 
   service.getClassNames = function() {
@@ -45,17 +50,25 @@ app.service('searchDataLocator', ['constants', function(constants) {
   };
 
   service.setClassData = function(classes) {
-    var classMap = {};
-    _.each(classes, function(classInfo) {
-      var className = classInfo['className'];
-      while (_.contains(_.keys(classMap), className)) {
-        className += "#"
-      }
-      classMap[className] = classInfo;
+    // classesByClassName = {};
+    // _.each(classes, function(classInfo) {
+    //   var className = classInfo['className'];
+    //   classesByClassName[] = classInfo;
+    // });
+
+    classesByClassName = _.indexBy(classes, function(clazz) {
+      return clazz['package'] + '.' + clazz['className'];
     });
 
-    classInfo = classMap;
-    classNames = _.keys(classInfo);
+    classNames = _.keys(classesByClassName);
+
+    classesByPackage = {};
+    _.each(classes, function(clazz) {
+      if (!_.contains(_.keys(classesByPackage), clazz['package'])) {
+        classesByPackage[clazz['package']] = {};
+      }
+      classesByPackage[clazz['package']][clazz['className']] = clazz;
+    });
   };
 
   service.setPackageData = function(packages) {

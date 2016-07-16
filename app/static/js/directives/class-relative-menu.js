@@ -20,8 +20,7 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
       var items = [];
 
       scope.$on('CLASS_RELATIVES_UPDATED', function(event, classRelatives) {
-        scope.relatives.ancestors = classRelatives.ancestors.slice();
-        scope.relatives.descendants = classRelatives.descendants.slice();
+        scope.relatives = classRelatives;
         scope.classNames = {
           ancestors: _.pluck(classRelatives.ancestors, 'className'),
           descendants: _.pluck(classRelatives.descendants, 'className')
