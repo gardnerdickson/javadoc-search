@@ -193,10 +193,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     var url = new URI($scope.javadocUrl).segment(classInfo.url);
 
     return javadocService.retrieveRelatives(url.toString()).then(function(relatives) {
-      return {
-        ancestors: _.pluck(relatives.ancestors, 'className'),
-        descendants: _.pluck(relatives.descendants, 'className')
-      };
+      return relatives;
     });
   }
 

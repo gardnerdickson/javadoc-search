@@ -4,11 +4,11 @@
     </div>
     <div ng-if="!loadingRelatives">
         <ul style="border-top: 1px solid #333">
-            <li class-relative-menu-item="" search-result-type="Class" ng-repeat="item in relatives.ancestors" ng-class="{'selected': selected}">
+            <li class-relative-menu-item="" search-result-type="Class" ng-repeat="item in classNames.ancestors" ng-class="{'selected': selected}">
             </li>
         </ul>
         <ul style="border-top: 1px solid #333">
-            <li class-relative-menu-item="" search-result-type="Class" ng-repeat="item in relatives.descendants" ng-class="{'selected': selected}">
+            <li class-relative-menu-item="" search-result-type="Class" ng-repeat="item in classNames.descendants" ng-class="{'selected': selected}">
             </li>
         </ul>
     </div>

@@ -22,12 +22,16 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
       scope.$on('CLASS_RELATIVES_UPDATED', function(event, classRelatives) {
         scope.relatives.ancestors = classRelatives.ancestors.slice();
         scope.relatives.descendants = classRelatives.descendants.slice();
+        scope.classNames = {
+          ancestors: _.pluck(classRelatives.ancestors, 'className'),
+          descendants: _.pluck(classRelatives.descendants, 'className')
+        };
 
         var index = 0;
-        _.each(scope.relatives.ancestors, function(ancestor) {
+        _.each(scope.classNames.ancestors, function(ancestor) {
           items[index++] = ancestor;
         });
-        _.each(scope.relatives.descendants, function(descendant) {
+        _.each(scope.classNames.descendants, function(descendant) {
           items[index++] = descendant;
         });
 
