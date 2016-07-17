@@ -13,27 +13,20 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
 
       $log.log("class relative menu enabled: ", attr['selection-enabled']);
 
-      scope.relatives = [];
+      scope.relatives = {};
+      scope.classNames = {};
       scope.relativeMenuEnabled = false;
 
       var selectedItem = null;
       var items = [];
 
       scope.$on('CLASS_RELATIVES_UPDATED', function(event, classRelatives) {
-        scope.relatives = classRelatives;
-        scope.classNames = {
-          ancestors: _.pluck(classRelatives.ancestors, 'className'),
-          descendants: _.pluck(classRelatives.descendants, 'className')
-        };
+        scope.relatives.ancestors = _.values(classRelatives.ancestors);
+        scope.relatives.descendants = _.values(classRelatives.descendants);
+        scope.classNames.ancestors = _.keys(classRelatives.ancestors);
+        scope.classNames.descendants = _.keys(classRelatives.descendants);
 
-        var index = 0;
-        _.each(scope.classNames.ancestors, function(ancestor) {
-          items[index++] = ancestor;
-        });
-        _.each(scope.classNames.descendants, function(descendant) {
-          items[index++] = descendant;
-        });
-
+        items = _.union(_.keys(classRelatives.ancestors), _.keys(classRelatives.descendants));
         if (!_.isEmpty(items)) {
           selectedItem = items[0];
         }
