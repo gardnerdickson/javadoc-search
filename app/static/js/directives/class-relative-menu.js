@@ -7,6 +7,9 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
       $scope.resultItems = {};
       this.addResultItem = function(resultItemScope) {
         $scope.resultItems[resultItemScope.item] = resultItemScope;
+        if (resultItemScope.item === $scope.classNames.ancestors[0]) {
+          resultItemScope.select();
+        }
       };
     },
     link: function(scope, element, attr) {
