@@ -89,7 +89,7 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataL
         enter: function() {
           var selectedSearchResultName = scope.selectedSearchResult.value;
           if (selectedSearchResultName !== null) {
-            scope.query = selectedSearchResultName.replace(/#/g, '');
+            scope.query = searchDataLocator.getClassesByClassName()[selectedSearchResultName].className;
             if (scope.searchMode === 'Package') {
               scope.query = ':' + scope.query;
             }

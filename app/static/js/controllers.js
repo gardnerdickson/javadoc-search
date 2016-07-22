@@ -84,7 +84,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
   $scope.$on('SELECTED_SEARCH_RESULT_CHANGED', function(event, searchResult) {
     $scope.selectedSearchResult = {
-      value: searchResult,
+      value: searchDataLocator.getClassesByClassName()[searchResult].qualifiedClassName,
       type: $scope.searchMode
     };
   });
