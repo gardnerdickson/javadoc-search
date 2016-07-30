@@ -4,9 +4,9 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
     templateUrl: 'static/partials/class-relative-menu.html',
     restrict: 'A',
     controller: function($scope, $element) {
-      $scope.resultItems = {};
+      $scope.relativeResultItems = {};
       this.addResultItem = function(resultItemScope) {
-        $scope.resultItems[resultItemScope.item] = resultItemScope;
+        $scope.relativeResultItems[resultItemScope.item] = resultItemScope;
         if (resultItemScope.item === $scope.classNames.ancestors[0]) {
           resultItemScope.select();
         }
@@ -50,12 +50,12 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
             var selectedItemIndex = 0;
             if (selectedItem !== null) {
               selectedItemIndex = _.indexOf(items, selectedItem);
-              scope.resultItems[items[selectedItemIndex]].deselect();
+              scope.relativeResultItems[items[selectedItemIndex]].deselect();
               selectedItemIndex = selectedItemIndex - 1 >= 0 ? selectedItemIndex - 1 : 0;
             }
 
             selectedItem = items[selectedItemIndex];
-            scope.resultItems[items[selectedItemIndex]].select();
+            scope.relativeResultItems[items[selectedItemIndex]].select();
           });
         },
 
@@ -68,12 +68,12 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
             var selectedItemIndex = 0;
             if (selectedItem !== null) {
               selectedItemIndex = _.indexOf(items, selectedItem);
-              scope.resultItems[items[selectedItemIndex]].deselect();
+              scope.relativeResultItems[items[selectedItemIndex]].deselect();
               selectedItemIndex = selectedItemIndex + 1 < items.length ? selectedItemIndex + 1 : items.length - 1;
             }
 
             selectedItem = items[selectedItemIndex];
-            scope.resultItems[items[selectedItemIndex]].select();
+            scope.relativeResultItems[items[selectedItemIndex]].select();
           });
 
         },

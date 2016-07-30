@@ -196,12 +196,10 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       var indexByFunction = function(classInfo) {
         return classInfo['package'] + '.' + classInfo['className'];
       };
-      var dbg = {
+      return {
         ancestors: _.indexBy(relatives.ancestors, indexByFunction),
         descendants: _.indexBy(relatives.descendants, indexByFunction)
       };
-
-      return dbg;
     });
   }
 

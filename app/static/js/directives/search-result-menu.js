@@ -26,6 +26,9 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', func
 
       scope.$on('ENABLE_SEARCH_RESULT_MENU', function(event, value) {
         scope.classMenuEnabled = value;
+        if (scope.classMenuEnabled && selectedItem !== null) {
+          scope.resultItems[selectedItem].select();
+        }
       });
 
 
