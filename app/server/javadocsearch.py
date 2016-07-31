@@ -6,7 +6,6 @@ from flask import Flask
 from flask import request
 from flask import Response
 from flask import render_template
-from flask import session
 
 from scraper import JavadocScraper
 
@@ -35,34 +34,8 @@ def init_logging():
 @app.route('/<path:path>')
 def index(path):
     if len(path) != 0:
-        if str(path).endswith('favicon.ico'):
-            return '', 404
-
-        if 'base_url' not in session:
-            return "Session does not contain a 'base_url' value.", 500
-
-        resource_path = urllib.parse.urljoin(session['base_url'], path)
-        javadoc_resource = _retrieve_arbitrary_javadoc_resource(resource_path)
-        if javadoc_resource is not None:
-            return Response(javadoc_resource.read(), mimetype=javadoc_resource.info().getheader('Content-Type'))
         return '', 404
-
     return render_template('index.html')
-
-
-@app.route('/baseUrl', methods=['POST'])
-def post_base_url():
-    encoded_url = request.form['baseUrl']
-    base_url = urllib.parse.unquote(encoded_url)
-
-    if base_url.endswith('/index.html'):
-        base_url = str.replace(base_url, '/index.html', '/')
-
-    session['base_url'] = base_url
-
-    app.logger.info("Set session baseUrl to %s", base_url)
-
-    return '', 200
 
 
 @app.route('/classes', methods=['GET'])

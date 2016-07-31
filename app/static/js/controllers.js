@@ -84,7 +84,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
   $scope.$on('SELECTED_SEARCH_RESULT_CHANGED', function(event, searchResult) {
     $scope.selectedSearchResult = {
-      value: searchDataLocator.getClassesByClassName()[searchResult].qualifiedClassName,
+      value: searchResult,
       type: $scope.searchMode
     };
   });
@@ -96,15 +96,12 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       $scope.javadocUrl += '/';
     }
 
-    javadocService.setBaseJavadocUrl($scope.javadocUrl).then(function() {
-
-      retrieveClassesAndPackages().then(function() {
-        $log.debug("Done loading!!!");
-        $scope.loading = false;
-      });
-
-      loadJavadocSite($scope.javadocUrl);
+    retrieveClassesAndPackages().then(function() {
+      $log.debug("Done loading!!!");
+      $scope.loading = false;
     });
+
+    loadJavadocSite($scope.javadocUrl);
   }
 
   function retrieveClassesAndPackages() {

@@ -3,16 +3,16 @@ app.service('javadocService', ['$q', '$http', function($q, $http) {
 
   var service = {};
 
-  service.setBaseJavadocUrl = function(url) {
-    var data = { baseUrl: url };
-
-    var defer = $q.defer();
-    $http.post('./baseUrl', data).then(function() {
-      defer.resolve();
-    });
-
-    return defer.promise;
-  };
+  //service.setBaseJavadocUrl = function(url) {
+  //  var data = { baseUrl: url };
+  //
+  //  var defer = $q.defer();
+  //  $http.post('./baseUrl', data).then(function() {
+  //    defer.resolve();
+  //  });
+  //
+  //  return defer.promise;
+  //};
 
   service.retrieveClasses = function(url) {
     console.log("Retrieving classes for url: ", url);
