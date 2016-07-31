@@ -1,6 +1,7 @@
 import urllib.request
 import urllib.parse
 import json
+from urllib.error import URLError
 
 from flask import Flask
 from flask import request
@@ -8,6 +9,7 @@ from flask import Response
 from flask import render_template
 
 from scraper import JavadocScraper
+from siteadapter import SiteAdapter
 
 
 class JavadocSearchFlaskApplication(Flask):
@@ -44,20 +46,36 @@ def get_classes():
     base_url = urllib.parse.unquote(encoded_base_url)
 
     app.logger.debug("Getting classes: %s", base_url)
+
+    site_adapter = SiteAdapter(base_url)
+    try:
+        all_classes_doc = site_adapter.retrieve_allclasses_frame()
+    except URLError:
+        return Response("Javadoc page not found", 404)
+
     scraper = JavadocScraper()
-    classes = scraper.retrieve_all_classes(base_url)
+    classes = scraper.retrieve_all_classes(all_classes_doc)
 
     return json.dumps(classes)
 
 
 @app.route('/relatives', methods=['GET'])
 def get_hierarchy_classes():
+    encoded_base_url = request.args['baseUrl']
     encoded_class_url = request.args['classUrl']
+    base_url = urllib.parse.unquote(encoded_base_url)
     class_url = urllib.parse.unquote(encoded_class_url)
 
     app.logger.debug("Getting class relatives: %s", class_url)
+
+    site_adapter = SiteAdapter(base_url)
+    try:
+        class_doc = site_adapter.retrieve_class_page(class_url)
+    except URLError:
+        return Response("Javadoc page not found", 404)
+
     scraper = JavadocScraper()
-    classes = scraper.retrieve_hierarchy_classes(class_url)
+    classes = scraper.retrieve_hierarchy_classes(class_doc)
 
     return json.dumps(classes)
 
@@ -68,8 +86,15 @@ def get_packages():
     base_url = urllib.parse.unquote(encoded_base_url)
 
     app.logger.debug("Getting packages: %s", base_url)
+
+    site_adapter = SiteAdapter(base_url)
+    try:
+        package_doc = site_adapter.retrieve_package_frame()
+    except URLError:
+        return Response("Javadoc page not found", 404)
+
     scraper = JavadocScraper()
-    packages = scraper.retrieve_packages(base_url)
+    packages = scraper.retrieve_packages(package_doc)
 
     return json.dumps(packages)
 
@@ -80,8 +105,16 @@ def get_misc_metadata():
     base_url = urllib.parse.unquote(encoded_base_url)
 
     app.logger.debug("Getting miscellaneous metadata: %s", base_url)
+
+    site_adapter = SiteAdapter(base_url)
+    try:
+        allclasses_doc = site_adapter.retrieve_allclasses_frame()
+        overview_doc = site_adapter.retrieve_overview_frame()
+    except URLError:
+        return Response("Javadoc page not found", 404)
+
     scraper = JavadocScraper()
-    version = scraper.get_misc_metadata(base_url)
+    version = scraper.get_misc_metadata(allclasses_doc, overview_doc)
 
     return json.dumps(version)
 
@@ -100,12 +133,6 @@ def proxy_package_page():
     package_page_response = urllib.request.urlopen(package_url)
 
     return package_page_response.read()
-
-
-def _retrieve_arbitrary_javadoc_resource(resource_url):
-    app.logger.debug("Getting arbitrary javadoc resource: %s", resource_url)
-    resource_response = urllib.request.urlopen(resource_url)
-    return resource_response
 
 
 init_logging()

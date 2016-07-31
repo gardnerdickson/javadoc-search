@@ -187,9 +187,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
   function relativeCacheLoad(key) {
     var classInfo = searchDataLocator.getClassesByClassName()[key];
-    var url = new URI($scope.javadocUrl).segment(classInfo.url);
-
-    return javadocService.retrieveRelatives(url.toString()).then(function(relatives) {
+    return javadocService.retrieveRelatives($scope.javadocUrl, classInfo.url).then(function(relatives) {
       var indexByFunction = function(classInfo) {
         return classInfo['package'] + '.' + classInfo['className'];
       };

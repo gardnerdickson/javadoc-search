@@ -54,9 +54,11 @@ app.service('javadocService', ['$q', '$http', function($q, $http) {
     return defer.promise;
   };
 
-  service.retrieveRelatives = function(url) {
+  service.retrieveRelatives = function(baseUrl, classUrl) {
     var config = {
-      params: { classUrl: url }
+      params: {
+        baseUrl: baseUrl,
+        classUrl: classUrl }
     };
 
     var defer = $q.defer();

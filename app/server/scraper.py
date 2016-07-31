@@ -1,7 +1,4 @@
 
-import urllib.request
-
-import html5lib
 from enum import Enum
 
 
@@ -11,10 +8,6 @@ class JavadocVersion(Enum):
 
 
 class JavadocScraper:
-
-    _CLASSES_PATH = '/allclasses-frame.html'
-    _PACKAGES_PATH = '/overview-frame.html'
-    _SUMMARY_PATH = '/overview-summary.html'
 
     _SUPER_CLASS_LABELS = (
         "All Superinterfaces:",
@@ -35,9 +28,7 @@ class JavadocScraper:
     )
 
 
-    def retrieve_all_classes(self, base_url):
-        allclasses_doc = self._retrieve_response_as_doc(base_url + self._CLASSES_PATH)
-
+    def retrieve_all_classes(self, allclasses_doc):
         javadoc_version = self._get_javadoc_version_from_allclasses_page(allclasses_doc)
 
         if javadoc_version is JavadocVersion.New:
@@ -69,21 +60,16 @@ class JavadocScraper:
         return classes
 
 
-    def retrieve_hierarchy_classes(self, class_url):
-        class_page_doc = self._retrieve_response_as_doc(class_url)
-
+    def retrieve_hierarchy_classes(self, class_page_doc):
         javadoc_version = self._get_javadoc_version_from_class_page(class_page_doc)
-
         if javadoc_version is JavadocVersion.New:
             return self._find_class_links_new(class_page_doc)
         else:
             return self._find_class_links_old(class_page_doc)
 
 
-    def retrieve_packages(self, base_url):
+    def retrieve_packages(self, package_page_doc):
         packages = []
-        package_page_doc = self._retrieve_response_as_doc(base_url + self._PACKAGES_PATH)
-
         javadoc_version = self._get_javadoc_version_from_packages_page(package_page_doc)
         if javadoc_version is JavadocVersion.New:
             package_links = package_page_doc.findall('.//li/a')
@@ -102,13 +88,9 @@ class JavadocScraper:
         return packages
 
 
-    def get_misc_metadata(self, base_url):
-        allclasses_doc = self._retrieve_response_as_doc(base_url + self._CLASSES_PATH)
+    def get_misc_metadata(self, allclasses_doc, overview_doc):
         javadoc_version = self._get_javadoc_version_from_allclasses_page(allclasses_doc)
-
-        summary_doc = self._retrieve_response_as_doc(base_url + self._SUMMARY_PATH)
-        javadoc_title = self._get_javadoc_title(summary_doc)
-
+        javadoc_title = self._get_javadoc_title(overview_doc)
         return {
             'title': javadoc_title,
             'version': javadoc_version.name
@@ -189,13 +171,6 @@ class JavadocScraper:
             classes[class_name] = url
 
         return classes
-
-
-    @staticmethod
-    def _retrieve_response_as_doc(url):
-        html_raw_response = urllib.request.urlopen(url)
-        html_doc = html5lib.parse(html_raw_response, encoding=html_raw_response.info().get_content_charset(), namespaceHTMLElements=False)
-        return html_doc
 
 
     @staticmethod
