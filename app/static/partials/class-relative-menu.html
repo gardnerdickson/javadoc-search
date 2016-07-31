@@ -3,11 +3,13 @@
         Loading...
     </div>
     <div ng-if="!loadingRelatives">
-        <ul style="border-top: 1px solid #333">
+        <div class="class-relative-label">Superclasses</div>
+        <ul>
             <li class-relative-menu-item="" search-result-type="Class" ng-repeat="item in classNames.ancestors" ng-class="{'selected': selected}">
             </li>
         </ul>
-        <ul style="border-top: 1px solid #333">
+        <div class="class-relative-label">Subclasses</div>
+        <ul>
             <li class-relative-menu-item="" search-result-type="Class" ng-repeat="item in classNames.descendants" ng-class="{'selected': selected}">
             </li>
         </ul>
