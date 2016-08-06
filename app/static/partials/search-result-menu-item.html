@@ -1,5 +1,7 @@
 <div class="class-name"
      ng-class="{'interface': details.classType == 'interface'}"
      ng-click="selectAndLoadPage(item)">
-    {{item | packageMask}}&nbsp;&nbsp;<span class="class-package-name" ng-show="selected">{{details.package}}</span>
+    <span ng-if="searchMode == 'Class'">{{item | packageMask}}&nbsp;&nbsp;</span>
+    <span ng-if="searchMode != 'Class'">{{item}}&nbsp;&nbsp;</span>
+    <span class="class-package-name" ng-show="selected">{{details.package}}</span>
 </div>
