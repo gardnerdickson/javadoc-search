@@ -119,20 +119,24 @@ def get_misc_metadata():
     return json.dumps(version)
 
 
-@app.route('/packagePageProxy', methods=['GET'])
-def proxy_package_page():
+@app.route('/javadocPageProxy', methods=['GET'])
+def javadoc_page_proxy():
     encoded_base_url = request.args['baseUrl']
     base_url = urllib.parse.unquote(encoded_base_url)
 
-    encoded_package_relative_url = request.args['packageUrl']
-    package_relative_url = urllib.parse.unquote(encoded_package_relative_url)
+    encoded_page_relative_url = request.args['pageUrl']
+    page_relative_url = urllib.parse.unquote(encoded_page_relative_url)
 
-    package_url = urllib.parse.urljoin(base_url, package_relative_url)
+    if 'mimeType' in request.args:
+        mime_type = urllib.parse.unquote(request.args['mimeType'])
+    else:
+        mime_type = "text/html"
 
+    package_url = urllib.parse.urljoin(base_url, page_relative_url)
     app.logger.debug("Proxying package page: %s", package_url)
     package_page_response = urllib.request.urlopen(package_url)
 
-    return package_page_response.read()
+    return Response(package_page_response.read(), mimetype=mime_type)
 
 
 init_logging()

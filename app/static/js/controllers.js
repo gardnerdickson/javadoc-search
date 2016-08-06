@@ -166,7 +166,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     PackageFrameOnLoadHandler.path = packageInfo.url.replace('package-frame.html', ''); // TODO: Is there a nicer way of getting the package url??
     javadocFrame.bind('load', PackageFrameOnLoadHandler.onLoad);
 
-    var url = new URI('/packagePageProxy').addSearch('baseUrl', $scope.javadocUrl).addSearch('packageUrl', packageInfo.url);
+    var url = new URI('/javadocPageProxy').addSearch('baseUrl', $scope.javadocUrl).addSearch('pageUrl', packageInfo.url);
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   }
 
@@ -240,8 +240,11 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   var PackageFrameOnLoadHandler = {
     path: '',
     onLoad: function() {
-      var iframeBody = $(javadocFrame.contents().find('body'));
+      var iframeHead = $(javadocFrame.contents().find('head'));
+      var stylesheetProxy = './javadocPageProxy?baseUrl=' + URI.encode($scope.javadocUrl) + '&pageUrl=stylesheet.css&mimeType=' + URI.encode('text/css');
+      iframeHead.append('<link rel="stylesheet" type="text/css" href="' + stylesheetProxy + '">');
 
+      var iframeBody = $(javadocFrame.contents().find('body'));
       var links = [];
       if (javadocVersion === 'New') {
         links = iframeBody.find('.indexContainer a');
@@ -249,7 +252,6 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       else {
         links = iframeBody.find('table tbody tr td a')
       }
-
       _.each(links, function(link) {
         link = $(link);
         var linkUrl = PackageFrameOnLoadHandler.path + link.attr('href');
