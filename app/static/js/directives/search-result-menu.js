@@ -75,6 +75,8 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', func
           scope.$apply(function() {
             if (scope.classMenuEnabled) {
               scope.searchMode === 'Class' ? scope.loadJavadocClassPage(selectedItem) : scope.loadJavadocPackagePage(selectedItem);
+              var selectedItemIndex = _.indexOf(scope.classes, selectedItem);
+              scope.resultItems[scope.classes[selectedItemIndex]].deselect();
               selectedItem = null;
             }
           });
