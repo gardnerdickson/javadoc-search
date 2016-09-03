@@ -12,7 +12,7 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
         }
       };
     },
-    link: function(scope, element, attr) {
+    link: function(scope, element, attr, controller) {
 
       $log.log("class relative menu enabled: ", attr['selection-enabled']);
 
@@ -38,6 +38,23 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
       scope.$on('ENABLE_CLASS_RELATIVE_MENU', function(event, value) {
         scope.relativeMenuEnabled = value;
       });
+
+
+      controller.selectItemFromHover = function(item) {
+        if (!scope.relativeMenuEnabled) {
+          return;
+        }
+        var selectedItemIndex;
+        if (selectedItem !== null) {
+          selectedItemIndex = _.indexOf(items, selectedItem);
+          $log.debug("Relative menu deselecting ", items[selectedItemIndex]);
+          scope.relativeResultItems[items[selectedItemIndex]].deselect();
+        }
+        selectedItemIndex = _.indexOf(items, item);
+        selectedItem = items[selectedItemIndex];
+        scope.relativeResultItems[selectedItem].select();
+      };
+
 
       keyPressWatcher.register({
 

@@ -9,7 +9,7 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', func
         $scope.resultItems[resultItemScope.item] = resultItemScope;
       };
     },
-    link: function(scope, element, attrs) {
+    link: function(scope, element, attrs, controller) {
 
       scope.classes = [];
       scope.classMenuEnabled = false;
@@ -31,6 +31,26 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', func
         }
       });
 
+      scope.loadPage = function(item) {
+        $log.debug("Loading selected item: ", item);
+        scope.searchMode === 'Class' ? scope.loadJavadocClassPage(item) : scope.loadJavadocPackagePage(item);
+      };
+
+
+      controller.selectItemFromHover = function(item) {
+        if (!scope.classMenuEnabled) {
+          return;
+        }
+        var selectedItemIndex;
+        if (selectedItem !== null) {
+          selectedItemIndex = _.indexOf(scope.classes, selectedItem);
+          scope.resultItems[scope.classes[selectedItemIndex]].deselect();
+        }
+        selectedItemIndex = _.indexOf(scope.classes, item);
+        selectedItem = scope.classes[selectedItemIndex];
+        scope.resultItems[selectedItem].select();
+      };
+
 
       keyPressWatcher.register({
 
@@ -44,7 +64,7 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', func
             if (selectedItem !== null) {
               selectedItemIndex = _.indexOf(scope.classes, selectedItem);
               scope.resultItems[scope.classes[selectedItemIndex]].deselect();
-              selectedItemIndex--;
+              selectedItemIndex = selectedItemIndex - 1 >= 0 ? selectedItemIndex - 1 : 0;
             }
 
             selectedItem = scope.classes[selectedItemIndex];
@@ -62,7 +82,7 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', func
             if (selectedItem !== null) {
               selectedItemIndex = _.indexOf(scope.classes, selectedItem);
               scope.resultItems[scope.classes[selectedItemIndex]].deselect();
-              selectedItemIndex++;
+              selectedItemIndex = selectedItemIndex + 1 < scope.classes.length ? selectedItemIndex + 1 : scope.classes.length - 1;
             }
             
             selectedItem = scope.classes[selectedItemIndex];
@@ -74,7 +94,7 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', func
           scope.closeSearchResultMenu();
           scope.$apply(function() {
             if (scope.classMenuEnabled) {
-              scope.searchMode === 'Class' ? scope.loadJavadocClassPage(selectedItem) : scope.loadJavadocPackagePage(selectedItem);
+              scope.loadPage(selectedItem);
               var selectedItemIndex = _.indexOf(scope.classes, selectedItem);
               scope.resultItems[scope.classes[selectedItemIndex]].deselect();
               selectedItem = null;

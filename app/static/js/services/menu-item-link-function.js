@@ -16,6 +16,10 @@ app.service('menuItemLinkFunction', ['$log', 'searchDataLocator', function($log,
       scope.$emit('SELECTED_SEARCH_RESULT_CHANGED', scope.item);
     };
 
+    scope.onHover = function() {
+      menuController.selectItemFromHover(scope.item);
+    };
+
     scope.deselect = function () {
       scope.selected = false;
     };
