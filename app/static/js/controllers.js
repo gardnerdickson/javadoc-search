@@ -89,6 +89,23 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     };
   });
 
+  
+  $scope.searchResultArrowClicked = function(item) {
+    $log.debug("Arrow clicked for: ", item);
+    if (isRelativeMenuVisible()) {
+      $scope.closeClassRelativeMenu();
+      enableClassMenu();
+    }
+    else {
+      if (!$scope.loadingRelatives) {
+        $scope.loadingRelatives = true;
+        retrieveClassRelatives();
+      }
+      $scope.openClassRelativeMenu();
+      enableRelativeMenu();
+    }
+  };
+
 
   function init() {
     $scope.javadocUrl = new URI(URI.decode($routeParams.url)).normalize().toString();
@@ -213,20 +230,16 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     right: function() {
       if ($scope.searchMode === 'Class') {
         $scope.$apply(function() {
-
           if ($scope.selectedSearchResult === null) {
             return;
           }
-
           if ($scope.relativeMenuEnabled) {
             enableClassMenu();
           }
-
           if (!$scope.loadingRelatives) {
             $scope.loadingRelatives = true;
             retrieveClassRelatives();
           }
-
           $scope.openClassRelativeMenu();
           enableRelativeMenu();
         });

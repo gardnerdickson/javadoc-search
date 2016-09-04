@@ -1,8 +1,16 @@
-<div class="class-name"
-     ng-class="{'interface': details.classType == 'interface'}"
-     ng-click="loadPage(item)"
-     ng-mouseover="onHover()">
-    <span ng-if="searchMode == 'Class'">{{item | packageMask}}&nbsp;&nbsp;</span>
-    <span ng-if="searchMode != 'Class'">{{item}}&nbsp;&nbsp;</span>
-    <span class="class-package-name" ng-show="selected">{{details.package}}</span>
+<div class="class-name-container" ng-style="menuItemContainerStyle">
+    <div class="class-name"
+         ng-class="{'interface': details.classType == 'interface'}"
+         ng-click="loadPage(item)"
+         ng-mouseover="onHover()"
+         ng-style="menuItemStyle">
+        <span ng-if="searchMode == 'Class'">{{item | packageMask}}&nbsp;&nbsp;</span>
+        <span ng-if="searchMode != 'Class'">{{item}}&nbsp;&nbsp;</span>
+        <span class="class-package-name" ng-show="selected">{{details.package}}</span>
+    </div>
+    <div ng-if="searchMode == 'Class' && menu == 'SearchResult'"
+         class="glyphicon glyphicon-chevron-right"
+         ng-click="searchResultArrowClicked(item)"
+         style="float: left; line-height: 30px; width: 30px; text-align: center">
+    </div>
 </div>
