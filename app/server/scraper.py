@@ -68,6 +68,37 @@ class JavadocScraper:
             return self._find_class_links_old(class_page_doc)
 
 
+    def retrieve_class_methods(self, class_page_doc):
+        import xml.etree.ElementTree
+        path = ".//table[@class='overviewSummary']//tr"
+        return_type_path = str(path + "/td[@class='colFirst']/code")
+        method_name_path = str(path + "/td[@class='colLast']")
+
+        method_rows = class_page_doc.findall(path)
+        for row in method_rows:
+            print(xml.etree.ElementTree.tostring(row))
+
+        methods = []
+        for row in method_rows:
+            return_type_element = row.find("td[@class='colFirst']/code")
+            if return_type_element is not None:
+                type_link = return_type_element.find('a')
+                if type_link is not None:
+                    return_type = type_link.text
+                else:
+                    return_type = return_type_element.text
+
+                method_name_element = row.find("td[@class='colLast']/code/a")
+                method_name = method_name_element.text
+
+                methods.append({
+                    'name': method_name,
+                    'returnType': return_type
+                })
+
+        return methods
+
+
     def retrieve_packages(self, package_page_doc):
         packages = []
         javadoc_version = self._get_javadoc_version_from_packages_page(package_page_doc)

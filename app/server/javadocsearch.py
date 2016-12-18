@@ -80,6 +80,27 @@ def get_hierarchy_classes():
     return json.dumps(classes)
 
 
+@app.route('/classMethods', methods=['GET'])
+def get_class_methods():
+    encoded_base_url = request.args['baseUrl']
+    encoded_class_url = request.args['classUrl']
+    base_url = urllib.parse.unquote(encoded_base_url)
+    class_url = urllib.parse.unquote(encoded_class_url)
+
+    app.logger.debug("Getting class methods: %s", class_url)
+
+    site_adapter = SiteAdapter(base_url)
+    try:
+        class_doc = site_adapter.retrieve_class_page(class_url)
+    except URLError:
+        return Response("Javadoc page not found", 404)
+
+    scraper = JavadocScraper()
+    methods = scraper.retrieve_class_methods(class_doc)
+
+    return json.dumps(methods)
+
+
 @app.route('/packages', methods=['GET'])
 def get_packages():
     encoded_base_url = request.args['baseUrl']
