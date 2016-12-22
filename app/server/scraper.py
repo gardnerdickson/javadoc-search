@@ -1,4 +1,4 @@
-
+import urllib.parse
 from enum import Enum
 
 
@@ -82,11 +82,12 @@ class JavadocScraper:
                 else:
                     return_type = return_type_element.text
 
-                method_name_element = row.find("td[@class='colLast']/code/strong/a")
-                method_name = method_name_element.text
-
+                method_signature_element = row.find("td[@class='colLast']/code/strong/a")
+                raw_method_signature = method_signature_element.get('href')
+                method_signature = urllib.parse.unquote(raw_method_signature.split("#")[1])
+                
                 methods.append({
-                    'name': method_name,
+                    'signature': method_signature,
                     'returnType': return_type
                 })
 
