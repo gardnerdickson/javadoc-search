@@ -69,14 +69,8 @@ class JavadocScraper:
 
 
     def retrieve_class_methods(self, class_page_doc):
-        import xml.etree.ElementTree
-        path = ".//table[@class='overviewSummary']//tr"
-        return_type_path = str(path + "/td[@class='colFirst']/code")
-        method_name_path = str(path + "/td[@class='colLast']")
 
-        method_rows = class_page_doc.findall(path)
-        for row in method_rows:
-            print(xml.etree.ElementTree.tostring(row))
+        method_rows = class_page_doc.findall(".//table[@class='overviewSummary']//tr")
 
         methods = []
         for row in method_rows:
@@ -88,7 +82,7 @@ class JavadocScraper:
                 else:
                     return_type = return_type_element.text
 
-                method_name_element = row.find("td[@class='colLast']/code/a")
+                method_name_element = row.find("td[@class='colLast']/code/strong/a")
                 method_name = method_name_element.text
 
                 methods.append({
