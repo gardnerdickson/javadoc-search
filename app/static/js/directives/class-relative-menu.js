@@ -18,6 +18,7 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
 
       scope.relatives = {};
       scope.classNames = {};
+      scope.methodSignatures = [];
       scope.relativeMenuEnabled = false;
 
       var selectedItem = null;
@@ -33,6 +34,10 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
         if (!_.isEmpty(items)) {
           selectedItem = items[0];
         }
+      });
+
+      scope.$on('CLASS_METHODS_UPDATED', function(event, classMethods) {
+        scope.methodSignatures = _.pluck(classMethods, 'signature');
       });
 
       scope.$on('ENABLE_CLASS_RELATIVE_MENU', function(event, value) {

@@ -60,6 +60,10 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     $scope.$broadcast('CLASS_RELATIVES_UPDATED', relatives);
   };
 
+  $scope.updateClassMethods = function(methods) {
+    $scope.$broadcast('CLASS_METHODS_UPDATED', methods)
+  };
+
   $scope.openSearchResultMenu = function() {
     var topContainer = $('.top-container');
     if (!topContainer.hasClass('search-result-menu-open')) {
@@ -166,6 +170,12 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
         $scope.updateClassRelatives(relatives);
       }
     });
+
+    var classInfo = searchDataLocator.getClassesByClassName()[$scope.selectedSearchResult.value];
+    javadocService.retrieveClassMethods($scope.javadocUrl, classInfo.url).then(function(methods) {
+      $scope.updateClassMethods(methods);
+    });
+
   }
 
   function loadJavadocSite(url) {
