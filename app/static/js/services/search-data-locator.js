@@ -29,6 +29,8 @@ app.service('searchDataLocator', ['constants', function(constants) {
   var packageInfo = {};
   var packageNames = {};
 
+  var methodInfo = [];
+
   service.getClassesByClassName = function() {
     return classesByClassName;
   };
@@ -49,13 +51,11 @@ app.service('searchDataLocator', ['constants', function(constants) {
     return packageNames;
   };
 
-  service.setClassData = function(classes) {
-    // classesByClassName = {};
-    // _.each(classes, function(classInfo) {
-    //   var className = classInfo['className'];
-    //   classesByClassName[] = classInfo;
-    // });
+  service.getMethodInfo = function() {
+    return methodInfo;
+  };
 
+  service.setClassData = function(classes) {
     classesByClassName = _.indexBy(classes, function(clazz) {
       return clazz['package'] + '.' + clazz['className'];
     });
@@ -79,6 +79,10 @@ app.service('searchDataLocator', ['constants', function(constants) {
 
     packageInfo = packageMap;
     packageNames = _.pluck(packageInfo, 'packageName')
+  };
+
+  service.setMethodData = function(methods) {
+    methodInfo = _.indexBy(methods, 'signature');
   };
 
 

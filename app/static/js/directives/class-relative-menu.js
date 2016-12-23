@@ -19,6 +19,7 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
       scope.relatives = {};
       scope.classNames = {};
       scope.methodSignatures = [];
+      scope.classMethods = [];
       scope.relativeMenuEnabled = false;
 
       var selectedItem = null;
@@ -37,7 +38,10 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
       });
 
       scope.$on('CLASS_METHODS_UPDATED', function(event, classMethods) {
+        scope.classMethods = classMethods;
         scope.methodSignatures = _.pluck(classMethods, 'signature');
+
+        items = _.union(items, scope.methodSignatures);
       });
 
       scope.$on('ENABLE_CLASS_RELATIVE_MENU', function(event, value) {
@@ -104,7 +108,20 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
           scope.$apply(function() {
             scope.closeClassRelativeMenu();
             if (scope.relativeMenuEnabled) {
-              scope.searchMode === 'Class' ? scope.loadJavadocClassPage(selectedItem) : scope.loadJavadocPackagePage(selectedItem);
+              var itemScope = scope.relativeResultItems[selectedItem];
+              switch (itemScope.searchResultType) {
+                case 'Class':
+                  scope.loadJavadocClassPage(selectedItem);
+                  break;
+                case 'Package':
+                  scope.loadJavadocPackagePage(selectedItem);
+                  break;
+                case 'Method':
+                  scope.loadJavadocMethodAnchor(selectedItem);
+                  break;
+                default:
+                  throw "Unrecognized search result type: " + itemScope.searchResultType;
+              }
               selectedItem = null;
             }
           })

@@ -1,7 +1,7 @@
 <div class="class-name-container" ng-style="menuItemContainerStyle">
     <div class="class-name"
          ng-class="{'interface': details.classType == 'interface'}"
-         ng-click="loadPage(item)"
+         ng-click="onClick()"
          ng-mouseover="onHover()"
          ng-style="menuItemStyle">
         <span ng-if="searchMode == 'Class'">{{item | packageMask}}&nbsp;&nbsp;</span>

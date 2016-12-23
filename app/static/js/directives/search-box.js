@@ -94,7 +94,11 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataL
               scope.query = ':' + scope.query;
             }
             else {
-              scope.query = searchDataLocator.getClassesByClassName()[selectedSearchResultName].className;
+              // TODO(gdickson): Checking 'classInfo' is a workaround while method search results are being introduced.
+              var classInfo = searchDataLocator.getClassesByClassName()[selectedSearchResultName];
+              if (classInfo !== undefined) {
+                scope.query = searchDataLocator.getClassesByClassName()[selectedSearchResultName].className;
+              }
             }
           }
 

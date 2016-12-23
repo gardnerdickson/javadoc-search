@@ -2,13 +2,25 @@
 app.service('menuItemLinkFunction', ['$log', 'searchDataLocator', function($log, searchDataLocator) {
 
   this.link = function(scope, element, attrs, menuController) {
+
+    var onClickMethod;
+
     scope.selected = false;
 
-    if (attrs['searchResultType'] === 'Class') {
-      scope.details = searchDataLocator.getClassesByClassName()[scope.item];
-    }
-    else {
-      scope.details = searchDataLocator.getPackageInfo()[scope.item];
+    scope.searchResultType = attrs['searchResultType'];
+    switch (attrs['searchResultType']) {
+      case 'Class':
+        scope.details = searchDataLocator.getClassesByClassName()[scope.item];
+        onClickMethod = scope.loadJavadocClassPage;
+        break;
+      case 'Package':
+        scope.details = searchDataLocator.getPackageInfo()[scope.item];
+        onClickMethod = scope.loadJavadocPackagePage;
+        break;
+      case 'Method':
+        scope.details = searchDataLocator.getMethodInfo()[scope.item];
+        onClickMethod = scope.loadJavadocMethodAnchor;
+        break;
     }
 
     scope.select = function () {
@@ -20,10 +32,14 @@ app.service('menuItemLinkFunction', ['$log', 'searchDataLocator', function($log,
       menuController.selectItemFromHover(scope.item);
     };
 
+    scope.onClick = function() {
+      onClickMethod(scope.item);
+    };
+
     scope.deselect = function () {
       scope.selected = false;
     };
-    
+
     menuController.addResultItem(scope);
   }
 

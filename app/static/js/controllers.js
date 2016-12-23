@@ -55,12 +55,17 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     loadJavadocPackagePage(searchDataLocator.getPackageInfo()[packageName]);
   };
 
+  $scope.loadJavadocMethodAnchor = function(methodSignature) {
+    loadJavadocMethodAnchor(searchDataLocator.getMethodInfo()[methodSignature]);
+  };
+
   $scope.updateClassRelatives = function(relatives) {
     $scope.loadingRelatives = false;
     $scope.$broadcast('CLASS_RELATIVES_UPDATED', relatives);
   };
 
   $scope.updateClassMethods = function(methods) {
+    searchDataLocator.setMethodData(methods);
     $scope.$broadcast('CLASS_METHODS_UPDATED', methods)
   };
 
@@ -194,6 +199,15 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     javadocFrame.bind('load', PackageFrameOnLoadHandler.onLoad);
 
     var url = new URI('/javadocPageProxy').addSearch('baseUrl', $scope.javadocUrl).addSearch('pageUrl', packageInfo.url);
+    $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
+  }
+
+  function loadJavadocMethodAnchor(methodInfo) {
+    var methodPath = methodInfo.url;
+    while (methodPath.startsWith('../')) {
+      methodPath = methodPath.replace('../', '');
+    }
+    var url = new URI($scope.javadocUrl + methodPath);
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   }
 
