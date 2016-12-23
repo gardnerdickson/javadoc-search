@@ -83,12 +83,13 @@ class JavadocScraper:
                     return_type = return_type_element.text
 
                 method_signature_element = row.find("td[@class='colLast']/code/strong/a")
-                raw_method_signature = method_signature_element.get('href')
-                method_signature = urllib.parse.unquote(raw_method_signature.split("#")[1])
+                method_url = method_signature_element.get('href')
+                method_signature = urllib.parse.unquote(method_url.split("#")[1])
                 
                 methods.append({
                     'signature': method_signature,
-                    'returnType': return_type
+                    'returnType': return_type,
+                    'url': method_url
                 })
 
         return methods
