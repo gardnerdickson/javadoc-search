@@ -1,9 +1,9 @@
 
-app.service('menuItemLinkFunction', ['$log', 'searchDataLocator', function($log, searchDataLocator) {
+app.service('menuItemLinkFunction', ['$log', 'searchDataLocator', 'keyPressWatcher', function($log, searchDataLocator, keyPressWatcher) {
 
   this.link = function(scope, element, attrs, menuController) {
 
-    var onClickMethod;
+    var loadPageFunction;
 
     scope.selected = false;
 
@@ -11,15 +11,15 @@ app.service('menuItemLinkFunction', ['$log', 'searchDataLocator', function($log,
     switch (attrs['searchResultType']) {
       case 'Class':
         scope.details = searchDataLocator.getClassesByClassName()[scope.item];
-        onClickMethod = scope.loadJavadocClassPage;
+        loadPageFunction = scope.loadJavadocClassPage;
         break;
       case 'Package':
         scope.details = searchDataLocator.getPackageInfo()[scope.item];
-        onClickMethod = scope.loadJavadocPackagePage;
+        loadPageFunction = scope.loadJavadocPackagePage;
         break;
       case 'Method':
         scope.details = searchDataLocator.getMethodInfo()[scope.item];
-        onClickMethod = scope.loadJavadocMethodAnchor;
+        loadPageFunction = scope.loadJavadocMethodAnchor;
         break;
     }
 
@@ -33,12 +33,27 @@ app.service('menuItemLinkFunction', ['$log', 'searchDataLocator', function($log,
     };
 
     scope.onClick = function() {
-      onClickMethod(scope.item);
+      loadPageFunction(scope.item);
     };
 
     scope.deselect = function () {
       scope.selected = false;
     };
+
+
+    keyPressWatcher.register({
+
+      enter: function() {
+        scope.$apply(function() {
+          if (scope.selected && menuController.enabled()) {
+            loadPageFunction(scope.item);
+            scope.deselect();
+          }
+        });
+      }
+
+    });
+
 
     menuController.addResultItem(scope);
   }

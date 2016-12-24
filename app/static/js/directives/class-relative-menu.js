@@ -4,13 +4,20 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
     templateUrl: 'static/partials/class-relative-menu.html',
     restrict: 'A',
     controller: function($scope, $element) {
+
       $scope.relativeResultItems = {};
+
       this.addResultItem = function(resultItemScope) {
         $scope.relativeResultItems[resultItemScope.item] = resultItemScope;
         if (resultItemScope.item === $scope.classNames.ancestors[0]) {
           resultItemScope.select();
         }
       };
+
+      this.enabled = function() {
+        return $scope.relativeMenuEnabled;
+      };
+
     },
     link: function(scope, element, attr, controller) {
 
@@ -108,20 +115,6 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
           scope.$apply(function() {
             scope.closeClassRelativeMenu();
             if (scope.relativeMenuEnabled) {
-              var itemScope = scope.relativeResultItems[selectedItem];
-              switch (itemScope.searchResultType) {
-                case 'Class':
-                  scope.loadJavadocClassPage(selectedItem);
-                  break;
-                case 'Package':
-                  scope.loadJavadocPackagePage(selectedItem);
-                  break;
-                case 'Method':
-                  scope.loadJavadocMethodAnchor(selectedItem);
-                  break;
-                default:
-                  throw "Unrecognized search result type: " + itemScope.searchResultType;
-              }
               selectedItem = null;
             }
           })

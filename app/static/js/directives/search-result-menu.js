@@ -4,10 +4,17 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', func
     templateUrl: 'static/partials/search-result-menu.html',
     restrict: 'A',
     controller: function($scope, $element) {
+
       $scope.resultItems = {};
+
       this.addResultItem = function(resultItemScope) {
         $scope.resultItems[resultItemScope.item] = resultItemScope;
       };
+
+      this.enabled = function() {
+        return $scope.classMenuEnabled;
+      };
+
     },
     link: function(scope, element, attrs, controller) {
 
@@ -30,11 +37,6 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', func
           scope.resultItems[selectedItem].select();
         }
       });
-
-      scope.loadPage = function(item) {
-        $log.debug("Loading selected item: ", item);
-        scope.searchMode === 'Class' ? scope.loadJavadocClassPage(item) : scope.loadJavadocPackagePage(item);
-      };
 
 
       controller.selectItemFromHover = function(item) {
@@ -91,15 +93,12 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', func
         },
 
         enter: function() {
-          scope.closeSearchResultMenu();
           scope.$apply(function() {
+            scope.closeSearchResultMenu();
             if (scope.classMenuEnabled) {
-              scope.loadPage(selectedItem);
-              var selectedItemIndex = _.indexOf(scope.classes, selectedItem);
-              scope.resultItems[scope.classes[selectedItemIndex]].deselect();
               selectedItem = null;
             }
-          });
+          })
         }
 
       });
