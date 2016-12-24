@@ -1,7 +1,7 @@
 
 import urllib.request
 import urllib.parse
-import html5lib
+from lxml import html
 
 
 class SiteAdapter:
@@ -34,6 +34,6 @@ class SiteAdapter:
     @staticmethod
     def _retrieve_page_as_doc(url):
         html_raw_response = urllib.request.urlopen(url)
-        html_doc = html5lib.parse(html_raw_response, encoding=html_raw_response.info().get_content_charset(), namespaceHTMLElements=False)
+        html_doc = html.parse(html_raw_response)
         return html_doc
 

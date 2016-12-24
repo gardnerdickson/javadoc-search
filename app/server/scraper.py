@@ -70,7 +70,7 @@ class JavadocScraper:
 
     def retrieve_class_methods(self, class_page_doc):
 
-        method_rows = class_page_doc.findall(".//table[@class='overviewSummary']//tr")
+        method_rows = class_page_doc.find(".//a[@name='method_summary']").getparent().findall('.//tr')
 
         methods = []
         for row in method_rows:
