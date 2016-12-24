@@ -1,5 +1,6 @@
 import urllib.parse
 from enum import Enum
+from lxml import etree
 
 
 class JavadocVersion(Enum):
@@ -68,10 +69,23 @@ class JavadocScraper:
             return self._find_class_links_old(class_page_doc)
 
 
+    def retrieve_class_constructors(self, class_page_doc):
+        constructor_rows = class_page_doc.find(".//a[@name='constructor_summary']").getparent().findall(".//tr")
+        constructors = []
+        for row in constructor_rows:
+            element = row.find("td[@class='colOne']/code/strong/a")
+            if element is not None:
+                constructor_url = element.get('href')
+                constructor_signature = urllib.parse.unquote(constructor_url.split("#")[1])
+                constructors.append({
+                    'signature': constructor_signature,
+                    'url': constructor_url
+                })
+        return constructors
+
+
     def retrieve_class_methods(self, class_page_doc):
-
         method_rows = class_page_doc.find(".//a[@name='method_summary']").getparent().findall('.//tr')
-
         methods = []
         for row in method_rows:
             return_type_element = row.find("td[@class='colFirst']/code")
