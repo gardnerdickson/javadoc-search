@@ -4,8 +4,8 @@
          ng-click="onClick()"
          ng-mouseover="onHover()"
          ng-style="menuItemStyle">
-        <span ng-if="searchMode == 'Class'">{{item | packageMask}}&nbsp;&nbsp;</span>
-        <span ng-if="searchMode != 'Class'">{{item}}&nbsp;&nbsp;</span>
+        <span ng-if="searchResultType == 'Class'">{{item | packageMask}}&nbsp;&nbsp;</span>
+        <span ng-if="searchResultType != 'Class'">{{item}}&nbsp;&nbsp;</span>
         <span class="class-package-name" ng-show="selected">{{details.package}}</span>
     </div>
     <div ng-if="searchMode == 'Class' && menu == 'SearchResult'"
