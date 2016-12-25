@@ -197,7 +197,7 @@ class JavadocScraper:
             'className': class_name,
             'classType': class_type_and_package[0],
             'package': class_type_and_package[1],
-            'qualifiedClassName': class_type_and_package[0] + '.' + class_type_and_package[1],
+            'qualifiedClassName': class_type_and_package[1] + '.' + class_name,
             'url': url
         }
 

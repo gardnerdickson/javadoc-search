@@ -26,30 +26,32 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
       scope.relatives = {};
       scope.classNames = {};
       scope.methodSignatures = [];
-      scope.classMethods = [];
+      scope.methods = [];
+      scope.constructors = [];
+      scope.constructorSignatures = [];
       scope.relativeMenuEnabled = false;
 
       var selectedItem = null;
       var items = [];
 
-      scope.$on('CLASS_RELATIVES_UPDATED', function(event, classRelatives) {
-        scope.relatives.ancestors = _.values(classRelatives.ancestors);
-        scope.relatives.descendants = _.values(classRelatives.descendants);
-        scope.classNames.ancestors = _.keys(classRelatives.ancestors);
-        scope.classNames.descendants = _.keys(classRelatives.descendants);
+      scope.$on('UPDATE_CLASS_RELATIVES_MENU', function(event, relatives, constructors, methods) {
+        scope.relatives = relatives;
+        scope.classNames.ancestors = _.pluck(relatives.ancestors, 'qualifiedClassName');
+        scope.classNames.descendants = _.pluck(relatives.descendants, 'qualifiedClassName');
 
-        items = _.union(_.keys(classRelatives.ancestors), _.keys(classRelatives.descendants));
+        scope.constructors = constructors;
+        scope.constructorSignatures = _.pluck(constructors, 'signature');
+
+        scope.methods = methods;
+        scope.methodSignatures = _.pluck(methods, 'signature');
+
+        items = _.union(scope.classNames.ancestors, scope.classNames.descendants, scope.constructorSignatures, scope.methodSignatures);
+
         if (!_.isEmpty(items)) {
           selectedItem = items[0];
         }
       });
 
-      scope.$on('CLASS_METHODS_UPDATED', function(event, classMethods) {
-        scope.classMethods = classMethods;
-        scope.methodSignatures = _.pluck(classMethods, 'signature');
-
-        items = _.union(items, scope.methodSignatures);
-      });
 
       scope.$on('ENABLE_CLASS_RELATIVE_MENU', function(event, value) {
         scope.relativeMenuEnabled = value;

@@ -21,10 +21,15 @@ app.service('menuItemLinkFunction', ['$log', 'searchDataLocator', 'keyPressWatch
         scope.details = searchDataLocator.getMethodInfo()[scope.item];
         loadPageFunction = scope.loadJavadocMethodAnchor;
         break;
+      case 'Constructor':
+        scope.details = searchDataLocator.getConstructorInfo()[scope.item];
+        loadPageFunction = scope.loadJavadocConstructorAnchor;
+        break;
     }
 
     scope.select = function () {
       scope.selected = true;
+      $log.debug("SELECTED SEARCH RESULT CHANGED TO ", scope.item);
       scope.$emit('SELECTED_SEARCH_RESULT_CHANGED', scope.item);
     };
 

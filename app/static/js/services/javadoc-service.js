@@ -74,5 +74,21 @@ app.service('javadocService', ['$q', '$http', function($q, $http) {
     return defer.promise;
   };
 
+  service.retrieveClassConstructors = function(baseUrl, classUrl) {
+    var config = {
+      params: {
+        baseUrl: baseUrl,
+        classUrl: classUrl
+      }
+    };
+
+    var defer = $q.defer();
+    $http.get('./classConstructors', config).then(function(response) {
+      defer.resolve(response.data)
+    });
+
+    return defer.promise;
+  };
+
   return service;
 }]);

@@ -55,18 +55,12 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     loadJavadocPackagePage(searchDataLocator.getPackageInfo()[packageName]);
   };
 
+  $scope.loadJavadocConstructorAnchor = function(constructorSignature) {
+    loadJavadocMethodAnchor(searchDataLocator.getConstructorInfo()[constructorSignature]);
+  };
+
   $scope.loadJavadocMethodAnchor = function(methodSignature) {
     loadJavadocMethodAnchor(searchDataLocator.getMethodInfo()[methodSignature]);
-  };
-
-  $scope.updateClassRelatives = function(relatives) {
-    $scope.loadingRelatives = false;
-    $scope.$broadcast('CLASS_RELATIVES_UPDATED', relatives);
-  };
-
-  $scope.updateClassMethods = function(methods) {
-    searchDataLocator.setMethodData(methods);
-    $scope.$broadcast('CLASS_METHODS_UPDATED', methods)
   };
 
   $scope.openSearchResultMenu = function() {
@@ -98,7 +92,6 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     };
   });
 
-  
   $scope.searchResultArrowClicked = function(item) {
     $log.debug("Arrow clicked for: ", item);
     if (isRelativeMenuVisible()) {
@@ -164,23 +157,22 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       return;
     }
 
-    relativesCache.get($scope.selectedSearchResult.value).then(function(relatives) {
-      // TODO(gdickson): Checking $$phase is yucky.
-      if (!$scope.$$phase) {
-        $scope.$apply(function() {
-          $scope.updateClassRelatives(relatives);
-        })
-      }
-      else {
-        $scope.updateClassRelatives(relatives);
-      }
-    });
-
     var classInfo = searchDataLocator.getClassesByClassName()[$scope.selectedSearchResult.value];
-    javadocService.retrieveClassMethods($scope.javadocUrl, classInfo.url).then(function(methods) {
-      $scope.updateClassMethods(methods);
-    });
+    var relativesPromise = javadocService.retrieveRelatives($scope.javadocUrl, classInfo.url);
+    var constructorPromise = javadocService.retrieveClassConstructors($scope.javadocUrl, classInfo.url);
+    var methodPromise = javadocService.retrieveClassMethods($scope.javadocUrl, classInfo.url);
 
+    $q.all([relativesPromise, constructorPromise, methodPromise]).then(function(results) {
+      var relatives = results[0];
+      var constructors = results[1];
+      var methods = results[2];
+
+      searchDataLocator.setConstructorData(constructors);
+      searchDataLocator.setMethodData(methods);
+
+      $scope.loadingRelatives = false;
+      $scope.$broadcast('UPDATE_CLASS_RELATIVES_MENU', relatives, constructors, methods);
+    });
   }
 
   function loadJavadocSite(url) {
@@ -224,7 +216,6 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   function isRelativeMenuVisible() {
     return $('.top-container').hasClass('class-relative-menu-open');
   }
-
 
   function relativeCacheLoad(key) {
     var classInfo = searchDataLocator.getClassesByClassName()[key];

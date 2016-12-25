@@ -30,6 +30,7 @@ app.service('searchDataLocator', ['constants', function(constants) {
   var packageNames = {};
 
   var methodInfo = [];
+  var constructorInfo = [];
 
   service.getClassesByClassName = function() {
     return classesByClassName;
@@ -53,6 +54,10 @@ app.service('searchDataLocator', ['constants', function(constants) {
 
   service.getMethodInfo = function() {
     return methodInfo;
+  };
+
+  service.getConstructorInfo = function() {
+    return constructorInfo;
   };
 
   service.setClassData = function(classes) {
@@ -81,8 +86,13 @@ app.service('searchDataLocator', ['constants', function(constants) {
     packageNames = _.pluck(packageInfo, 'packageName')
   };
 
+
   service.setMethodData = function(methods) {
     methodInfo = _.indexBy(methods, 'signature');
+  };
+
+  service.setConstructorData = function(constructors) {
+    constructorInfo = _.indexBy(constructors, 'signature')
   };
 
 
