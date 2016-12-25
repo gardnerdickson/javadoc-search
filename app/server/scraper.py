@@ -70,7 +70,11 @@ class JavadocScraper:
 
 
     def retrieve_class_constructors(self, class_page_doc):
-        constructor_rows = class_page_doc.find(".//a[@name='constructor_summary']").getparent().findall(".//tr")
+        constructor_summary = class_page_doc.find(".//a[@name='constructor_summary']")
+        if constructor_summary is None:
+            return dict()
+
+        constructor_rows = constructor_summary.getparent().findall(".//tr")
         constructors = []
         for row in constructor_rows:
             element = row.find("td[@class='colOne']/code/strong/a")
@@ -85,7 +89,11 @@ class JavadocScraper:
 
 
     def retrieve_class_methods(self, class_page_doc):
-        method_rows = class_page_doc.find(".//a[@name='method_summary']").getparent().findall('.//tr')
+        method_summary = class_page_doc.find(".//a[@name='method_summary']")
+        if method_summary is None:
+            return dict()
+
+        method_rows = method_summary.getparent().findall('.//tr')
         methods = []
         for row in method_rows:
             return_type_element = row.find("td[@class='colFirst']/code")
