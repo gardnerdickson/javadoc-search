@@ -70,14 +70,26 @@ class JavadocScraper:
 
 
     def retrieve_class_constructors(self, class_page_doc):
-        constructor_summary = class_page_doc.find(".//a[@name='constructor_summary']")
+
+        path = ".//a[@name='{0}']"
+
+        element_path = None
+        constructor_summary = class_page_doc.find(path.format('constructor_summary'))
+        if constructor_summary is not None:
+            element_path = "td[@class='colOne']/code/strong/a"
+
+        if constructor_summary is None:
+            constructor_summary = class_page_doc.find(path.format('constructor.summary'))
+            if constructor_summary is not None:
+                element_path = "td[@class='colOne']/code/span/a"
+
         if constructor_summary is None:
             return dict()
 
         constructor_rows = constructor_summary.getparent().findall(".//tr")
         constructors = []
         for row in constructor_rows:
-            element = row.find("td[@class='colOne']/code/strong/a")
+            element = row.find(element_path)
             if element is not None:
                 constructor_url = element.get('href')
                 constructor_signature = urllib.parse.unquote(constructor_url.split("#")[1])
@@ -89,14 +101,30 @@ class JavadocScraper:
 
 
     def retrieve_class_methods(self, class_page_doc):
-        method_summary = class_page_doc.find(".//a[@name='method_summary']")
+
+        path = ".//a[@name='{0}']"
+
+        return_type_path = None
+        signature_path = None
+        method_summary = class_page_doc.find(path.format("method_summary"))
+        if method_summary is not None:
+            return_type_path = "td[@class='colFirst']/code"
+            signature_path = "td[@class='colLast']/code/strong/a"
+
+        if method_summary is None:
+            method_summary = class_page_doc.find(path.format("method.summary"))
+            if method_summary is not None:
+                return_type_path = "td[@class='colFirst']/code"
+                signature_path = "td[@class='colLast']/code/span/a"
+
         if method_summary is None:
             return dict()
 
         method_rows = method_summary.getparent().findall('.//tr')
         methods = []
         for row in method_rows:
-            return_type_element = row.find("td[@class='colFirst']/code")
+            print(etree.tostring(row))
+            return_type_element = row.find(return_type_path)
             if return_type_element is not None:
                 type_link = return_type_element.find('a')
                 if type_link is not None:
@@ -104,7 +132,7 @@ class JavadocScraper:
                 else:
                     return_type = return_type_element.text
 
-                method_signature_element = row.find("td[@class='colLast']/code/strong/a")
+                method_signature_element = row.find(signature_path)
                 method_url = method_signature_element.get('href')
                 method_signature = urllib.parse.unquote(method_url.split("#")[1])
                 
