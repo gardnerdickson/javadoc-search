@@ -35,7 +35,7 @@ class JavadocScraper:
         if javadoc_version is JavadocVersion.New:
             class_links_xpath = './/li/a'
         else:
-            class_links_xpath = './/table/tbody/tr/td/font/a'
+            class_links_xpath = './/table/tr/td/font/a'
 
         classes = []
         class_links = allclasses_doc.findall(class_links_xpath)
@@ -73,20 +73,23 @@ class JavadocScraper:
 
         path = ".//a[@name='{0}']"
 
-        element_path = None
         constructor_summary = class_page_doc.find(path.format('constructor_summary'))
-        if constructor_summary is not None:
-            element_path = "td[@class='colOne']/code/strong/a"
-
         if constructor_summary is None:
             constructor_summary = class_page_doc.find(path.format('constructor.summary'))
-            if constructor_summary is not None:
-                element_path = "td[@class='colOne']/code/span/a"
-
+            
         if constructor_summary is None:
             return dict()
 
-        constructor_rows = constructor_summary.getparent().findall(".//tr")
+        constructor_rows = None
+        element_path = None
+        version = JavadocScraper._get_javadoc_version_from_class_page(class_page_doc)
+        if version is JavadocVersion.Old:
+            constructor_rows = constructor_summary.getnext().findall(".//tr")
+            element_path = "td/code//a"
+        elif version is JavadocVersion.New:
+            constructor_rows = constructor_summary.getparent().findall(".//tr")
+            element_path = "td[@class='colOne']//a"
+
         constructors = []
         for row in constructor_rows:
             element = row.find(element_path)
@@ -123,7 +126,6 @@ class JavadocScraper:
         method_rows = method_summary.getparent().findall('.//tr')
         methods = []
         for row in method_rows:
-            print(etree.tostring(row))
             return_type_element = row.find(return_type_path)
             if return_type_element is not None:
                 type_link = return_type_element.find('a')
@@ -151,7 +153,7 @@ class JavadocScraper:
         if javadoc_version is JavadocVersion.New:
             package_links = package_page_doc.findall('.//li/a')
         else:
-            package_links = package_page_doc.findall('.//table/tbody/tr/td/p/font/a')
+            package_links = package_page_doc.findall('.//table/tr/td/p/font/a')
 
         for package_link in package_links:
             package_name = package_link.text
@@ -217,7 +219,7 @@ class JavadocScraper:
         if sub_class_label in JavadocScraper._SUB_CLASS_LABELS:
             descendant_links = element[1].findall('.//dd/a')
             for descendant_link in descendant_links:
-                ancestors.append(JavadocScraper._parse_relative_link(descendant_link))
+                descendants.append(JavadocScraper._parse_relative_link(descendant_link))
 
         return {
             'ancestors': ancestors,
@@ -236,18 +238,6 @@ class JavadocScraper:
             'qualifiedClassName': class_type_and_package[1] + '.' + class_name,
             'url': url
         }
-
-
-    @staticmethod
-    def _find_class_links(description_root, index):
-        classes = {}
-        class_links = description_root.findall('./dl[' + str(index + 1) + ']/dd/a')
-        for class_link in class_links:
-            class_name = class_link.text
-            url = class_link.attrib['href']
-            classes[class_name] = url
-
-        return classes
 
 
     @staticmethod
