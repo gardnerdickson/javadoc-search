@@ -84,7 +84,8 @@ class JavadocScraper:
         element_path = None
         version = JavadocScraper._get_javadoc_version_from_class_page(class_page_doc)
         if version is JavadocVersion.Old:
-            constructor_rows = constructor_summary.getnext().findall(".//tr")
+            constructor_table = constructor_summary.getnext() or constructor_summary.getparent().getnext()
+            constructor_rows = constructor_table.findall(".//tr")
             element_path = "td/code//a"
         elif version is JavadocVersion.New:
             constructor_rows = constructor_summary.getparent().findall(".//tr")
