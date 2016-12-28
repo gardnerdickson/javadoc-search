@@ -76,7 +76,7 @@ class JavadocScraper:
         constructor_summary = class_page_doc.find(path.format('constructor_summary'))
         if constructor_summary is None:
             constructor_summary = class_page_doc.find(path.format('constructor.summary'))
-            
+
         if constructor_summary is None:
             return dict()
 
@@ -107,23 +107,26 @@ class JavadocScraper:
 
         path = ".//a[@name='{0}']"
 
-        return_type_path = None
-        signature_path = None
-        method_summary = class_page_doc.find(path.format("method_summary"))
-        if method_summary is not None:
-            return_type_path = "td[@class='colFirst']/code"
-            signature_path = "td[@class='colLast']/code/strong/a"
-
+        method_summary = class_page_doc.find(path.format('method_summary'))
         if method_summary is None:
-            method_summary = class_page_doc.find(path.format("method.summary"))
-            if method_summary is not None:
-                return_type_path = "td[@class='colFirst']/code"
-                signature_path = "td[@class='colLast']/code/span/a"
+            method_summary = class_page_doc.find(path.format('method.summary'))
 
         if method_summary is None:
             return dict()
 
-        method_rows = method_summary.getparent().findall('.//tr')
+        method_rows = None
+        return_type_path = None
+        signature_path = None
+        version = JavadocScraper._get_javadoc_version_from_class_page(class_page_doc)
+        if version is JavadocVersion.Old:
+            method_rows = method_summary.getnext().findall('.//tr')
+            return_type_path = "td[1]//code"
+            signature_path = "td[2]//code//a"
+        elif version is JavadocVersion.New:
+            method_rows = method_summary.getparent().findall('.//tr')
+            return_type_path = "td[@class='colFirst']/code"
+            signature_path = "td[@class='colLast']//a"
+
         methods = []
         for row in method_rows:
             return_type_element = row.find(return_type_path)
@@ -135,12 +138,14 @@ class JavadocScraper:
                     return_type = return_type_element.text
 
                 method_signature_element = row.find(signature_path)
+                if method_signature_element is None:
+                    continue
                 method_url = method_signature_element.get('href')
                 method_signature = urllib.parse.unquote(method_url.split("#")[1])
                 
                 methods.append({
-                    'signature': method_signature,
-                    'returnType': return_type,
+                    'signature': method_signature.strip(),
+                    'returnType': return_type.strip(),
                     'url': method_url
                 })
 
