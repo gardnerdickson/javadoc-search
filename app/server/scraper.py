@@ -1,6 +1,5 @@
 import urllib.parse
 from enum import Enum
-from lxml import etree
 
 
 class JavadocVersion(Enum):
