@@ -96,6 +96,9 @@ class JavadocScraper:
             if element is not None:
                 constructor_url = element.get('href')
                 constructor_signature = urllib.parse.unquote(constructor_url.split("#")[1])
+                if version is JavadocVersion.New:
+                    constructor_signature = JavadocScraper._fix_method_signature(constructor_signature)
+
                 constructors.append({
                     'signature': constructor_signature,
                     'url': constructor_url
@@ -142,6 +145,8 @@ class JavadocScraper:
                     continue
                 method_url = method_signature_element.get('href')
                 method_signature = urllib.parse.unquote(method_url.split("#")[1])
+                if version is JavadocVersion.New:
+                    method_signature = JavadocScraper._fix_method_signature(method_signature)
                 
                 methods.append({
                     'signature': method_signature.strip(),
@@ -276,3 +281,36 @@ class JavadocScraper:
             return JavadocVersion.New
         else:
             return JavadocVersion.Old
+
+
+    @staticmethod
+    def _fix_method_signature(signature):
+        if '-' not in signature:
+            return signature
+
+        sig_list = list(signature)
+        set_open_bracket = False
+
+        index = 0
+        while index < len(sig_list):
+            char = sig_list[index]
+            if char is '-':
+                if not set_open_bracket:
+                    sig_list[index] = '('
+                    set_open_bracket = True
+                elif index == len(sig_list) - 1:
+                    sig_list[index] = ')'
+                else:
+                    sig_list[index] = ','
+                    index += 1
+                    sig_list.insert(index, ' ')
+
+            if index < len(sig_list) - 1:
+                if "".join(sig_list[index:index + 2]) == ':A':
+                    sig_list[index] = '['
+                    sig_list[index + 1] = ']'
+
+            index += 1
+
+        return "".join(sig_list)
+
