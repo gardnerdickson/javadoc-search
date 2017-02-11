@@ -4,13 +4,20 @@
          ng-click="onClick()"
          ng-mouseover="onHover()"
          ng-style="menuItemStyle">
-        <span ng-if="searchResultType == 'Class'">{{item | packageMask}}&nbsp;&nbsp;</span>
-        <span ng-if="searchResultType != 'Class'">{{item}}&nbsp;&nbsp;</span>
-        <span class="class-package-name" ng-show="selected">{{details.package}}</span>
-    </div>
-    <div ng-if="searchMode == 'Class' && menu == 'SearchResult'"
-         class="glyphicon glyphicon-chevron-right"
-         ng-click="searchResultArrowClicked(item)"
-         style="float: left; line-height: 30px; width: 30px; text-align: center">
+
+        <span>
+            <span ng-if="searchResultType == 'Class'">{{item | packageMask}}&nbsp;&nbsp;</span>
+            <span ng-if="searchResultType != 'Class'">{{item}}&nbsp;&nbsp;</span>
+            <span class="class-package-name" ng-show="selected">{{details.package}}</span>
+        </span>
+
+        <span class="item-arrow-container"
+              ng-show="selected && searchResultType == 'Class' && menu == 'SearchResult'"
+              ng-click="searchResultArrowClicked(item)">
+            <span class="glyphicon glyphicon-chevron-right item-arrow"></span>
+        </span>
     </div>
 </div>
+
+<!--class="item-arrow-container"-->
+<!--style="float: right; height: 30px; background-color: #c0c0c0"-->

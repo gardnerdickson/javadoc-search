@@ -168,6 +168,23 @@ nav.search-result-push-menu-left .relative-label:hover {
 
 }
 
+span.item-arrow-container {
+    float: right;
+    height: 30px;
+    width: 30px;
+}
+
+span.item-arrow-container:hover {
+    float: right;
+    height: 30px;
+    width: 30px;
+    background-color: #c0c0c0;
+}
+
+nav.search-result-push-menu-left .item-arrow {
+    right: 22px;
+}
+
 nav.class-relative-menu {
     position: fixed;
     z-index: 20;

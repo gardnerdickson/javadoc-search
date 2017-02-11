@@ -6,13 +6,6 @@ app.directive('searchResultMenuItem', ['menuItemLinkFunction', function(menuItem
     require: '^searchResultMenu',
     link: function(scope, element, attrs, menuController) {
       scope.menu = 'SearchResult';
-      scope.menuItemContainerStyle = {
-        width: '100%'
-      };
-      scope.menuItemStyle = {
-        float: 'left',
-        width: '90%'
-      };
       menuItemLinkFunction.link(scope, element, attrs, menuController);
     }
   }
@@ -26,8 +19,6 @@ app.directive('classRelativeMenuItem', ['menuItemLinkFunction', function(menuIte
     require: '^classRelativeMenu',
     link: function(scope, element, attrs, menuController) {
       scope.menu = 'Relative';
-      scope.menuItemContainerStyle = {};
-      scope.menuItemStyle = {};
       menuItemLinkFunction.link(scope, element, attrs, menuController);
     }
   }
