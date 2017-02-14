@@ -111,7 +111,7 @@ nav.search-result-push-menu-left li {
     line-height: 30px;
 }
 
-nav.search-result-push-menu-left .selected div.class-name {
+nav.search-result-push-menu-left .selected div {
     background-color: #fff;
     color: #000;
 }
@@ -155,7 +155,6 @@ nav.search-result-push-menu-left .relative-label:hover {
     cursor: auto;
 }
 
-
 .top-container.search-result-menu-open nav.search-result-push-menu-left {
     left: 0;
 }
@@ -168,13 +167,18 @@ nav.search-result-push-menu-left .relative-label:hover {
 
 }
 
-span.item-arrow-container {
+#search-result-container {
+    width: 270px;
+    float: left;
+}
+
+#item-arrow-container {
     float: right;
     height: 30px;
     width: 30px;
 }
 
-span.item-arrow-container:hover {
+#item-arrow-container:hover {
     float: right;
     height: 30px;
     width: 30px;
