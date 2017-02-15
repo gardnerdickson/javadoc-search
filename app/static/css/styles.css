@@ -120,17 +120,8 @@ nav.search-result-push-menu-left li:hover {
     cursor: pointer;
 }
 
-nav.search-result-push-menu-left .class-name {
-    text-indent: 15px;
-}
-
 nav.search-result-push-menu-left .class-name.interface {
     font-style: italic;
-}
-
-nav.search-result-push-menu-left .selected.relative-class-name {
-    background-color: #fff;
-    color: #000;
 }
 
 nav.search-result-push-menu-left .class-package-name {
@@ -167,9 +158,17 @@ nav.search-result-push-menu-left .relative-label:hover {
 
 }
 
-#search-result-container {
+.search-result-menu #search-result-container {
     width: 270px;
+}
+
+.class-relative-menu #search-result-container {
+    width: 300px;
+}
+
+#search-result-container {
     float: left;
+    text-indent: 15px;
 }
 
 #item-arrow-container {
@@ -186,7 +185,7 @@ nav.search-result-push-menu-left .relative-label:hover {
 }
 
 nav.search-result-push-menu-left .item-arrow {
-    right: 22px;
+    left: 8px;
 }
 
 nav.class-relative-menu {
@@ -226,7 +225,7 @@ nav.class-relative-push-menu-left li {
     line-height: 30px;
 }
 
-nav.class-relative-push-menu-left .selected div.class-name {
+nav.class-relative-push-menu-left .selected div {
     background-color: #fff;
     color: #000;
 }
