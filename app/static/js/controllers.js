@@ -48,7 +48,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   $scope.loadingRelatives = false;
 
   $scope.loadJavadocClassPage = function(className) {
-    loadJavadocClassPage(searchDataLocator.getClassesByClassName()[className])
+    loadJavadocClassPage(searchDataLocator.getClassesByQualifiedClassName()[className])
   };
 
   $scope.loadJavadocPackagePage = function(packageName) {
@@ -144,8 +144,8 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       searchDataLocator.setClassData(classes);
       searchDataLocator.setPackageData(packages);
 
-      matcherLocator.createMatcher(searchDataLocator.getClassNames(), 'Fuzzy', 'Classes_Basic');
-      matcherLocator.createMatcher(searchDataLocator.getPackageNames(), 'Fuzzy', 'Packages_Basic');
+      matcherLocator.createMatcher(searchDataLocator.getClassNames(), searchDataLocator.getQualifiedClassNames(), 'ElasticLunr', 'Classes_Basic');
+      matcherLocator.createMatcher(searchDataLocator.getPackageNames(), searchDataLocator.getPackageNames(), 'Fuzzy', 'Packages_Basic');
 
       $scope.$broadcast('ENABLE_SEARCH_RESULT_MENU');
     });
@@ -157,7 +157,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       return;
     }
 
-    var classInfo = searchDataLocator.getClassesByClassName()[$scope.selectedSearchResult.value];
+    var classInfo = searchDataLocator.getClassesByQualifiedClassName()[$scope.selectedSearchResult.value];
     var relativesPromise = javadocService.retrieveRelatives($scope.javadocUrl, classInfo.url);
     var constructorPromise = javadocService.retrieveClassConstructors($scope.javadocUrl, classInfo.url);
     var methodPromise = javadocService.retrieveClassMethods($scope.javadocUrl, classInfo.url);
@@ -218,7 +218,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   }
 
   function relativeCacheLoad(key) {
-    var classInfo = searchDataLocator.getClassesByClassName()[key];
+    var classInfo = searchDataLocator.getClassesByQualifiedClassName()[key];
     return javadocService.retrieveRelatives($scope.javadocUrl, classInfo.url).then(function(relatives) {
       var indexByFunction = function(classInfo) {
         return classInfo['package'] + '.' + classInfo['className'];

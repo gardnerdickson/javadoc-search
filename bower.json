@@ -20,6 +20,7 @@
     "underscore": "~1.6.0",
     "uri.js": "~1.13.2",
     "angular-route": "~1.2.20",
-    "fuse.js": "~1.2.2"
+    "fuse.js": "~1.2.2",
+    "elasticlunr.js": "^0.9.5"
   }
 }

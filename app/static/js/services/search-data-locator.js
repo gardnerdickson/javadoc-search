@@ -18,13 +18,14 @@
  *    'url': com/example/ExampleClass.html
  *  }
  */
-app.service('searchDataLocator', ['constants', function(constants) {
+app.service('searchDataLocator', ['$log', 'constants', function($log, constants) {
 
   var service = {};
 
-  var classesByClassName = {};
+  var classesByQualifiedClassName = {};
   var classesByPackage = {};
   var classNames = [];
+  var qualifiedClassNames = [];
 
   var packageInfo = {};
   var packageNames = {};
@@ -32,8 +33,8 @@ app.service('searchDataLocator', ['constants', function(constants) {
   var methodInfo = [];
   var constructorInfo = [];
 
-  service.getClassesByClassName = function() {
-    return classesByClassName;
+  service.getClassesByQualifiedClassName = function() {
+    return classesByQualifiedClassName;
   };
 
   service.getClassesByPackage = function() {
@@ -42,6 +43,10 @@ app.service('searchDataLocator', ['constants', function(constants) {
 
   service.getClassNames = function() {
     return classNames;
+  };
+
+  service.getQualifiedClassNames = function() {
+    return qualifiedClassNames;
   };
 
   service.getPackageInfo = function() {
@@ -61,11 +66,10 @@ app.service('searchDataLocator', ['constants', function(constants) {
   };
 
   service.setClassData = function(classes) {
-    classesByClassName = _.indexBy(classes, function(clazz) {
-      return clazz['package'] + '.' + clazz['className'];
-    });
 
-    classNames = _.keys(classesByClassName);
+    classesByQualifiedClassName = _.indexBy(classes, 'qualifiedClassName');
+    classNames = _.pluck(classes, 'className');
+    qualifiedClassNames = _.pluck(classes, 'qualifiedClassName');
 
     classesByPackage = {};
     _.each(classes, function(clazz) {

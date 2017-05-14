@@ -10,7 +10,7 @@ app.service('menuItemLinkFunction', ['$log', 'searchDataLocator', 'keyPressWatch
     scope.searchResultType = attrs['searchResultType'];
     switch (attrs['searchResultType']) {
       case 'Class':
-        scope.details = searchDataLocator.getClassesByClassName()[scope.item];
+        scope.details = searchDataLocator.getClassesByQualifiedClassName()[scope.item];
         loadPageFunction = scope.loadJavadocClassPage;
         break;
       case 'Package':

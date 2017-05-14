@@ -95,9 +95,9 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataL
             }
             else {
               // TODO(gdickson): Checking 'classInfo' is a workaround while method search results are being introduced.
-              var classInfo = searchDataLocator.getClassesByClassName()[selectedSearchResultName];
+              var classInfo = searchDataLocator.getClassesByQualifiedClassName()[selectedSearchResultName];
               if (classInfo !== undefined) {
-                scope.query = searchDataLocator.getClassesByClassName()[selectedSearchResultName].className;
+                scope.query = searchDataLocator.getClassesByQualifiedClassName()[selectedSearchResultName].className;
               }
             }
           }

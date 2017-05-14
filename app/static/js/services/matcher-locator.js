@@ -1,45 +1,87 @@
-
-app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
+app.service('matcherLocator', ['$log', 'constants', function ($log, constants) {
 
   var service = {};
 
   var indexes = {};
 
-  service.createMatcher = function(values, type, key) {
+  service.createMatcher = function (searchSet, returnSet, type, key) {
     if (type === 'Basic') {
-      indexes[key] = new BasicMatcher(values, constants.search.MAX_RESULTS)
+      indexes[key] = new BasicMatcher(searchSet, returnSet, constants.search.MAX_RESULTS)
     }
     else if (type === 'CamelCase') {
-      indexes[key] = new CamelCaseMatcher(values, constants.search.MAX_RESULTS);
+      indexes[key] = new CamelCaseMatcher(searchSet, returnSet, constants.search.MAX_RESULTS);
     }
     else if (type === 'Fuzzy') {
-      indexes[key] = new FuzzyMatcher(values, constants.search.MAX_RESULTS);
+      indexes[key] = new FuzzyMatcher(searchSet, returnSet, constants.search.MAX_RESULTS);
+    }
+    else if (type === 'ElasticLunr') {
+      indexes[key] = new ElasticLunrMatcher(searchSet, returnSet)
     }
     else {
       throw "Invalid matcher type: " + type;
     }
   };
 
-  service.getMatcher = function(key) {
+  service.getMatcher = function (key) {
     return indexes[key];
   };
 
 
-  function FuzzyMatcher(values, maxResults) {
-    this._values = values;
+  function ElasticLunrMatcher(searchSet, returnSet) {
+
+    this._searchSet = searchSet;
+    this._returnSet = returnSet;
+
+    this._index = elasticlunr(function () {
+      this.addField("value");
+      this.setRef("index");
+    });
+
+    for (var i = 0; i < this._searchSet.length; i++) {
+      this._index.addDoc({
+        "value": this._searchSet[i],
+        "index": i
+      })
+    }
+
+  }
+
+  ElasticLunrMatcher.prototype = {
+
+    findMatches: function (query) {
+      var queryResults = this._index.search(query, {expand: true});
+
+      var results = [];
+      var that = this;
+      _.each(queryResults, function(queryResult) {
+        results.push(that._returnSet[queryResult['ref']])
+      });
+
+      return results;
+    }
+
+  };
+
+
+  function FuzzyMatcher(searchSet, returnSet, maxResults) {
+
+    this._searchSet = searchSet;
+    this._returnSet = returnSet;
+
     this._maxResults = maxResults;
 
-    this.fuse = new Fuse(this._values);
+    this.fuse = new Fuse(this._searchSet);
   }
+
   FuzzyMatcher.prototype = {
 
-    findMatches: function(query) {
+    findMatches: function (query) {
       var fuseResult = this.fuse.search(query);
 
       var searchResultIndexes = fuseResult.splice(0, 30);
       var searchResults = [];
       for (var i in searchResultIndexes) {
-        searchResults.push(this._values[searchResultIndexes[i]]);
+        searchResults.push(this._returnSet[searchResultIndexes[i]]);
       }
 
       return searchResults;
@@ -51,16 +93,17 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
     this._values = sortedValues;
     this._maxResults = maxResults;
   }
+
   BasicMatcher.prototype = {
 
-    maxResults: function(value) {
+    maxResults: function (value) {
       if (value === undefined) {
         return this._maxResults;
       }
       this._maxResults = value;
     },
 
-    findMatches: function(query) {
+    findMatches: function (query) {
       var matches = [];
       var regex = new RegExp(query, 'i');
 
@@ -82,16 +125,17 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
     this._values = values;
     this._maxResults = maxResults;
   }
+
   CamelCaseMatcher.prototype = {
 
-    maxResults: function(value) {
+    maxResults: function (value) {
       if (value === undefined) {
         return this._maxResults;
       }
       this._maxResults = value;
     },
 
-    findMatches: function(pattern) {
+    findMatches: function (pattern) {
       var matches = {};
       var regex = new RegExp(pattern);
 
@@ -109,7 +153,7 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
       return matches;
     },
 
-    getCamelCaseValue: function(str) {
+    getCamelCaseValue: function (str) {
       var upperCaseValue = '';
       for (var i = 0; i < str.length; i++) {
         var char = str.charAt(i);
@@ -136,9 +180,10 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
       this.add(sortedValues[i]);
     }
   }
+
   BinarySearchTree.prototype = {
 
-    add: function(value) {
+    add: function (value) {
       var node = new Node(value);
       var current = null;
 
@@ -175,7 +220,7 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
       }
     },
 
-    maxResults: function(value) {
+    maxResults: function (value) {
       if (value === undefined) {
         return this._maxResults;
       }
@@ -183,7 +228,7 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
       this._maxResults = value;
     },
 
-    getMatchingFunction: function() {
+    getMatchingFunction: function () {
       var thisBinarySearchTree = this;
       return function findMatches(pattern, cb) {
         pattern = pattern.toLowerCase();
@@ -201,11 +246,11 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
 
             if (node === thisBinarySearchTree._root) {
               if (regex.test(node.value)) {
-                matches.push({ value: node.value });
+                matches.push({value: node.value});
               }
             }
             else {
-              matches.push({ value: node.value });
+              matches.push({value: node.value});
             }
 
             if (node.left !== null && regex.test(node.left.value)) {
@@ -230,6 +275,7 @@ app.service('matcherLocator', ['$log', 'constants', function($log, constants) {
   function Node(value) {
     this.value = value;
   }
+
   Node.prototype = {
     left: null,
     right: null
