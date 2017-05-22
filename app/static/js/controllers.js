@@ -144,7 +144,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       searchDataLocator.setClassData(classes);
       searchDataLocator.setPackageData(packages);
 
-      matcherLocator.createMatcher(searchDataLocator.getClassNames(), searchDataLocator.getQualifiedClassNames(), 'ElasticLunr', 'Classes_Basic');
+      matcherLocator.createMatcher(searchDataLocator.getClassNames(), searchDataLocator.getQualifiedClassNames(), 'Fuzzy', 'Classes_Basic');
       matcherLocator.createMatcher(searchDataLocator.getPackageNames(), searchDataLocator.getPackageNames(), 'Fuzzy', 'Packages_Basic');
 
       $scope.$broadcast('ENABLE_SEARCH_RESULT_MENU');
