@@ -1,5 +1,5 @@
 
-app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', function($rootScope, $log, keyPressWatcher) {
+app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', 'javadocData', 'searchResultData', function($rootScope, $log, keyPressWatcher, javadocData, searchResultData) {
   return {
     templateUrl: 'static/partials/search-result-menu.html',
     restrict: 'A',
@@ -23,9 +23,15 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', func
 
       var selectedItem = null;
 
-      scope.$on('SEARCH_RESULTS_UPDATED', function(event, searchResults) {
-        scope.classes = searchResults.slice();
+
+      scope.$on('CLASSES_LOADED', function(event, classes) {
+        $log.log("search-result-menu: Received CLASSES_LOADED event.");
+        scope.classes = classes.slice();
       });
+
+      // scope.$on('SEARCH_RESULTS_UPDATED', function(event, searchResults) {
+      //   scope.classes = searchResults.slice();
+      // });
 
       scope.$on('DESELECT_SEARCH_RESULT', function(event, searchResult) {
         selectedItem = null;

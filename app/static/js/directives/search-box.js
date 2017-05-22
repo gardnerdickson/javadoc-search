@@ -1,5 +1,5 @@
 
-app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataLocator', 'keyPressWatcher', function($rootScope, $log, matcherLocator, searchDataLocator, keyPressWatcher) {
+app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'javadocData', 'searchResultData', 'keyPressWatcher', function($rootScope, $log, matcherLocator, javadocData, searchResultData, keyPressWatcher) {
   return {
     templateUrl: 'static/partials/search-box.html',
     restrict: 'A',
@@ -69,6 +69,8 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataL
         catch (ignore) { }
 
         $rootScope.$broadcast('SEARCH_RESULTS_UPDATED', matches);
+        $log.debug("Updating filter with: ", matches);
+        searchResultData.updateFilter(matches);
         $rootScope.$broadcast('ENABLE_SEARCH_RESULT_MENU', true);
         $rootScope.$broadcast('ENABLE_CLASS_RELATIVE_MENU', false);
 
@@ -95,9 +97,9 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'searchDataL
             }
             else {
               // TODO(gdickson): Checking 'classInfo' is a workaround while method search results are being introduced.
-              var classInfo = searchDataLocator.getClassesByQualifiedClassName()[selectedSearchResultName];
+              var classInfo = javadocData.getClassesByQualifiedClassName()[selectedSearchResultName];
               if (classInfo !== undefined) {
-                scope.query = searchDataLocator.getClassesByQualifiedClassName()[selectedSearchResultName].className;
+                scope.query = javadocData.getClassesByQualifiedClassName()[selectedSearchResultName].className;
               }
             }
           }

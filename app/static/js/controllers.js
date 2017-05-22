@@ -28,7 +28,7 @@ app.controller('LoadUrlController', ['$scope', '$log', '$location', function($sc
 }]);
 
 
-app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', '$q', '$http', 'javadocService', 'searchDataLocator', 'matcherLocator', 'keyPressWatcher', 'constants', function($scope, $log, $routeParams, $timeout, $sce, $q, $http, javadocService, searchDataLocator , matcherLocator, keyPressWatcher, constants) {
+app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$timeout', '$sce', '$q', '$http', 'javadocService', 'javadocData', 'searchResultData', 'matcherLocator', 'keyPressWatcher', 'constants', function($scope, $log, $routeParams, $timeout, $sce, $q, $http, javadocService, javadocData, searchResultData, matcherLocator, keyPressWatcher, constants) {
   var javadocVersion = null;
   var relativesCache = new LoadingCache({
     limit: 10,
@@ -48,19 +48,19 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   $scope.loadingRelatives = false;
 
   $scope.loadJavadocClassPage = function(className) {
-    loadJavadocClassPage(searchDataLocator.getClassesByQualifiedClassName()[className])
+    loadJavadocClassPage(javadocData.getClassesByQualifiedClassName()[className])
   };
 
   $scope.loadJavadocPackagePage = function(packageName) {
-    loadJavadocPackagePage(searchDataLocator.getPackageInfo()[packageName]);
+    loadJavadocPackagePage(javadocData.getPackageInfo()[packageName]);
   };
 
   $scope.loadJavadocConstructorAnchor = function(constructorSignature) {
-    loadJavadocMethodAnchor(searchDataLocator.getConstructorInfo()[constructorSignature]);
+    loadJavadocMethodAnchor(javadocData.getConstructorInfo()[constructorSignature]);
   };
 
   $scope.loadJavadocMethodAnchor = function(methodSignature) {
-    loadJavadocMethodAnchor(searchDataLocator.getMethodInfo()[methodSignature]);
+    loadJavadocMethodAnchor(javadocData.getMethodInfo()[methodSignature]);
   };
 
   $scope.openSearchResultMenu = function() {
@@ -141,13 +141,15 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       $log.debug("Got metadata for packages: ", packages);
       $log.debug("Got misc metadata: ", miscMetadata);
 
-      searchDataLocator.setClassData(classes);
-      searchDataLocator.setPackageData(packages);
+      javadocData.setClassData(classes);
+      javadocData.setPackageData(packages);
+      searchResultData.setResults(classes);
 
-      matcherLocator.createMatcher(searchDataLocator.getClassNames(), searchDataLocator.getQualifiedClassNames(), 'Fuzzy', 'Classes_Basic');
-      matcherLocator.createMatcher(searchDataLocator.getPackageNames(), searchDataLocator.getPackageNames(), 'Fuzzy', 'Packages_Basic');
+      matcherLocator.createMatcher(javadocData.getClassNames(), javadocData.getQualifiedClassNames(), 'ElasticLunr', 'Classes_Basic');
+      matcherLocator.createMatcher(javadocData.getPackageNames(), javadocData.getPackageNames(), 'Fuzzy', 'Packages_Basic');
 
       $scope.$broadcast('ENABLE_SEARCH_RESULT_MENU');
+      $scope.$broadcast('CLASSES_LOADED', javadocData.getQualifiedClassNames())
     });
   }
 
@@ -157,7 +159,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       return;
     }
 
-    var classInfo = searchDataLocator.getClassesByQualifiedClassName()[$scope.selectedSearchResult.value];
+    var classInfo = javadocData.getClassesByQualifiedClassName()[$scope.selectedSearchResult.value];
     var relativesPromise = javadocService.retrieveRelatives($scope.javadocUrl, classInfo.url);
     var constructorPromise = javadocService.retrieveClassConstructors($scope.javadocUrl, classInfo.url);
     var methodPromise = javadocService.retrieveClassMethods($scope.javadocUrl, classInfo.url);
@@ -167,8 +169,8 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       var constructors = results[1];
       var methods = results[2];
 
-      searchDataLocator.setConstructorData(constructors);
-      searchDataLocator.setMethodData(methods);
+      javadocData.setConstructorData(constructors);
+      javadocData.setMethodData(methods);
 
       $scope.loadingRelatives = false;
       $scope.$broadcast('UPDATE_CLASS_RELATIVES_MENU', relatives, constructors, methods);
@@ -218,7 +220,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
   }
 
   function relativeCacheLoad(key) {
-    var classInfo = searchDataLocator.getClassesByQualifiedClassName()[key];
+    var classInfo = javadocData.getClassesByQualifiedClassName()[key];
     return javadocService.retrieveRelatives($scope.javadocUrl, classInfo.url).then(function(relatives) {
       var indexByFunction = function(classInfo) {
         return classInfo['package'] + '.' + classInfo['className'];

@@ -18,7 +18,7 @@
  *    'url': com/example/ExampleClass.html
  *  }
  */
-app.service('searchDataLocator', ['$log', 'constants', function($log, constants) {
+app.service('javadocData', ['$log', 'constants', function($log, constants) {
 
   var service = {};
 

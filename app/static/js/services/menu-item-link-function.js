@@ -1,5 +1,5 @@
 
-app.service('menuItemLinkFunction', ['$log', 'searchDataLocator', 'keyPressWatcher', function($log, searchDataLocator, keyPressWatcher) {
+app.service('menuItemLinkFunction', ['$log', 'javadocData', 'searchResultData', 'keyPressWatcher', function($log, javadocData, searchResultData, keyPressWatcher) {
 
   this.link = function(scope, element, attrs, menuController) {
 
@@ -10,19 +10,19 @@ app.service('menuItemLinkFunction', ['$log', 'searchDataLocator', 'keyPressWatch
     scope.searchResultType = attrs['searchResultType'];
     switch (attrs['searchResultType']) {
       case 'Class':
-        scope.details = searchDataLocator.getClassesByQualifiedClassName()[scope.item];
+        scope.details = javadocData.getClassesByQualifiedClassName()[scope.item];
         loadPageFunction = scope.loadJavadocClassPage;
         break;
       case 'Package':
-        scope.details = searchDataLocator.getPackageInfo()[scope.item];
+        scope.details = javadocData.getPackageInfo()[scope.item];
         loadPageFunction = scope.loadJavadocPackagePage;
         break;
       case 'Method':
-        scope.details = searchDataLocator.getMethodInfo()[scope.item];
+        scope.details = javadocData.getMethodInfo()[scope.item];
         loadPageFunction = scope.loadJavadocMethodAnchor;
         break;
       case 'Constructor':
-        scope.details = searchDataLocator.getConstructorInfo()[scope.item];
+        scope.details = javadocData.getConstructorInfo()[scope.item];
         loadPageFunction = scope.loadJavadocConstructorAnchor;
         break;
     }
@@ -44,6 +44,10 @@ app.service('menuItemLinkFunction', ['$log', 'searchDataLocator', 'keyPressWatch
     scope.deselect = function () {
       scope.selected = false;
     };
+    
+    scope.$on('SEARCH_RESULTS_UPDATED', function() {
+      scope.visible = searchResultData.checkSearchResult(scope.item)
+    });
 
 
     keyPressWatcher.register({
