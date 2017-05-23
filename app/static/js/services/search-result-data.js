@@ -33,5 +33,11 @@ app.service('searchResultData', ['$log', function($log) {
     return filterMap[searchResult];
   };
 
+  service.getMatchedSearchResults = function() {
+    return _.filter(results, function(result) {
+      return filterMap[result]
+    });
+  };
+
   return service;
 }]);
