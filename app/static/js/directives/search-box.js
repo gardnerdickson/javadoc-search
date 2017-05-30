@@ -69,8 +69,6 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'javadocData
         catch (ignore) { }
 
         $rootScope.$broadcast('SEARCH_RESULTS_UPDATED', matches);
-        $log.debug("Updating filter with: ", matches);
-        $log.debug("search mode: ", scope.searchMode);
         searchResultData.updateFilter(matches);
         $rootScope.$broadcast('ENABLE_SEARCH_RESULT_MENU', true);
         $rootScope.$broadcast('ENABLE_CLASS_RELATIVE_MENU', false);

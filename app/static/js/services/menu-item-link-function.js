@@ -27,10 +27,23 @@ app.service('menuItemLinkFunction', ['$log', 'javadocData', 'searchResultData', 
         break;
     }
 
+    var enterKeypressHandler = {
+      enter: function() {
+        scope.$apply(function() {
+          if (scope.selected && menuController.enabled()) {
+            loadPageFunction(scope.item);
+            scope.deselect();
+          }
+        });
+      }
+    };
+
+    var keypressHandlerId;
+    
     scope.select = function () {
       scope.selected = true;
-      $log.debug("SELECTED SEARCH RESULT CHANGED TO ", scope.item);
       scope.$emit('SELECTED_SEARCH_RESULT_CHANGED', scope.item);
+      keypressHandlerId = keyPressWatcher.register(enterKeypressHandler)
     };
 
     scope.onHover = function() {
@@ -43,26 +56,8 @@ app.service('menuItemLinkFunction', ['$log', 'javadocData', 'searchResultData', 
 
     scope.deselect = function () {
       scope.selected = false;
+      keyPressWatcher.unregister(keypressHandlerId)
     };
-    
-    scope.$on('SEARCH_RESULTS_UPDATED', function() {
-      scope.visible = searchResultData.checkSearchResult(scope.item)
-    });
-
-
-    keyPressWatcher.register({
-
-      enter: function() {
-        scope.$apply(function() {
-          if (scope.selected && menuController.enabled()) {
-            loadPageFunction(scope.item);
-            scope.deselect();
-          }
-        });
-      }
-
-    });
-
 
     menuController.addResultItem(scope);
   }

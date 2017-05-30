@@ -16,17 +16,17 @@ app.service('keyPressWatcher', ['$log', function($log) {
 
   var handlerConfigs = [];
 
-  service.register = function(handlerConfig, uniqueId) {
+  service.register = function(handlerConfig) {
     tryValidateHandlers(handlerConfig);
 
-    if (uniqueId === undefined) {
-      uniqueId = _.unique();
-    }
+    var uniqueId = _.unique();
 
     handlerConfigs.push({
       handlerConfig: handlerConfig,
       uniqueId: uniqueId
-    })
+    });
+
+    return uniqueId;
   };
 
   service.unregister = function(uniqueId) {
