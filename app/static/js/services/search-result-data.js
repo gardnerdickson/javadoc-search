@@ -25,8 +25,6 @@ app.service('searchResultData', ['$log', function($log) {
     _.each(searchResults, function(searchResult) {
       filterMap[searchResult] = true
     });
-
-    $log.debug("search-result-data: Done updating filter map: ", filterMap);
   };
 
   service.checkSearchResult = function(searchResult) {

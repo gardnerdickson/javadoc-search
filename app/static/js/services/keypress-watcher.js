@@ -14,27 +14,18 @@ app.service('keyPressWatcher', ['$log', function($log) {
     ESC: 'esc'
   };
 
-  var handlerConfigs = [];
+  var handlerConfigs = {};
 
   service.register = function(handlerConfig) {
     tryValidateHandlers(handlerConfig);
 
-    var uniqueId = _.unique();
-
-    handlerConfigs.push({
-      handlerConfig: handlerConfig,
-      uniqueId: uniqueId
-    });
-
+    var uniqueId = _.uniqueId("handler_");
+    handlerConfigs[uniqueId] = handlerConfig;
     return uniqueId;
   };
 
   service.unregister = function(uniqueId) {
-    for (var i = 0; i < handlerConfigs.length; i++) {
-      if (handlerConfigs[i].uniqueId === uniqueId) {
-        handlerConfigs.splice(i, 1);
-      }
-    }
+    delete handlerConfigs[uniqueId];
   };
 
   function tryValidateHandlers(handlers) {
@@ -85,7 +76,7 @@ app.service('keyPressWatcher', ['$log', function($log) {
       event.preventDefault();
     }
 
-    _.each(_.pluck(handlerConfigs, 'handlerConfig'), function(handlerConfig) {
+    _.each(_.values(handlerConfigs), function(handlerConfig) {
       if (_.has(handlerConfig, keyEvent)) {
         handlerConfig[keyEvent](event.which);
       }
