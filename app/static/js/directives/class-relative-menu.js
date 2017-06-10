@@ -122,7 +122,7 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
           })
         }
 
-      });
+      }, 'relativeMenu');
 
     }
   }

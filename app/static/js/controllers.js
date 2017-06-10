@@ -264,7 +264,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       }
     }
 
-  });
+  }, 'mainController');
 
 
   var javadocFrame = $('#javadoc-frame');

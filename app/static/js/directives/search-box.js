@@ -130,7 +130,7 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'javadocData
           }
         }
 
-      });
+      }, 'searchBox');
 
     }
   }

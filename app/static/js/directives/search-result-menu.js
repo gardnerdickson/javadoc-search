@@ -71,14 +71,11 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', 'jav
             var selectedItemIndex = 0;
             var matchedItems = searchResultData.getMatchedSearchResults();
             if (selectedItem !== null) {
-              // selectedItemIndex = _.indexOf(scope.classes, selectedItem);
               selectedItemIndex = _.indexOf(matchedItems, selectedItem);
-              // scope.resultItems[scope.classes[selectedItemIndex]].deselect();
               scope.resultItems[matchedItems[selectedItemIndex]].deselect();
               selectedItemIndex = selectedItemIndex - 1 >= 0 ? selectedItemIndex - 1 : 0;
             }
 
-            // selectedItem = scope.classes[selectedItemIndex];
             selectedItem = matchedItems[selectedItemIndex];
             scope.resultItems[selectedItem].select();
           });
@@ -93,15 +90,11 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', 'jav
             var selectedItemIndex = 0;
             var matchedItems = searchResultData.getMatchedSearchResults();
             if (selectedItem !== null) {
-              // selectedItemIndex = _.indexOf(scope.classes, selectedItem);
               selectedItemIndex = _.indexOf(matchedItems, selectedItem);
-              // scope.resultItems[scope.classes[selectedItemIndex]].deselect();
               scope.resultItems[matchedItems[selectedItemIndex]].deselect();
-              // selectedItemIndex = selectedItemIndex + 1 < scope.classes.length ? selectedItemIndex + 1 : scope.classes.length - 1;
-              selectedItemIndex = selectedItemIndex + 1 < matchedItems.length ? selectedItemIndex + 1 : matchItems.length - 1;
+              selectedItemIndex = selectedItemIndex + 1 < matchedItems.length ? selectedItemIndex + 1 : matchedItems.length - 1;
             }
             
-            // selectedItem = scope.classes[selectedItemIndex];
             selectedItem = matchedItems[selectedItemIndex];
             scope.resultItems[selectedItem].select();
           });
@@ -116,7 +109,7 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', 'jav
           })
         }
 
-      });
+      }, 'resultMenu');
 
     }
   };

@@ -43,12 +43,12 @@ app.service('menuItemLinkFunction', ['$log', 'javadocData', 'searchResultData', 
     scope.select = function () {
       scope.selected = true;
       scope.$emit('SELECTED_SEARCH_RESULT_CHANGED', scope.item);
-      keypressHandlerId = keyPressWatcher.register(enterKeypressHandler)
+      keypressHandlerId = keyPressWatcher.register(enterKeypressHandler, 'resultItem')
     };
 
-    scope.onHover = function() {
-      menuController.selectItemFromHover(scope.item);
-    };
+    // scope.onHover = function() {
+    //   menuController.selectItemFromHover(scope.item);
+    // };
 
     scope.onClick = function() {
       loadPageFunction(scope.item);
