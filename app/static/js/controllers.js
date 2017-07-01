@@ -63,6 +63,18 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     loadJavadocMethodAnchor(javadocData.getMethodInfo()[methodSignature]);
   };
 
+
+  $scope.toggleSearchResultMenu = function() {
+    var topContainer = $('.top-container');
+    if (!topContainer.hasClass('search-result-menu-open')) {
+      topContainer.addClass('search-result-menu-open');
+      $scope.$broadcast('SEARCH_RESULTS_UPDATED')
+    }
+    else {
+      topContainer.removeClass('search-result-menu-open');
+    }
+  };
+
   $scope.openSearchResultMenu = function() {
     var topContainer = $('.top-container');
     if (!topContainer.hasClass('search-result-menu-open')) {
