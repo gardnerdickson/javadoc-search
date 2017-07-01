@@ -36,13 +36,15 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'javadocData
         }
 
         if (basicClassesMatcher === null) {
-          basicClassesMatcher = matcherLocator.getMatcher('Classes_Basic');
+          basicClassesMatcher = matcherLocator.getMatcher('Classes');
         }
         if (basicPackagesMatcher === null) {
-          basicPackagesMatcher = matcherLocator.getMatcher('Packages_Basic');
+          basicPackagesMatcher = matcherLocator.getMatcher('Packages');
         }
 
         var querySanitized = scope.query.replace(':', '');
+
+        $log.debug("Query is: ", scope.query, " - Sanitized query is: ", querySanitized);
 
         if (lastQuery === null || lastQuery === '') {
           if (scope.query !== '' && scope.query !== ':') {
@@ -50,26 +52,32 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'javadocData
             scope.openSearchResultMenu();
           }
         }
-        else if (querySanitized === '') {
-          $log.debug("Closing search result menu");
-          scope.closeSearchResultMenu();
-          scope.closeClassRelativeMenu();
-        }
 
         try {
-          if (scope.query.indexOf(':') === 0 && scope.query !== ':') {
+          if (scope.query.indexOf(':') === 0) {
             scope.searchMode = 'Package';
-            matches = basicPackagesMatcher.findMatches(querySanitized);
+            if (querySanitized === '') {
+              $log.error("TODO: match all packages");
+            }
+            else {
+              matches = basicPackagesMatcher.findMatches(querySanitized);
+            }
           }
           else {
             scope.searchMode = 'Class';
-            matches = basicClassesMatcher.findMatches(querySanitized);
+            if (querySanitized === '') {
+              matches = javadocData.getQualifiedClassNames();
+            }
+            else {
+              matches = basicClassesMatcher.findMatches(querySanitized);
+            }
           }
         }
         catch (ignore) { }
 
-        $rootScope.$broadcast('SEARCH_RESULTS_UPDATED', matches);
+        $log.debug("[search-box] Updating filter with ", matches.length, "matches.");
         searchResultData.updateFilter(matches);
+        $rootScope.$broadcast('SEARCH_RESULTS_UPDATED');
         $rootScope.$broadcast('ENABLE_SEARCH_RESULT_MENU', true);
         $rootScope.$broadcast('ENABLE_CLASS_RELATIVE_MENU', false);
 

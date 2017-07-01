@@ -1,5 +1,5 @@
 
-app.directive('searchResultMenuItem', ['menuItemLinkFunction', 'searchResultData', function(menuItemLinkFunction, searchResultData) {
+app.directive('searchResultMenuItem', ['$log', 'menuItemLinkFunction', 'searchResultData', function($log, menuItemLinkFunction, searchResultData) {
   return {
     templateUrl: 'static/partials/search-result-menu-item.html',
     restrict: 'A',
@@ -8,7 +8,7 @@ app.directive('searchResultMenuItem', ['menuItemLinkFunction', 'searchResultData
       scope.menu = 'SearchResult';
       
       scope.$on('SEARCH_RESULTS_UPDATED', function() {
-        scope.visible = searchResultData.checkSearchResult(scope.item)
+        scope.visible = searchResultData.checkSearchResult(scope.item);
       });
 
       menuItemLinkFunction.link(scope, element, attrs, menuController);

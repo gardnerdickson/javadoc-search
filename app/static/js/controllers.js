@@ -157,8 +157,8 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       javadocData.setPackageData(packages);
       searchResultData.setResults(javadocData.getQualifiedClassNames());
 
-      matcherLocator.createMatcher(javadocData.getClassNames(), javadocData.getQualifiedClassNames(), 'ElasticLunr', 'Classes_Basic');
-      matcherLocator.createMatcher(javadocData.getPackageNames(), javadocData.getPackageNames(), 'Fuzzy', 'Packages_Basic');
+      matcherLocator.createMatcher(javadocData.getClassNames(), javadocData.getQualifiedClassNames(), 'ElasticLunr', 'Classes');
+      matcherLocator.createMatcher(javadocData.getPackageNames(), javadocData.getPackageNames(), 'Fuzzy', 'Packages');
 
       $scope.$broadcast('ENABLE_SEARCH_RESULT_MENU');
       $scope.searchMode = 'Class'; // TODO(gdickson): This is a hack until this variable can be removed altogether.
