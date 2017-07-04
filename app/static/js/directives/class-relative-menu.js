@@ -34,7 +34,7 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
       var selectedItem = null;
       var items = [];
 
-      scope.$on('UPDATE_CLASS_RELATIVES_MENU', function(event, relatives, constructors, methods) {
+      scope.$on('CLASS_RELATIVES_LOADED', function(event, relatives, constructors, methods) {
         scope.relatives = relatives;
         scope.classNames.ancestors = _.pluck(relatives.ancestors, 'qualifiedClassName');
         scope.classNames.descendants = _.pluck(relatives.descendants, 'qualifiedClassName');
@@ -53,8 +53,20 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
       });
 
 
-      scope.$on('ENABLE_CLASS_RELATIVE_MENU', function(event, value) {
-        scope.relativeMenuEnabled = value;
+      scope.$on('KEYPRESS_OPEN_RELATIVE_MENU', function() {
+        scope.relativeMenuEnabled = true;
+      });
+
+      scope.$on('KEYPRESS_CLOSE_RELATIVE_MENU', function() {
+        scope.relativeMenuEnabled = false;
+      });
+
+      scope.$on('SEARCH_RESULTS_UPDATED', function(event, value) {
+        scope.relativeMenuEnabled = false;
+      });
+      
+      scope.$on('SEARCH_RESULT_ARROW_CLICKED', function(event) {
+        scope.relativeMenuEnabled = !scope.relativeMenuEnabled;
       });
 
 

@@ -104,21 +104,30 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     };
   });
 
-  $scope.searchResultArrowClicked = function(item) {
-    $log.debug("Arrow clicked for: ", item);
+  $scope.$on('KEYPRESS_CLOSE_RELATIVE_MENU', function() {
     if (isRelativeMenuVisible()) {
       $scope.closeClassRelativeMenu();
-      enableClassMenu();
     }
-    else {
+  });
+
+  $scope.$on('KEYPRESS_OPEN_RELATIVE_MENU', function() {
+    if (!isRelativeMenuVisible()) {
+      $scope.openClassRelativeMenu();
       if (!$scope.loadingRelatives) {
         $scope.loadingRelatives = true;
         retrieveClassRelatives();
       }
-      $scope.openClassRelativeMenu();
-      enableRelativeMenu();
     }
-  };
+  });
+
+  $scope.$on('SEARCH_RESULT_ARROW_CLICKED', function(event) {
+    if (toggleClassRelativeMenu()) {
+      if (!$scope.loadingRelatives) {
+        $scope.loadingRelatives = true;
+        retrieveClassRelatives();
+      }
+    }
+  });
 
 
   function init() {
@@ -160,7 +169,6 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       matcherLocator.createMatcher(javadocData.getClassNames(), javadocData.getQualifiedClassNames(), 'ElasticLunr', 'Classes');
       matcherLocator.createMatcher(javadocData.getPackageNames(), javadocData.getPackageNames(), 'Fuzzy', 'Packages');
 
-      $scope.$broadcast('ENABLE_SEARCH_RESULT_MENU');
       $scope.searchMode = 'Class'; // TODO(gdickson): This is a hack until this variable can be removed altogether.
       $scope.$broadcast('CLASSES_LOADED', javadocData.getQualifiedClassNames())
     });
@@ -186,7 +194,7 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
       javadocData.setMethodData(methods);
 
       $scope.loadingRelatives = false;
-      $scope.$broadcast('UPDATE_CLASS_RELATIVES_MENU', relatives, constructors, methods);
+      $scope.$broadcast('CLASS_RELATIVES_LOADED', relatives, constructors, methods);
     });
   }
 
@@ -218,14 +226,11 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     $scope.iframeSource = $sce.trustAsResourceUrl(url.toString());
   }
 
-  function enableClassMenu() {
-    $scope.$broadcast('ENABLE_SEARCH_RESULT_MENU', true);
-    $scope.$broadcast('ENABLE_CLASS_RELATIVE_MENU', false);
-  }
 
-  function enableRelativeMenu() {
-    $scope.$broadcast('ENABLE_CLASS_RELATIVE_MENU', true);
-    $scope.$broadcast('ENABLE_SEARCH_RESULT_MENU', false);
+  function toggleClassRelativeMenu() {
+    var relativeMenuVisible = isRelativeMenuVisible();
+    relativeMenuVisible ? $scope.closeClassRelativeMenu() : $scope.openClassRelativeMenu();
+    return !relativeMenuVisible;
   }
 
   function isRelativeMenuVisible() {
@@ -250,28 +255,16 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
 
     left: function() {
       $scope.$apply(function() {
-        if (isRelativeMenuVisible()) {
-          $scope.closeClassRelativeMenu();
-          enableClassMenu();
-        }
+        $scope.$broadcast('KEYPRESS_CLOSE_RELATIVE_MENU');
       });
     },
 
     right: function() {
       if ($scope.searchMode === 'Class') {
         $scope.$apply(function() {
-          if ($scope.selectedSearchResult === null) {
-            return;
+          if ($scope.selectedSearchResult !== null) {
+            $scope.$broadcast('KEYPRESS_OPEN_RELATIVE_MENU');
           }
-          if ($scope.relativeMenuEnabled) {
-            enableClassMenu();
-          }
-          if (!$scope.loadingRelatives) {
-            $scope.loadingRelatives = true;
-            retrieveClassRelatives();
-          }
-          $scope.openClassRelativeMenu();
-          enableRelativeMenu();
         });
       }
     }

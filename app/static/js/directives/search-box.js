@@ -31,9 +31,7 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'javadocData
 
       scope.onChange = function($event) {
 
-        if (scope.selectedSearchResult !== null) {
-          $rootScope.$broadcast('DESELECT_SEARCH_RESULT', scope.selectedSearchResult.value); // deselect current search result
-        }
+        $rootScope.$broadcast('SEARCH_BOX_QUERY_CHANGED', scope.query);
 
         if (basicClassesMatcher === null) {
           basicClassesMatcher = matcherLocator.getMatcher('Classes');
@@ -43,8 +41,6 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'javadocData
         }
 
         var querySanitized = scope.query.replace(':', '');
-
-        $log.debug("Query is: ", scope.query, " - Sanitized query is: ", querySanitized);
 
         if (lastQuery === null || lastQuery === '') {
           if (scope.query !== '' && scope.query !== ':') {
@@ -75,11 +71,8 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'javadocData
         }
         catch (ignore) { }
 
-        $log.debug("[search-box] Updating filter with ", matches.length, "matches.");
         searchResultData.updateFilter(matches);
         $rootScope.$broadcast('SEARCH_RESULTS_UPDATED');
-        $rootScope.$broadcast('ENABLE_SEARCH_RESULT_MENU', true);
-        $rootScope.$broadcast('ENABLE_CLASS_RELATIVE_MENU', false);
 
         lastQuery = querySanitized;
       };

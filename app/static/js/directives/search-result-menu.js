@@ -29,18 +29,45 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', 'jav
         scope.classes = classes.slice();
       });
 
-      // scope.$on('SEARCH_RESULTS_UPDATED', function(event, searchResults) {
-      //   scope.classes = searchResults.slice();
-      // });
-
-      scope.$on('DESELECT_SEARCH_RESULT', function(event, searchResult) {
+      scope.$on('SEARCH_BOX_QUERY_CHANGED', function(event, query) {
+        if (scope.classMenuEnabled && selectedItem !== null) {
+          $log.debug("[search-result-menu] Deselecting search result.");
+          scope.resultItems[selectedItem].deselect();
+        }
         selectedItem = null;
       });
 
-      scope.$on('ENABLE_SEARCH_RESULT_MENU', function(event, value) {
-        scope.classMenuEnabled = value;
-        if (scope.classMenuEnabled && selectedItem !== null) {
+      scope.$on('SEARCH_RESULTS_UPDATED', function(event) {
+        scope.classMenuEnabled = true;
+        if (selectedItem !== null) {
           scope.resultItems[selectedItem].select();
+        }
+      });
+
+      scope.$on('KEYPRESS_OPEN_RELATIVE_MENU', function() {
+        if (scope.classMenuEnabled) {
+          scope.classMenuEnabled = false;
+        }
+      });
+      
+      scope.$on('KEYPRESS_CLOSE_RELATIVE_MENU', function() {
+        if (!scope.classMenuEnabled) {
+          scope.classMenuEnabled = true;
+          if (selectedItem !== null) {
+            scope.resultItems[selectedItem].select();
+          }
+        }
+      });
+      
+      scope.$on('SEARCH_RESULT_ARROW_CLICKED', function(event) {
+        if (!scope.classMenuEnabled) {
+          scope.classMenuEnabled = true;
+          if (selectedItem !== null) {
+            scope.resultItems[selectedItem].select();
+          }
+        }
+        else {
+          scope.classMenuEnabled = false;
         }
       });
 
