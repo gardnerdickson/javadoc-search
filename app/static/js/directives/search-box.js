@@ -11,18 +11,6 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'javadocData
       var focus = false;
       var matches = [];
 
-      scope.$on('FOCUS_SEARCH_BOX', function(event) {
-        if (!focus) {
-          element.find('input').focus();
-        }
-      });
-
-      scope.$on('BLUR_SEARCH_BOX', function(event) {
-        if (focus) {
-          element.find('input').blur();
-        }
-      });
-
       scope.$on('SELECTED_SEARCH_RESULT_CHANGED', function(event, selectedItem) {
         if (focus) {
           element.find('input').blur();
@@ -89,28 +77,29 @@ app.directive('searchBox', ['$rootScope', '$log', 'matcherLocator', 'javadocData
       keyPressWatcher.register({
 
         enter: function() {
-          var selectedSearchResultName = scope.selectedSearchResult.value;
-          if (selectedSearchResultName !== null) {
-            if (scope.searchMode === 'Package') {
-              scope.query = selectedSearchResultName;
-              scope.query = ':' + scope.query;
-            }
-            else {
-              // TODO(gdickson): Checking 'classInfo' is a workaround while method search results are being introduced.
-              var classInfo = javadocData.getClassesByQualifiedClassName()[selectedSearchResultName];
-              if (classInfo !== undefined) {
-                scope.query = javadocData.getClassesByQualifiedClassName()[selectedSearchResultName].className;
+          if (scope.selectedSearchResult !== null) {
+            var selectedSearchResultName = scope.selectedSearchResult.value;
+            if (selectedSearchResultName !== null) {
+              if (scope.searchMode === 'Package') {
+                scope.query = selectedSearchResultName;
+                scope.query = ':' + scope.query;
+              }
+              else {
+                // TODO(gdickson): Checking 'classInfo' is a workaround while method search results are being introduced.
+                var classInfo = javadocData.getClassesByQualifiedClassName()[selectedSearchResultName];
+                if (classInfo !== undefined) {
+                  scope.query = javadocData.getClassesByQualifiedClassName()[selectedSearchResultName].className;
+                }
               }
             }
+
+            lastQuery = '';
           }
 
-          lastQuery = '';
         },
 
         esc: function() {
           scope.$apply(function() {
-            scope.closeSearchResultMenu();
-            scope.closeClassRelativeMenu();
             scope.query = '';
             lastQuery = '';
           });

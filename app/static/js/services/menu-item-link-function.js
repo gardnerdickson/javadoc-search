@@ -30,11 +30,12 @@ app.service('menuItemLinkFunction', ['$log', 'javadocData', 'searchResultData', 
 
     scope.select = function() {
       scope.selected = true;
+      $log.debug("[menu-item-link-function] Selecting", scope.item);
       scope.$emit('SELECTED_SEARCH_RESULT_CHANGED', scope.item);
       keypressHandlerId = keyPressWatcher.register({
         enter: function() {
           scope.$apply(function() {
-            if (scope.selected && menuController.enabled()) {
+            if (scope.selected) {
               loadPageFunction(scope.item);
               scope.deselect();
             }
@@ -52,6 +53,7 @@ app.service('menuItemLinkFunction', ['$log', 'javadocData', 'searchResultData', 
     };
 
     scope.deselect = function() {
+      $log.debug("[menu-item-link-function] Deselecting", scope.item);
       scope.selected = false;
       keyPressWatcher.unregister(keypressHandlerId)
     };

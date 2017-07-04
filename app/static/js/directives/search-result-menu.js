@@ -31,7 +31,6 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', 'jav
 
       scope.$on('SEARCH_BOX_QUERY_CHANGED', function(event, query) {
         if (scope.classMenuEnabled && selectedItem !== null) {
-          $log.debug("[search-result-menu] Deselecting search result.");
           scope.resultItems[selectedItem].deselect();
         }
         selectedItem = null;
@@ -42,6 +41,10 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', 'jav
         if (selectedItem !== null) {
           scope.resultItems[selectedItem].select();
         }
+      });
+
+      scope.$on('KEYPRESS_CLOSE_CLASS_MENU', function() {
+        scope.classMenuEnabled = false;
       });
 
       scope.$on('KEYPRESS_OPEN_RELATIVE_MENU', function() {
@@ -129,11 +132,21 @@ app.directive('searchResultMenu', ['$rootScope' ,'$log', 'keyPressWatcher', 'jav
 
         enter: function() {
           scope.$apply(function() {
+            scope.classMenuEnabled = false;
             scope.closeSearchResultMenu();
-            if (scope.classMenuEnabled) {
+            selectedItem = null;
+          })
+        },
+
+        esc: function() {
+          scope.$apply(function() {
+            scope.classMenuEnabled = false;
+            scope.closeSearchResultMenu();
+            if (selectedItem !== null) {
+              scope.resultItems[selectedItem].deselect();
               selectedItem = null;
             }
-          })
+          });
         }
 
       }, 'resultMenu');

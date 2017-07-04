@@ -104,6 +104,13 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
     };
   });
 
+  $scope.$on('SEARCH_BOX_QUERY_CHANGED', function() {
+    if (isRelativeMenuVisible()) {
+      $scope.closeClassRelativeMenu();
+    }
+    $scope.selectedSearchResult = null;
+  });
+
   $scope.$on('KEYPRESS_CLOSE_RELATIVE_MENU', function() {
     if (isRelativeMenuVisible()) {
       $scope.closeClassRelativeMenu();
@@ -267,6 +274,12 @@ app.controller('JavadocSearchController', ['$scope', '$log', '$routeParams', '$t
           }
         });
       }
+    },
+
+    esc: function() {
+      $scope.$apply(function() {
+        $scope.selectedSearchResult = null;
+      });
     }
 
   }, 'mainController');

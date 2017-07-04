@@ -69,6 +69,10 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
         scope.relativeMenuEnabled = !scope.relativeMenuEnabled;
       });
 
+      scope.$on('SEARCH_BOX_QUERY_CHANGED', function(event) {
+        scope.relativeMenuEnabled = false;
+      });
+
 
       controller.selectItemFromHover = function(item) {
         if (!scope.relativeMenuEnabled) {
@@ -127,11 +131,21 @@ app.directive('classRelativeMenu', ['$rootScope', '$log', 'keyPressWatcher', fun
 
         enter: function() {
           scope.$apply(function() {
+            scope.relativeMenuEnabled = false;
             scope.closeClassRelativeMenu();
-            if (scope.relativeMenuEnabled) {
+            selectedItem = null;
+          })
+        },
+
+        esc: function() {
+          scope.$apply(function() {
+            scope.relativeMenuEnabled = false;
+            scope.closeClassRelativeMenu();
+            if (selectedItem !== null) {
+              scope.relativeResultItems[selectedItem].deselect();
               selectedItem = null;
             }
-          })
+          });
         }
 
       }, 'relativeMenu');
